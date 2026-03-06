@@ -1,3 +1,5 @@
 {
-  "IDX.agenticWorkspace": true
+  "IDX.agenticWorkspace": true,
+  "terminal.integrated.allowChords": false,
+  "terminal.integrated.sendKeybindingsToShell": false
 }
