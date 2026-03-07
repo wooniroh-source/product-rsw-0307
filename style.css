@@ -173,8 +173,73 @@ section { padding: 4rem 5%; }
 
 footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; margin-top: 4rem; }
 
-/* Mobile */
+/* Process Section */
+.process-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.process-step-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem 1rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.process-step-box:hover {
+    border-color: var(--secondary);
+    background: var(--light);
+    transform: translateY(-5px);
+}
+
+.step-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary);
+    color: var(--white);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0,102,204,0.2);
+}
+
+.step-icon {
+    font-size: 2.2rem;
+    color: var(--secondary);
+    margin-bottom: 1.2rem;
+}
+
+.process-step-box h4 {
+    font-size: 1.1rem;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+}
+
+.process-step-box p {
+    font-size: 0.85rem;
+    color: var(--gray);
+    line-height: 1.4;
+}
+
+/* Mobile Media Query update for process */
 @media (max-width: 768px) {
+    .process-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    .process-step-box { padding: 1.5rem 0.5rem; }
+    .process-step-box h4 { font-size: 1rem; }
+}
     nav ul { display: none; }
     
     #hero { height: 60vh; }
