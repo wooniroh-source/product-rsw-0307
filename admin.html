@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예약 관리 시스템 - 클린앤파트너즈</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <!-- 사이드바 -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>Admin</h2>
+                <p>예약 관리 시스템</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active"><a href="#"><i class="fas fa-list"></i> 예약 현황</a></li>
+                <li><a href="index.html"><i class="fas fa-home"></i> 홈페이지로</a></li>
+            </ul>
+        </aside>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>예약 현황 대시보드</h1>
+                <div class="admin-user">
+                    <span>관리자님, 환영합니다.</span>
+                </div>
+            </header>
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3>전체 예약</h3>
+                    <p id="totalCount">0건</p>
+                </div>
+                <div class="stat-card pending">
+                    <h3>대기중</h3>
+                    <p id="pendingCount">0건</p>
+                </div>
+                <div class="stat-card confirmed">
+                    <h3>예약 확정</h3>
+                    <p id="confirmedCount">0건</p>
+                </div>
+            </div>
+
+            <div class="admin-table-wrapper">
+                <div class="table-header">
+                    <h3>최신 예약 목록</h3>
+                    <button id="refreshBtn" class="btn-sm"><i class="fas fa-sync-alt"></i> 새로고침</button>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>신청일</th>
+                            <th>예약일시</th>
+                            <th>고객명</th>
+                            <th>연락처</th>
+                            <th>서비스</th>
+                            <th>상태</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservationTableBody">
+                        <!-- JS로 데이터 로딩 -->
+                    </tbody>
+                </table>
+                <div id="noDataMessage" class="no-data" style="display: none;">
+                    접수된 예약이 없습니다.
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

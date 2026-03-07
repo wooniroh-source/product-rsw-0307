@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         render();
     };
 
-    // --- 3. 예약 폼 제출 로직 ---
+    // --- 3. 예약 폼 제출 로직 (LocalStorage 저장 포함) ---
     const setupBookingForm = () => {
         const bookingForm = document.getElementById('realtimeBookingForm');
         if (!bookingForm) return;
@@ -115,8 +115,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(bookingForm);
             const data = Object.fromEntries(formData.entries());
 
-            console.log('Booking Data:', data);
-            alert(`예약이 성공적으로 접수되었습니다!\n\n일시: ${data.selected_date} ${data.booking_time}\n성함: ${data.user_name}\n\n곧 안내 문자를 발송해 드리겠습니다.`);
+            // 1. 예약 데이터 객체 생성
+            const newReservation = {
+                id: Date.now(), // 고유 ID
+                createdAt: new Date().toLocaleString(),
+                date: data.selected_date,
+                time: data.booking_time,
+                name: data.user_name,
+                phone: data.user_phone,
+                service: data.service_type,
+                status: 'pending' // pending, confirmed, cancelled
+            };
+
+            // 2. LocalStorage에서 기존 데이터 가져오기
+            const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
+            
+            // 3. 새 데이터 추가 및 저장
+            reservations.push(newReservation);
+            localStorage.setItem('reservations', JSON.stringify(reservations));
+
+            console.log('Saved Reservation:', newReservation);
+            alert(`예약이 성공적으로 접수되었습니다!\n\n일시: ${data.selected_date} ${data.booking_time}\n성함: ${data.user_name}\n\n관리자 확인 후 확정 문자를 발송해 드리겠습니다.`);
             
             bookingForm.reset();
             document.getElementById('bookingFormSection').style.display = 'none';
@@ -124,8 +143,98 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // --- 4. 관리자 페이지 로직 ---
+    const setupAdminPage = () => {
+        const tableBody = document.getElementById('reservationTableBody');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const totalCount = document.getElementById('totalCount');
+        const pendingCount = document.getElementById('pendingCount');
+        const confirmedCount = document.getElementById('confirmedCount');
+        const noDataMessage = document.getElementById('noDataMessage');
+
+        if (!tableBody) return; // 관리자 페이지가 아니면 중단
+
+        const renderTable = () => {
+            const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
+            
+            // 통계 업데이트
+            if (totalCount) totalCount.textContent = `${reservations.length}건`;
+            if (pendingCount) pendingCount.textContent = `${reservations.filter(r => r.status === 'pending').length}건`;
+            if (confirmedCount) confirmedCount.textContent = `${reservations.filter(r => r.status === 'confirmed').length}건`;
+
+            tableBody.innerHTML = '';
+
+            if (reservations.length === 0) {
+                noDataMessage.style.display = 'block';
+                return;
+            } else {
+                noDataMessage.style.display = 'none';
+            }
+
+            // 최신순 정렬
+            reservations.sort((a, b) => b.id - a.id).forEach(res => {
+                const tr = document.createElement('tr');
+                
+                let statusBadge = '';
+                if(res.status === 'pending') statusBadge = '<span class="badge pending">대기중</span>';
+                else if(res.status === 'confirmed') statusBadge = '<span class="badge confirmed">확정됨</span>';
+                else if(res.status === 'cancelled') statusBadge = '<span class="badge cancelled">취소됨</span>';
+
+                let serviceName = '';
+                switch(res.service) {
+                    case 'wall': serviceName = '벽걸이'; break;
+                    case 'stand': serviceName = '스탠드'; break;
+                    case 'multi': serviceName = '2-in-1'; break;
+                    case 'system': serviceName = '시스템'; break;
+                    default: serviceName = res.service;
+                }
+
+                tr.innerHTML = `
+                    <td>${res.createdAt.split('. ')[1] || res.createdAt}</td>
+                    <td>${res.date}<br><small>${res.time}</small></td>
+                    <td>${res.name}</td>
+                    <td>${res.phone}</td>
+                    <td>${serviceName}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        ${res.status === 'pending' ? `<button class="btn-sm btn-approve" onclick="updateStatus(${res.id}, 'confirmed')">승인</button>` : ''}
+                        ${res.status !== 'cancelled' ? `<button class="btn-sm btn-cancel" onclick="updateStatus(${res.id}, 'cancelled')">취소</button>` : ''}
+                        <button class="btn-sm btn-delete" onclick="deleteReservation(${res.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        };
+
+        // 전역 함수로 등록 (HTML onclick에서 접근 가능하도록)
+        window.updateStatus = (id, newStatus) => {
+            const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
+            const index = reservations.findIndex(r => r.id === id);
+            if (index !== -1) {
+                reservations[index].status = newStatus;
+                localStorage.setItem('reservations', JSON.stringify(reservations));
+                renderTable();
+            }
+        };
+
+        window.deleteReservation = (id) => {
+            if(!confirm('정말 삭제하시겠습니까?')) return;
+            const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
+            const newReservations = reservations.filter(r => r.id !== id);
+            localStorage.setItem('reservations', JSON.stringify(newReservations));
+            renderTable();
+        };
+
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', renderTable);
+        }
+
+        renderTable();
+    };
+
     // 실행
     setupNavigation();
     setupCalendar();
     setupBookingForm();
+    setupAdminPage();
 });
