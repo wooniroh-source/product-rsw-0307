@@ -21,6 +21,54 @@ nav ul { display: flex; list-style: none; gap: 1.5rem; }
 nav a { text-decoration: none; color: var(--dark); font-weight: 600; font-size: 0.95rem; }
 nav a:hover { color: var(--primary); }
 
+/* Hero Banner */
+#hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1590402444816-05d848218571?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+    background-size: cover;
+    background-position: center;
+    height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    text-align: center;
+    margin-top: -1px; /* To prevent gap with header */
+}
+
+.hero-content h2 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    line-height: 1.2;
+}
+
+.hero-content p {
+    font-size: 1.4rem;
+    margin-bottom: 2.5rem;
+    text-shadow: 0 1px 5px rgba(0,0,0,0.4);
+    font-weight: 400;
+}
+
+.hero-btns .btn {
+    display: inline-block;
+    padding: 1.2rem 3rem;
+    background: var(--primary);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0,102,204,0.3);
+}
+
+.hero-btns .btn:hover {
+    background: var(--secondary);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,168,232,0.4);
+}
+
 section { padding: 4rem 5%; }
 .section-title { text-align: center; margin-bottom: 3rem; }
 .section-title h2 { font-size: 2.2rem; color: var(--primary); margin-bottom: 0.5rem; }
@@ -68,6 +116,12 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
 /* Mobile */
 @media (max-width: 768px) {
     nav ul { display: none; }
+    
+    #hero { height: 60vh; }
+    .hero-content h2 { font-size: 2.2rem; }
+    .hero-content p { font-size: 1.1rem; }
+    .hero-btns .btn { padding: 1rem 2rem; font-size: 1.1rem; }
+
     .day-cell { min-height: 70px; padding: 0.3rem; }
     .day-num { font-size: 0.9rem; }
     .day-status { font-size: 0.6rem; padding: 1px 3px; }
