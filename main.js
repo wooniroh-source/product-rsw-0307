@@ -232,15 +232,79 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTable();
     };
 
-    // --- 5. 히어로 슬라이더 로직 ---
+    // --- 5. 히어로 슬라이더 로직 (동적 로딩 포함) ---
     const setupHeroSlider = () => {
-        const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.slider-dots .dot');
+        const sliderContainer = document.querySelector('.slider-container');
+        const dotsContainer = document.querySelector('.slider-dots');
         const prevBtn = document.querySelector('.slider-arrow.prev');
         const nextBtn = document.querySelector('.slider-arrow.next');
         
-        if (slides.length === 0) return;
+        if (!sliderContainer) return;
 
+        // 1. 배너 데이터 가져오기 (LocalStorage 또는 기본값)
+        let banners = JSON.parse(localStorage.getItem('banners') || '[]');
+        
+        // 데이터가 없으면 기본값 설정
+        if (banners.length === 0) {
+            banners = [
+                {
+                    id: 1,
+                    title: "당신의 숨결을 디자인합니다",
+                    desc: "전문 분해 세척으로 시작하는 깨끗한 실내 공기 솔루션",
+                    url: "https://images.unsplash.com/photo-1590402444816-05d848218571?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+                    btnText: "온라인 예약하기",
+                    btnLink: "reservation.html"
+                },
+                {
+                    id: 2,
+                    title: "10년 경력의 베테랑 엔지니어",
+                    desc: "까다로운 시스템 에어컨부터 가정용까지 완벽하게 케어합니다",
+                    url: "https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+                    btnText: "서비스 상세 보기",
+                    btnLink: "services.html"
+                },
+                {
+                    id: 3,
+                    title: "친환경 세제 안심 공법",
+                    desc: "우리가족 건강을 생각하는 FDA 승인 친환경 약품 사용",
+                    url: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+                    btnText: "브랜드 스토리",
+                    btnLink: "about.html"
+                }
+            ];
+        }
+
+        // 2. 슬라이드 DOM 생성
+        sliderContainer.innerHTML = '';
+        dotsContainer.innerHTML = '';
+
+        banners.forEach((banner, index) => {
+            const slide = document.createElement('div');
+            slide.classList.add('slide');
+            if (index === 0) slide.classList.add('active');
+            slide.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${banner.url}')`;
+            
+            slide.innerHTML = `
+                <div class="hero-content">
+                    <h2>${banner.title}</h2>
+                    <p>${banner.desc}</p>
+                    <div class="hero-btns">
+                        <a href="${banner.btnLink}" class="btn">${banner.btnText}</a>
+                    </div>
+                </div>
+            `;
+            sliderContainer.appendChild(slide);
+
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+            dot.setAttribute('data-index', index);
+            dotsContainer.appendChild(dot);
+        });
+
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.slider-dots .dot');
+        
         let currentSlide = 0;
         let slideInterval;
 
@@ -248,9 +312,11 @@ document.addEventListener('DOMContentLoaded', () => {
             slides.forEach(s => s.classList.remove('active'));
             dots.forEach(d => d.classList.remove('active'));
             
-            slides[index].classList.add('active');
-            dots[index].classList.add('active');
-            currentSlide = index;
+            if (slides[index]) {
+                slides[index].classList.add('active');
+                dots[index].classList.add('active');
+                currentSlide = index;
+            }
         };
 
         const nextSlide = () => {
@@ -265,7 +331,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const startAutoSlide = () => {
             stopAutoSlide();
-            slideInterval = setInterval(nextSlide, 5000);
+            if (slides.length > 1) {
+                slideInterval = setInterval(nextSlide, 5000);
+            }
         };
 
         const stopAutoSlide = () => {
@@ -286,16 +354,94 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        dots.forEach(dot => {
-            dot.addEventListener('click', () => {
-                const index = parseInt(dot.getAttribute('data-index'));
+        dotsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('dot')) {
+                const index = parseInt(e.target.getAttribute('data-index'));
                 showSlide(index);
                 startAutoSlide();
-            });
+            }
         });
 
-        // 초기 시작
         startAutoSlide();
+    };
+
+    // --- 6. 관리자 페이지: 섹션 전환 및 배너 관리 ---
+    window.showSection = (sectionId) => {
+        const reservationsSection = document.getElementById('section-reservations');
+        const bannersSection = document.getElementById('section-banners');
+        const resMenu = document.getElementById('menu-reservations');
+        const banMenu = document.getElementById('menu-banners');
+
+        if (reservationsSection) reservationsSection.style.display = sectionId === 'reservations' ? 'block' : 'none';
+        if (bannersSection) bannersSection.style.display = sectionId === 'banners' ? 'block' : 'none';
+        
+        if (resMenu) resMenu.classList.toggle('active', sectionId === 'reservations');
+        if (banMenu) banMenu.classList.toggle('active', sectionId === 'banners');
+
+        if (sectionId === 'banners') renderBannerTable();
+    };
+
+    const renderBannerTable = () => {
+        const bannerTableBody = document.getElementById('bannerTableBody');
+        if (!bannerTableBody) return;
+
+        const banners = JSON.parse(localStorage.getItem('banners') || '[]');
+        bannerTableBody.innerHTML = '';
+
+        if (banners.length === 0) {
+            bannerTableBody.innerHTML = '<tr><td colspan="3" class="no-data">등록된 배너가 없습니다. 기본 배너가 표시됩니다.</td></tr>';
+            return;
+        }
+
+        banners.forEach(banner => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><img src="${banner.url}" style="width: 150px; height: 80px; object-fit: cover; border-radius: 4px;"></td>
+                <td>
+                    <strong>${banner.title}</strong><br>
+                    <small>${banner.desc}</small><br>
+                    <span style="font-size: 0.8rem; color: var(--primary);">${banner.btnText} -> ${banner.btnLink}</span>
+                </td>
+                <td>
+                    <button class="btn-sm btn-cancel" onclick="deleteBanner(${banner.id})">삭제</button>
+                </td>
+            `;
+            bannerTableBody.appendChild(tr);
+        });
+    };
+
+    const setupBannerForm = () => {
+        const bannerForm = document.getElementById('bannerForm');
+        if (!bannerForm) return;
+
+        bannerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(bannerForm);
+            const banners = JSON.parse(localStorage.getItem('banners') || '[]');
+            
+            const newBanner = {
+                id: Date.now(),
+                title: formData.get('bannerTitle'),
+                url: formData.get('bannerUrl'),
+                desc: formData.get('bannerDesc'),
+                btnText: formData.get('bannerBtnText'),
+                btnLink: formData.get('bannerBtnLink')
+            };
+
+            banners.push(newBanner);
+            localStorage.setItem('banners', JSON.stringify(banners));
+            alert('배너가 등록되었습니다.');
+            bannerForm.reset();
+            renderBannerTable();
+        });
+    };
+
+    window.deleteBanner = (id) => {
+        if (!confirm('배너를 삭제하시겠습니까?')) return;
+        let banners = JSON.parse(localStorage.getItem('banners') || '[]');
+        banners = banners.filter(b => b.id !== id);
+        localStorage.setItem('banners', JSON.stringify(banners));
+        renderBannerTable();
     };
 
     // 실행
@@ -304,4 +450,5 @@ document.addEventListener('DOMContentLoaded', () => {
     setupBookingForm();
     setupAdminPage();
     setupHeroSlider();
+    setupBannerForm();
 });

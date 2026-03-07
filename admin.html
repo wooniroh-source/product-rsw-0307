@@ -13,61 +13,119 @@
         <aside class="admin-sidebar">
             <div class="sidebar-header">
                 <h2>Admin</h2>
-                <p>예약 관리 시스템</p>
+                <p>관리 시스템</p>
             </div>
             <ul class="sidebar-menu">
-                <li class="active"><a href="#"><i class="fas fa-list"></i> 예약 현황</a></li>
+                <li class="active" id="menu-reservations"><a href="#" onclick="showSection('reservations')"><i class="fas fa-list"></i> 예약 현황</a></li>
+                <li id="menu-banners"><a href="#" onclick="showSection('banners')"><i class="fas fa-images"></i> 배너 관리</a></li>
                 <li><a href="index.html"><i class="fas fa-home"></i> 홈페이지로</a></li>
             </ul>
         </aside>
 
         <!-- 메인 콘텐츠 -->
         <main class="admin-content">
-            <header class="admin-header">
-                <h1>예약 현황 대시보드</h1>
-                <div class="admin-user">
-                    <span>관리자님, 환영합니다.</span>
-                </div>
-            </header>
+            <!-- 예약 현황 섹션 -->
+            <div id="section-reservations">
+                <header class="admin-header">
+                    <h1>예약 현황 대시보드</h1>
+                    <div class="admin-user">
+                        <span>관리자님, 환영합니다.</span>
+                    </div>
+                </header>
 
-            <div class="dashboard-stats">
-                <div class="stat-card">
-                    <h3>전체 예약</h3>
-                    <p id="totalCount">0건</p>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>전체 예약</h3>
+                        <p id="totalCount">0건</p>
+                    </div>
+                    <div class="stat-card pending">
+                        <h3>대기중</h3>
+                        <p id="pendingCount">0건</p>
+                    </div>
+                    <div class="stat-card confirmed">
+                        <h3>예약 확정</h3>
+                        <p id="confirmedCount">0건</p>
+                    </div>
                 </div>
-                <div class="stat-card pending">
-                    <h3>대기중</h3>
-                    <p id="pendingCount">0건</p>
-                </div>
-                <div class="stat-card confirmed">
-                    <h3>예약 확정</h3>
-                    <p id="confirmedCount">0건</p>
+
+                <div class="admin-table-wrapper">
+                    <div class="table-header">
+                        <h3>최신 예약 목록</h3>
+                        <button id="refreshBtn" class="btn-sm"><i class="fas fa-sync-alt"></i> 새로고침</button>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>신청일</th>
+                                <th>예약일시</th>
+                                <th>고객명</th>
+                                <th>연락처</th>
+                                <th>서비스</th>
+                                <th>상태</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservationTableBody">
+                            <!-- JS로 데이터 로딩 -->
+                        </tbody>
+                    </table>
+                    <div id="noDataMessage" class="no-data" style="display: none;">
+                        접수된 예약이 없습니다.
+                    </div>
                 </div>
             </div>
 
-            <div class="admin-table-wrapper">
-                <div class="table-header">
-                    <h3>최신 예약 목록</h3>
-                    <button id="refreshBtn" class="btn-sm"><i class="fas fa-sync-alt"></i> 새로고침</button>
+            <!-- 배너 관리 섹션 -->
+            <div id="section-banners" style="display: none;">
+                <header class="admin-header">
+                    <h1>메인 슬라이드 배너 관리</h1>
+                </header>
+
+                <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+                    <h3>새 배너 추가</h3>
+                    <form id="bannerForm" style="margin-top: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div class="input-group">
+                                <label>배너 제목</label>
+                                <input type="text" name="bannerTitle" placeholder="예: 프리미엄 에어컨 케어" required>
+                            </div>
+                            <div class="input-group">
+                                <label>배너 이미지 URL</label>
+                                <input type="url" name="bannerUrl" placeholder="https://example.com/image.jpg" required>
+                            </div>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 1rem;">
+                            <label>배너 설명</label>
+                            <input type="text" name="bannerDesc" placeholder="배너에 표시될 상세 설명 문구" required>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div class="input-group">
+                                <label>버튼 텍스트</label>
+                                <input type="text" name="bannerBtnText" placeholder="예: 예약하기" required>
+                            </div>
+                            <div class="input-group">
+                                <label>버튼 링크</label>
+                                <input type="text" name="bannerBtnLink" placeholder="reservation.html" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-booking-btn" style="width: auto; padding: 0.8rem 2rem;">배너 등록하기</button>
+                    </form>
                 </div>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>신청일</th>
-                            <th>예약일시</th>
-                            <th>고객명</th>
-                            <th>연락처</th>
-                            <th>서비스</th>
-                            <th>상태</th>
-                            <th>관리</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reservationTableBody">
-                        <!-- JS로 데이터 로딩 -->
-                    </tbody>
-                </table>
-                <div id="noDataMessage" class="no-data" style="display: none;">
-                    접수된 예약이 없습니다.
+
+                <div class="admin-table-wrapper">
+                    <h3>현재 등록된 배너 목록</h3>
+                    <table class="admin-table" style="margin-top: 1rem;">
+                        <thead>
+                            <tr>
+                                <th>이미지 미리보기</th>
+                                <th>내용</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bannerTableBody">
+                            <!-- JS로 데이터 로딩 -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </main>
