@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문의하기 - 클린앤파트너즈</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">클린앤파트너즈 에어컨청소 서비스</a>
+            <ul>
+                <li><a href="index.html">홈</a></li>
+                <li><a href="services.html">우리의 서비스</a></li>
+                <li><a href="reservation.html">실시간 예약</a></li>
+                <li><a href="about.html">왜 우리인가?</a></li>
+                <li><a href="contact.html">문의하기</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="contact">
+            <h2><i class="fas fa-envelope"></i> 상담 및 예약</h2>
+            <p style="text-align: center; margin-bottom: 2rem;">궁금하신 사항을 남겨주시면 담당자가 확인 후 연락드리겠습니다.</p>
+            <form>
+                <label for="name">이름:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="phone">연락처:</label>
+                <input type="tel" id="phone" name="phone" required>
+                <label for="message">문의 내용:</label>
+                <textarea id="message" name="message" rows="5"></textarea>
+                <button type="submit" class="btn primary-btn">문의하기</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 클린앤파트너즈 에어컨 청소 서비스. All rights reserved.</p>
+    </footer>
+    <script src="main.js"></script>
+</body>
+</html>
