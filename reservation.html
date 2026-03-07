@@ -11,13 +11,18 @@
     <header>
         <nav>
             <a href="index.html" class="logo">클린앤파트너즈</a>
-            <ul>
+            <ul class="nav-menu">
                 <li><a href="index.html">홈</a></li>
                 <li><a href="services.html">서비스 안내</a></li>
                 <li><a href="reservation.html">실시간 예약</a></li>
                 <li><a href="about.html">브랜드 소개</a></li>
                 <li><a href="contact.html">고객센터</a></li>
             </ul>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
         </nav>
     </header>
 
@@ -33,7 +38,7 @@
                 <div class="calendar-wrapper">
                     <div class="calendar-controls">
                         <button id="prevMonthBtn"><i class="fas fa-chevron-left"></i></button>
-                        <h3 id="calendarTitle">2026년 3월</h3>
+                        <h3 id="calendarTitle">로딩 중...</h3>
                         <button id="nextMonthBtn"><i class="fas fa-chevron-right"></i></button>
                     </div>
                     <div class="calendar-weekdays">
@@ -49,7 +54,7 @@
                 </div>
 
                 <!-- 예약 폼 섹션 (기본 숨김) -->
-                <div id="bookingFormSection" class="booking-form-wrapper" style="display: none;">
+                <div id="bookingFormSection" class="booking-form-wrapper" style="display: none; margin-top: 3rem;">
                     <div class="form-card">
                         <h3><i class="fas fa-check-circle"></i> <span id="displaySelectedDate"></span> 예약</h3>
                         <form id="realtimeBookingForm">
@@ -99,6 +104,7 @@
         <div class="footer-content">
             <p>클린앤파트너즈 에어컨 토탈 케어 | 상담전화: 1588-0000</p>
             <p>&copy; 2026 클린앤파트너즈. All rights reserved.</p>
+            <p style="margin-top: 10px; font-size: 0.8rem;"><a href="admin.html" style="color: #444; text-decoration: none;">Admin</a></p>
         </div>
     </footer>
 

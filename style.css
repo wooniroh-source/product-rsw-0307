@@ -386,6 +386,105 @@ section { padding: 6rem 5%; max-width: 1400px; margin: 0 auto; width: 100%; }
 .status-badge.pending { background: #fff3cd; color: #856404; }
 .status-badge.confirmed { background: #d4edda; color: #155724; }
 
+/* Price Table Styles */
+.price-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.price-table th, .price-table td {
+    padding: 1.2rem;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.price-table th {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 700;
+}
+
+.price-table tr:hover {
+    background: var(--light);
+}
+
+/* About Page Specific */
+.reasons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.reason {
+    background: #fff;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.reason i {
+    font-size: 3rem;
+    color: var(--secondary);
+    margin-bottom: 1.5rem;
+}
+
+/* Contact Form */
+#contact form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+#contact form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+#contact form input, #contact form textarea {
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.primary-btn:hover {
+    background: var(--secondary);
+}
+
+/* Reservation Page Calendar */
+.reservation-container { max-width: 1100px; margin: 0 auto; }
+.calendar-wrapper { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; box-shadow: var(--shadow); }
+.calendar-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.calendar-controls h3 { font-size: 1.5rem; color: var(--primary); }
+.calendar-days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.day-cell { min-height: 120px; border: 1px solid #f0f0f0; border-radius: 8px; padding: 0.8rem; }
+
 /* Footer */
 footer { background: #1a1a1a; color: #eee; padding: 5rem 5%; text-align: center; margin-top: 5rem; }
 .footer-content { max-width: 1200px; margin: 0 auto; }
@@ -460,6 +559,8 @@ footer { background: #1a1a1a; color: #eee; padding: 5rem 5%; text-align: center;
     .rolling-item .col:nth-child(4), .rolling-item .col:nth-child(5) {
         display: none;
     }
+
+    #contact form { padding: 2rem 1.5rem; }
 }
 
 /* Small Mobile (under 480px) */
@@ -472,6 +573,9 @@ footer { background: #1a1a1a; color: #eee; padding: 5rem 5%; text-align: center;
     
     .rolling-container { height: 300px; }
     .rolling-item { height: 60px; font-size: 0.8rem; }
+
+    .price-table { font-size: 0.8rem; }
+    .price-table th, .price-table td { padding: 0.8rem 0.5rem; }
 }
 
 /* --- Admin Dashboard Layout --- */
