@@ -1,12 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+    // Smooth scrolling for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                e.preventDefault();
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
         });
     });
 
@@ -44,23 +49,31 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 1; i <= lastDateOfMonth; i++) {
             const dayElement = document.createElement('div');
             dayElement.classList.add('calendar-day');
-            dayElement.textContent = i;
+            
+            // Randomly mark some days as full for "real-time" feel
+            const isFull = (i % 7 === 0 || i % 5 === 0) && i !== today.getDate();
+            
+            dayElement.innerHTML = `<span>${i}</span><div class="status ${isFull ? 'full' : 'avail'}">${isFull ? '마감' : '가능'}</div>`;
 
             if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) {
                 dayElement.classList.add('today');
             }
 
-            dayElement.addEventListener('click', () => {
-                document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
-                dayElement.classList.add('selected');
-                
-                const selectedDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                selectedDateText.textContent = `${year}년 ${month + 1}월 ${i}일`;
-                selectedDateInput.value = selectedDateStr;
-                reservationFormContainer.style.display = 'block';
-                
-                reservationFormContainer.scrollIntoView({ behavior: 'smooth' });
-            });
+            if (isFull) {
+                dayElement.classList.add('full-day');
+            } else {
+                dayElement.addEventListener('click', () => {
+                    document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
+                    dayElement.classList.add('selected');
+                    
+                    const selectedDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                    selectedDateText.textContent = `${year}년 ${month + 1}월 ${i}일`;
+                    selectedDateInput.value = selectedDateStr;
+                    reservationFormContainer.style.display = 'block';
+                    
+                    reservationFormContainer.scrollIntoView({ behavior: 'smooth' });
+                });
+            }
 
             calendarGrid.appendChild(dayElement);
         }

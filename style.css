@@ -189,13 +189,46 @@ section {
 }
 
 .calendar-day {
-    padding: 1rem;
+    padding: 0.5rem;
     border-radius: 4px;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    border: 1px solid #f0f0f0;
 }
 
-.calendar-day.today { background: var(--secondary-color); color: white; }
-.calendar-day.selected { background: var(--primary-color); color: white; }
+.calendar-day .status {
+    font-size: 0.75rem;
+    margin-top: 5px;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.status.avail { background: #e3f2fd; color: #1976d2; }
+.status.full { background: #ffebee; color: #d32f2f; }
+
+.calendar-day.full-day {
+    cursor: not-allowed;
+    background-color: #fafafa;
+}
+
+.calendar-day.today { 
+    background: var(--secondary-color); 
+    color: white; 
+    border-color: var(--secondary-color);
+}
+.calendar-day.selected { 
+    background: var(--primary-color); 
+    color: white; 
+    border-color: var(--primary-color);
+}
+
+.calendar-grid-header div {
+    padding-bottom: 10px;
+}
 
 /* Pricing Table */
 .price-table {
