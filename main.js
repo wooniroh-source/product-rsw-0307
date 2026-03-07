@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 메뉴 클릭 시 자동으로 닫기 (앵커 링크인 경우)
         document.querySelectorAll('.nav-menu a').forEach(link => {
             link.addEventListener('click', () => {
-                if (navMenu.classList.contains('active')) {
+                if (navMenu && navMenu.classList.contains('active')) {
                     menuToggle.classList.remove('active');
                     navMenu.classList.remove('active');
                 }
@@ -25,12 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // 스크롤 시 헤더 스타일 변경
         const header = document.querySelector('header');
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.style.padding = '0.8rem 5%';
-                header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-            } else {
-                header.style.padding = '1.2rem 5%';
-                header.style.boxShadow = 'none';
+            if (header) {
+                if (window.scrollY > 50) {
+                    header.style.padding = '0.8rem 5%';
+                    header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                } else {
+                    header.style.padding = '1.2rem 5%';
+                    header.style.boxShadow = 'none';
+                }
             }
         });
     };
@@ -56,17 +58,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const year = viewDate.getFullYear();
             const month = viewDate.getMonth();
 
-            calendarTitle.textContent = `${year}년 ${month + 1}월`;
+            if (calendarTitle) calendarTitle.textContent = `${year}년 ${month + 1}월`;
 
             const firstDayIndex = new Date(year, month, 1).getDay();
             const lastDayDate = new Date(year, month + 1, 0).getDate();
 
+            // 이전 달 빈칸
             for (let i = 0; i < firstDayIndex; i++) {
                 const emptyDiv = document.createElement('div');
                 emptyDiv.classList.add('day-cell', 'empty');
                 calendarDaysGrid.appendChild(emptyDiv);
             }
 
+            // 이번 달 날짜 채우기
             for (let day = 1; day <= lastDayDate; day++) {
                 const dayCell = document.createElement('div');
                 dayCell.classList.add('day-cell');
@@ -87,15 +91,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (!isPast && !isFull) {
                     dayCell.addEventListener('click', () => {
+                        // 선택 표시 초기화
                         document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('active'));
                         dayCell.classList.add('active');
 
+                        // 폼 표시 및 데이터 설정
                         const formattedDate = `${year}년 ${month + 1}월 ${day}일`;
-                        displaySelectedDate.textContent = formattedDate;
-                        inputSelectedDate.value = `${year}-${month + 1}-${day}`;
+                        if (displaySelectedDate) displaySelectedDate.textContent = formattedDate;
+                        if (inputSelectedDate) inputSelectedDate.value = `${year}-${month + 1}-${day}`;
                         
-                        bookingFormSection.style.display = 'block';
-                        bookingFormSection.scrollIntoView({ behavior: 'smooth' });
+                        if (bookingFormSection) {
+                            bookingFormSection.style.display = 'block';
+                            bookingFormSection.scrollIntoView({ behavior: 'smooth' });
+                        }
                     });
                 }
                 calendarDaysGrid.appendChild(dayCell);
@@ -148,9 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             alert('예약이 성공적으로 접수되었습니다!');
             bookingForm.reset();
-            document.getElementById('bookingFormSection').style.display = 'none';
+            const bookingFormSection = document.getElementById('bookingFormSection');
+            if (bookingFormSection) bookingFormSection.style.display = 'none';
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
+            // 실시간 현황 업데이트
             if (document.getElementById('live-reservation-list')) setupLiveReservationStatus();
         });
     };
@@ -323,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 2, title: "쾌적한 여름의 시작", desc: "지금 예약하고 시원한 바람을 만나보세요.", url: "https://images.unsplash.com/photo-1563453392212-326f5e854473?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" }
     ];
 
-    // --- 7. 6단계 안심 공정 관리 로직 ---
+    // --- 7. 6단계 안심 공정 데이터 ---
     const defaultProcess = [
         { title: "사전 점검", desc: "작동 상태 및 오염도 확인", url: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", icon: "fa-clipboard-check" },
         { title: "부품 분해", desc: "완전 분해를 통한 내부 노출", url: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", icon: "fa-tools" },
@@ -347,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // --- 8. 실시간 서비스 현황 로직 (롤링 5개) ---
+    // --- 8. 실시간 서비스 현황 로직 ---
     const setupLiveReservationStatus = () => {
         const container = document.getElementById('live-reservation-list');
         if (!container) return;
