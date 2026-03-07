@@ -1,20 +1,43 @@
-/* General Styles */
-body {
-    font-family: 'Segoe UI', Roboto, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f7fc;
-    color: #333;
+/* Root Variables - Inspired by Clean/Medical feel */
+:root {
+    --primary-color: #0066cc;
+    --secondary-color: #00a8e8;
+    --accent-color: #f8b400;
+    --text-color: #333;
+    --light-bg: #f9fbfd;
+    --white: #ffffff;
+    --gray: #777;
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
 }
 
-/* Header & Navigation */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--white);
+}
+
+/* Typography */
+h1, h2, h3 {
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* Layout */
 header {
-    background-color: #fff;
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background: var(--white);
+    padding: 1rem 5%;
     position: sticky;
     top: 0;
     z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
 nav {
@@ -23,328 +46,182 @@ nav {
     align-items: center;
 }
 
-nav .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #007bff;
+.logo {
+    font-size: 1.4rem;
+    color: var(--primary-color);
     text-decoration: none;
+    font-weight: 800;
 }
 
 nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
     display: flex;
-    gap: 1.5rem;
+    list-style: none;
+    gap: 2rem;
 }
 
 nav a {
     text-decoration: none;
-    color: #555;
-    font-weight: 500;
-    transition: color 0.3s;
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1rem;
 }
 
 nav a:hover {
-    color: #007bff;
-}
-
-/* Hero Section */
-#hero {
-    background: url('https://images.unsplash.com/photo-1621905251918-48416bd8575a?q=80&w=1920&auto=format&fit=crop') no-repeat center center/cover;
-    color: #fff;
-    text-align: center;
-    padding: 10rem 2rem;
-    position: relative;
-}
-
-#hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 123, 255, 0.7);
-}
-
-#hero .hero-content {
-    position: relative;
-    z-index: 1;
-}
-
-#hero h2 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-#hero p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-}
-
-.btn {
-    background-color: #fff;
-    color: #007bff;
-    padding: 0.8rem 1.5rem;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: bold;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s;
-}
-
-.btn:hover {
-    background-color: #f0f0f0;
-    transform: translateY(-2px);
+    color: var(--primary-color);
 }
 
 /* Sections */
 section {
-    padding: 4rem 2rem;
+    padding: 5rem 10%;
 }
 
-section h2 {
+.section-title {
     text-align: center;
-    font-size: 2.5rem;
     margin-bottom: 3rem;
-    color: #007bff;
 }
 
-section h2 i {
-    margin-right: 0.5rem;
-}
-
-/* Service Section */
-.service-items {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-.service-item {
-    background: #fff;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 300px;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.service-item:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.service-item i {
-    font-size: 3rem;
-    color: #007bff;
-    margin-bottom: 1rem;
-}
-
-/* Why Choose Us Section */
-.reasons {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-.reason {
-    background: #fff;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    width: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.reason i {
+.section-title h2 {
     font-size: 2.5rem;
-    color: #007bff;
+    color: var(--primary-color);
     margin-bottom: 1rem;
 }
 
-/* Reservation Calendar Styles */
-.calendar-container {
-    max-width: 600px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+/* Hero */
+#hero {
+    height: 70vh;
+    background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1621905251918-48416bd8575a?q=80&w=1920&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    text-align: center;
 }
 
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.hero-content h2 {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.hero-content p {
+    font-size: 1.4rem;
     margin-bottom: 2rem;
 }
 
-.calendar-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: #333;
+.btn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: var(--primary-color);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 700;
+    transition: var(--transition);
 }
 
-.calendar-header button {
-    background: none;
-    border: 1px solid #007bff;
-    color: #007bff;
+.btn:hover {
+    background: var(--secondary-color);
+    transform: translateY(-3px);
+}
+
+/* Service Cards */
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.service-card {
+    background: var(--light-bg);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    transition: var(--transition);
+    border: 1px solid #eee;
+}
+
+.service-card:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    background: var(--white);
+}
+
+.service-card i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+/* Process Steps */
+.process-steps {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.step {
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+    position: relative;
+}
+
+.step-num {
     width: 40px;
     height: 40px;
+    background: var(--primary-color);
+    color: var(--white);
     border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.calendar-header button:hover {
-    background-color: #007bff;
-    color: #fff;
-}
-
-.calendar-grid-header {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
     font-weight: bold;
-    color: #555;
-    margin-bottom: 1rem;
 }
 
-.calendar-grid-header div:first-child { color: #f44336; }
-.calendar-grid-header div:last-child { color: #007bff; }
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
+/* Calendar & Form Styling */
+.calendar-container {
+    background: var(--white);
+    border: 1px solid #eee;
+    border-radius: var(--border-radius);
+    padding: 2rem;
 }
 
 .calendar-day {
-    padding: 1rem 0;
-    text-align: center;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    font-weight: 500;
-}
-
-.calendar-day:hover:not(.empty) {
-    background-color: #e3f2fd;
-}
-
-.calendar-day.today {
-    background-color: #007bff;
-    color: #fff !important;
-}
-
-.calendar-day.selected {
-    background-color: #0056b3;
-    color: #fff !important;
-}
-
-.calendar-day.empty {
-    cursor: default;
-}
-
-/* Reservation Form */
-.reservation-form-container {
-    max-width: 600px;
-    margin: 2rem auto 0;
-    background: #fff;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.reservation-form-container h3 {
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    color: #333;
-    text-align: center;
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-}
-
-.form-group select,
-.form-group input {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.primary-btn {
-    background-color: #007bff;
-    color: #fff;
-    width: 100%;
-    border: none;
-    font-size: 1.1rem;
     padding: 1rem;
+    border-radius: 4px;
     cursor: pointer;
 }
 
-.primary-btn:hover {
-    background-color: #0056b3;
-    color: #fff;
-}
+.calendar-day.today { background: var(--secondary-color); color: white; }
+.calendar-day.selected { background: var(--primary-color); color: white; }
 
-/* Contact Form */
-#contact form {
-    max-width: 600px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-#contact label {
-    font-weight: bold;
-}
-
-#contact input,
-#contact textarea {
+/* Pricing Table */
+.price-table {
     width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border-collapse: collapse;
+    margin-top: 2rem;
 }
+
+.price-table th, .price-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+.price-table th { background: var(--light-bg); }
 
 /* Footer */
 footer {
-    background-color: #007bff;
-    color: #fff;
+    background: #222;
+    color: #eee;
+    padding: 4rem 10% 2rem;
     text-align: center;
-    padding: 1.5rem 2rem;
 }
 
-/* Responsive Media Queries */
 @media (max-width: 768px) {
-    nav ul {
-        display: none; /* Hide for now, can be a hamburger menu */
-    }
-
-    #hero h2 {
-        font-size: 2.5rem;
-    }
-
-    .service-items, .reasons {
-        flex-direction: column;
-        align-items: center;
-    }
+    section { padding: 3rem 5%; }
+    .hero-content h2 { font-size: 2.5rem; }
+    nav ul { display: none; } /* Mobile menu simplified */
 }
