@@ -1,124 +1,131 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-    // Smooth scrolling for internal links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                e.preventDefault();
-                targetElement.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
+    
+    // --- 1. 내비게이션 및 스크롤 로직 ---
+    const setupNavigation = () => {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    e.preventDefault();
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
         });
-    });
+    };
 
-    // Reservation Calendar Logic
-    const calendarGrid = document.getElementById('calendarGrid');
-    const currentMonthYear = document.getElementById('currentMonthYear');
-    const prevMonthBtn = document.getElementById('prevMonth');
-    const nextMonthBtn = document.getElementById('nextMonth');
-    const reservationFormContainer = document.getElementById('reservationFormContainer');
-    const selectedDateText = document.getElementById('selectedDateText');
-    const selectedDateInput = document.getElementById('selectedDateInput');
-    const reservationForm = document.getElementById('reservationForm');
-
-    let currentDate = new Date();
-
-    function renderCalendar(date) {
-        calendarGrid.innerHTML = '';
-        const year = date.getFullYear();
-        const month = date.getMonth();
+    // --- 2. 예약 달력 핵심 로직 ---
+    const setupCalendar = () => {
+        const calendarDaysGrid = document.getElementById('calendarDays');
+        const calendarTitle = document.getElementById('calendarTitle');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+        const bookingFormSection = document.getElementById('bookingFormSection');
+        const displaySelectedDate = document.getElementById('displaySelectedDate');
+        const inputSelectedDate = document.getElementById('inputSelectedDate');
         
-        currentMonthYear.textContent = `${year}년 ${month + 1}월`;
+        if (!calendarDaysGrid) return; // 달력이 없는 페이지면 중단
 
-        const firstDayOfMonth = new Date(year, month, 1).getDay();
-        const lastDateOfMonth = new Date(year, month + 1, 0).getDate();
-
-        // Previous month days (empty slots)
-        for (let i = 0; i < firstDayOfMonth; i++) {
-            const emptyDay = document.createElement('div');
-            emptyDay.classList.add('calendar-day', 'empty');
-            calendarGrid.appendChild(emptyDay);
-        }
-
-        // Current month days
+        let viewDate = new Date(); // 현재 보고 있는 달력의 날짜
         const today = new Date();
-        for (let i = 1; i <= lastDateOfMonth; i++) {
-            const dayElement = document.createElement('div');
-            dayElement.classList.add('calendar-day');
-            
-            // Randomly mark some days as full for "real-time" feel
-            const isFull = (i % 7 === 0 || i % 5 === 0) && i !== today.getDate();
-            
-            dayElement.innerHTML = `<span>${i}</span><div class="status ${isFull ? 'full' : 'avail'}">${isFull ? '마감' : '가능'}</div>`;
+        today.setHours(0, 0, 0, 0);
 
-            if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) {
-                dayElement.classList.add('today');
+        const render = () => {
+            calendarDaysGrid.innerHTML = '';
+            const year = viewDate.getFullYear();
+            const month = viewDate.getMonth();
+
+            calendarTitle.textContent = `${year}년 ${month + 1}월`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const lastDayDate = new Date(year, month + 1, 0).getDate();
+
+            // 이전 달 빈칸
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.classList.add('day-cell', 'empty');
+                calendarDaysGrid.appendChild(emptyDiv);
             }
 
-            if (isFull) {
-                dayElement.classList.add('full-day');
-            } else {
-                dayElement.addEventListener('click', () => {
-                    document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
-                    dayElement.classList.add('selected');
-                    
-                    const selectedDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                    selectedDateText.textContent = `${year}년 ${month + 1}월 ${i}일`;
-                    selectedDateInput.value = selectedDateStr;
-                    reservationFormContainer.style.display = 'block';
-                    
-                    reservationFormContainer.scrollIntoView({ behavior: 'smooth' });
-                });
+            // 이번 달 날짜 채우기
+            for (let day = 1; day <= lastDayDate; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.classList.add('day-cell');
+                
+                const cellDate = new Date(year, month, day);
+                const isPast = cellDate < today;
+                const isToday = cellDate.getTime() === today.getTime();
+                
+                // 가상의 예약 마감 데이터 (주말은 마감으로 가정)
+                const isFull = (cellDate.getDay() === 0 || cellDate.getDay() === 6);
+
+                dayCell.innerHTML = `
+                    <span class="day-num">${day}</span>
+                    <span class="day-status ${isPast ? 'past' : (isFull ? 'full' : 'avail')}">
+                        ${isPast ? '종료' : (isFull ? '마감' : '가능')}
+                    </span>
+                `;
+
+                if (isToday) dayCell.classList.add('today');
+                if (isPast || isFull) dayCell.classList.add('disabled');
+
+                if (!isPast && !isFull) {
+                    dayCell.addEventListener('click', () => {
+                        // 선택 표시 초기화
+                        document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('active'));
+                        dayCell.classList.add('active');
+
+                        // 폼 표시 및 데이터 설정
+                        const formattedDate = `${year}년 ${month + 1}월 ${day}일`;
+                        displaySelectedDate.textContent = formattedDate;
+                        inputSelectedDate.value = `${year}-${month + 1}-${day}`;
+                        
+                        bookingFormSection.style.display = 'block';
+                        bookingFormSection.scrollIntoView({ behavior: 'smooth' });
+                    });
+                }
+
+                calendarDaysGrid.appendChild(dayCell);
             }
-
-            calendarGrid.appendChild(dayElement);
-        }
-    }
-
-    if (calendarGrid) {
-        renderCalendar(currentDate);
+        };
 
         prevMonthBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar(currentDate);
-            reservationFormContainer.style.display = 'none';
+            viewDate.setMonth(viewDate.getMonth() - 1);
+            bookingFormSection.style.display = 'none';
+            render();
         });
 
         nextMonthBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar(currentDate);
-            reservationFormContainer.style.display = 'none';
+            viewDate.setMonth(viewDate.getMonth() + 1);
+            bookingFormSection.style.display = 'none';
+            render();
         });
-    }
 
-    if (reservationForm) {
-        reservationForm.addEventListener('submit', (e) => {
+        render();
+    };
+
+    // --- 3. 예약 폼 제출 로직 ---
+    const setupBookingForm = () => {
+        const bookingForm = document.getElementById('realtimeBookingForm');
+        if (!bookingForm) return;
+
+        bookingForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const formData = new FormData(reservationForm);
+            const formData = new FormData(bookingForm);
             const data = Object.fromEntries(formData.entries());
-            
-            console.log('Reservation Data:', data);
-            alert(`${data.date} ${data.time}에 ${data.name}님의 예약이 접수되었습니다. 곧 연락드리겠습니다.`);
-            
-            reservationForm.reset();
-            reservationFormContainer.style.display = 'none';
-            document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
-        });
-    }
 
-    // Form submission confirmation
-    const contactForm = document.querySelector('#contact form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            // In a real application, you would handle the form submission here (e.g., send data to a server).
-            alert('문의해주셔서 감사합니다. 빠른 시일 내에 연락드리겠습니다.');
-            contactForm.reset();
+            console.log('Booking Data:', data);
+            alert(`예약이 성공적으로 접수되었습니다!\n\n일시: ${data.selected_date} ${data.booking_time}\n성함: ${data.user_name}\n\n곧 안내 문자를 발송해 드리겠습니다.`);
+            
+            bookingForm.reset();
+            document.getElementById('bookingFormSection').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
-    }
+    };
 
+    // 실행
+    setupNavigation();
+    setupCalendar();
+    setupBookingForm();
 });

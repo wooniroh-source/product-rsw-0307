@@ -22,43 +22,75 @@
     </header>
 
     <main>
-        <section id="reservation">
-            <h2><i class="fas fa-calendar-alt"></i> 실시간 예약 현황</h2>
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
-                    <h3 id="currentMonthYear"></h3>
-                    <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
-                </div>
-                <div class="calendar-grid-header">
-                    <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
-                </div>
-                <div id="calendarGrid" class="calendar-grid"></div>
+        <section id="reservation-page">
+            <div class="section-title">
+                <h2>실시간 예약 신청</h2>
+                <p>원하시는 날짜를 선택하여 간편하게 예약하세요.</p>
             </div>
-            <div id="reservationFormContainer" class="reservation-form-container" style="display: none;">
-                <h3><span id="selectedDateText"></span> 예약 신청</h3>
-                <form id="reservationForm">
-                    <input type="hidden" id="selectedDateInput" name="date">
-                    <div class="form-group">
-                        <label for="resName">성함</label>
-                        <input type="text" id="resName" name="name" required placeholder="홍길동">
+
+            <div class="reservation-container">
+                <!-- 달력 섹션 -->
+                <div class="calendar-wrapper">
+                    <div class="calendar-controls">
+                        <button id="prevMonthBtn"><i class="fas fa-chevron-left"></i></button>
+                        <h3 id="calendarTitle">2026년 3월</h3>
+                        <button id="nextMonthBtn"><i class="fas fa-chevron-right"></i></button>
                     </div>
-                    <div class="form-group">
-                        <label for="resPhone">연락처</label>
-                        <input type="tel" id="resPhone" name="phone" required placeholder="010-0000-0000">
+                    <div class="calendar-weekdays">
+                        <div class="sun">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="sat">토</div>
                     </div>
-                    <div class="form-group">
-                        <label for="resTime">희망 시간</label>
-                        <select id="resTime" name="time" required>
-                            <option value="">시간 선택</option>
-                            <option value="09:00">09:00</option>
-                            <option value="11:00">11:00</option>
-                            <option value="14:00">14:00</option>
-                            <option value="16:00">16:00</option>
-                        </select>
+                    <div id="calendarDays" class="calendar-days-grid">
+                        <!-- JS에서 날짜가 생성됨 -->
                     </div>
-                    <button type="submit" class="btn primary-btn">예약 신청하기</button>
-                </form>
+                    <div class="calendar-legend">
+                        <span><span class="dot avail"></span> 예약가능</span>
+                        <span><span class="dot full"></span> 예약마감</span>
+                    </div>
+                </div>
+
+                <!-- 예약 폼 섹션 (기본 숨김) -->
+                <div id="bookingFormSection" class="booking-form-wrapper" style="display: none;">
+                    <div class="form-card">
+                        <h3><i class="fas fa-check-circle"></i> <span id="displaySelectedDate"></span> 예약</h3>
+                        <form id="realtimeBookingForm">
+                            <input type="hidden" id="inputSelectedDate" name="selected_date">
+                            
+                            <div class="input-group">
+                                <label for="userName">예약자 성함</label>
+                                <input type="text" id="userName" name="user_name" required placeholder="성함을 입력해주세요">
+                            </div>
+
+                            <div class="input-group">
+                                <label for="userPhone">연락처</label>
+                                <input type="tel" id="userPhone" name="user_phone" required placeholder="010-0000-0000">
+                            </div>
+
+                            <div class="input-group">
+                                <label for="serviceType">서비스 선택</label>
+                                <select id="serviceType" name="service_type" required>
+                                    <option value="">서비스를 선택하세요</option>
+                                    <option value="wall">벽걸이 에어컨</option>
+                                    <option value="stand">스탠드 에어컨</option>
+                                    <option value="multi">2-in-1 멀티형</option>
+                                    <option value="system">천장형 시스템</option>
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="bookingTime">희망 시간</label>
+                                <select id="bookingTime" name="booking_time" required>
+                                    <option value="">시간 선택</option>
+                                    <option value="09:00">오전 09:00</option>
+                                    <option value="11:00">오전 11:00</option>
+                                    <option value="14:00">오후 02:00</option>
+                                    <option value="16:00">오후 04:00</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="submit-booking-btn">예약 확정하기</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -69,6 +101,7 @@
             <p>&copy; 2026 클린앤파트너즈. All rights reserved.</p>
         </div>
     </footer>
+
     <script src="main.js"></script>
 </body>
 </html>
