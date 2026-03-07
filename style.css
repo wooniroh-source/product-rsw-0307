@@ -435,9 +435,9 @@ footer { background: #1a1a1a; color: #eee; padding: 4rem 5%; text-align: center;
     .step-img-wrapper { height: 110px; }
     .process-step-box h4 { font-size: 1.1rem; }
     
-    /* Rolling List Mobile optimization - Hide less important columns */
+    /* Rolling List Mobile optimization */
     .rolling-header, .rolling-item {
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr; /* Date, Status, Name */
     }
     .rolling-header .col:nth-child(4), .rolling-header .col:nth-child(5),
     .rolling-item .col:nth-child(4), .rolling-item .col:nth-child(5) {
@@ -466,6 +466,11 @@ footer { background: #1a1a1a; color: #eee; padding: 4rem 5%; text-align: center;
     .rolling-container { height: 250px; }
     .rolling-item { height: 50px; font-size: 0.75rem; }
     
+    /* Smallest screens: simplify to just 2 columns if needed, but 3 should fit usually */
+    .rolling-header, .rolling-item {
+        grid-template-columns: 1.2fr 1fr 1fr; 
+    }
+
     footer { padding: 3rem 5%; font-size: 0.85rem; }
 }
 
