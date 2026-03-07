@@ -51,10 +51,10 @@ nav a:hover {
 
 /* Hero Section */
 #hero {
-    background: url('https://via.placeholder.com/1200x400') no-repeat center center/cover;
+    background: url('https://images.unsplash.com/photo-1621905251918-48416bd8575a?q=80&w=1920&auto=format&fit=crop') no-repeat center center/cover;
     color: #fff;
     text-align: center;
-    padding: 6rem 2rem;
+    padding: 10rem 2rem;
     position: relative;
 }
 
