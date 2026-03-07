@@ -232,9 +232,76 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTable();
     };
 
+    // --- 5. 히어로 슬라이더 로직 ---
+    const setupHeroSlider = () => {
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.slider-dots .dot');
+        const prevBtn = document.querySelector('.slider-arrow.prev');
+        const nextBtn = document.querySelector('.slider-arrow.next');
+        
+        if (slides.length === 0) return;
+
+        let currentSlide = 0;
+        let slideInterval;
+
+        const showSlide = (index) => {
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+            
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentSlide = index;
+        };
+
+        const nextSlide = () => {
+            let next = (currentSlide + 1) % slides.length;
+            showSlide(next);
+        };
+
+        const prevSlide = () => {
+            let prev = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prev);
+        };
+
+        const startAutoSlide = () => {
+            stopAutoSlide();
+            slideInterval = setInterval(nextSlide, 5000);
+        };
+
+        const stopAutoSlide = () => {
+            if (slideInterval) clearInterval(slideInterval);
+        };
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                nextSlide();
+                startAutoSlide();
+            });
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                prevSlide();
+                startAutoSlide();
+            });
+        }
+
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const index = parseInt(dot.getAttribute('data-index'));
+                showSlide(index);
+                startAutoSlide();
+            });
+        });
+
+        // 초기 시작
+        startAutoSlide();
+    };
+
     // 실행
     setupNavigation();
     setupCalendar();
     setupBookingForm();
     setupAdminPage();
+    setupHeroSlider();
 });
