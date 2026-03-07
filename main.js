@@ -212,53 +212,56 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTable();
     };
 
-    // --- 5. 히어로 슬라이더 로직 ---
-    const setupHeroSlider = () => {
-        const sliderContainer = document.querySelector('.slider-container');
-        const dotsContainer = document.querySelector('.slider-dots');
-        const prevBtn = document.querySelector('.slider-arrow.prev');
-        const nextBtn = document.querySelector('.slider-arrow.next');
+    // --- 5. 공통 슬라이더 엔진 로직 ---
+    const setupSlider = (config) => {
+        const { containerId, dotsId, prevId, nextId, storageKey, defaults } = config;
+        const sliderContainer = document.getElementById(containerId);
+        const dotsContainer = document.getElementById(dotsId);
+        const prevBtn = document.getElementById(prevId);
+        const nextBtn = document.getElementById(nextId);
         
         if (!sliderContainer) return;
 
-        let banners = JSON.parse(localStorage.getItem('banners') || '[]');
-        if (banners.length === 0) {
-            banners = [
-                { id: 1, title: "당신의 숨결을 디자인합니다", desc: "전문 분해 세척으로 시작하는 깨끗한 실내 공기 솔루션", url: "https://images.unsplash.com/photo-1590402444816-05d848218571?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80", btnText: "온라인 예약하기", btnLink: "reservation.html" },
-                { id: 2, title: "10년 경력의 베테랑 엔지니어", desc: "까다로운 시스템 에어컨부터 가정용까지 완벽하게 케어합니다", url: "https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80", btnText: "서비스 상세 보기", btnLink: "services.html" },
-                { id: 3, title: "친환경 세제 안심 공법", desc: "우리가족 건강을 생각하는 FDA 승인 친환경 약품 사용", url: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80", btnText: "브랜드 스토리", btnLink: "about.html" }
-            ];
-        }
+        let data = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        if (data.length === 0) data = defaults;
 
         sliderContainer.innerHTML = '';
-        dotsContainer.innerHTML = '';
+        if (dotsContainer) dotsContainer.innerHTML = '';
 
-        banners.forEach((banner, index) => {
+        data.forEach((item, index) => {
             const slide = document.createElement('div');
             slide.classList.add('slide');
             if (index === 0) slide.classList.add('active');
-            slide.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${banner.url}')`;
-            slide.innerHTML = `<div class="hero-content"><h2>${banner.title}</h2><p>${banner.desc}</p><div class="hero-btns"><a href="${banner.btnLink}" class="btn">${banner.btnText}</a></div></div>`;
+            slide.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${item.url}')`;
+            
+            let contentHtml = `<div class="hero-content"><h2>${item.title}</h2><p>${item.desc}</p>`;
+            if (item.btnText && item.btnLink) {
+                contentHtml += `<div class="hero-btns"><a href="${item.btnLink}" class="btn">${item.btnText}</a></div>`;
+            }
+            contentHtml += `</div>`;
+            slide.innerHTML = contentHtml;
             sliderContainer.appendChild(slide);
 
-            const dot = document.createElement('span');
-            dot.classList.add('dot');
-            if (index === 0) dot.classList.add('active');
-            dot.setAttribute('data-index', index);
-            dotsContainer.appendChild(dot);
+            if (dotsContainer) {
+                const dot = document.createElement('span');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+                dot.setAttribute('data-index', index);
+                dotsContainer.appendChild(dot);
+            }
         });
 
-        const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.slider-dots .dot');
+        const slides = sliderContainer.querySelectorAll('.slide');
+        const dots = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
         let currentSlide = 0;
         let slideInterval;
 
         const showSlide = (index) => {
             slides.forEach(s => s.classList.remove('active'));
-            dots.forEach(d => d.classList.remove('active'));
+            if (dots.length > 0) dots.forEach(d => d.classList.remove('active'));
             if (slides[index]) {
                 slides[index].classList.add('active');
-                dots[index].classList.add('active');
+                if (dots[index]) dots[index].classList.add('active');
                 currentSlide = index;
             }
         };
@@ -270,17 +273,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); startAutoSlide(); });
         if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); startAutoSlide(); });
-        dotsContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('dot')) {
-                const index = parseInt(e.target.getAttribute('data-index'));
-                showSlide(index);
-                startAutoSlide();
-            }
-        });
+        if (dotsContainer) {
+            dotsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('dot')) {
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    showSlide(index);
+                    startAutoSlide();
+                }
+            });
+        }
         startAutoSlide();
     };
 
-    // --- 6. 6단계 안심 공정 관리 로직 ---
+    // --- 6. 배너 초기화 ---
+    const heroDefaults = [
+        { id: 1, title: "당신의 숨결을 디자인합니다", desc: "전문 분해 세척으로 시작하는 깨끗한 실내 공기 솔루션", url: "https://images.unsplash.com/photo-1590402444816-05d848218571?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80", btnText: "온라인 예약하기", btnLink: "reservation.html" },
+        { id: 2, title: "10년 경력의 베테랑 엔지니어", desc: "까다로운 시스템 에어컨부터 가정용까지 완벽하게 케어합니다", url: "https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80", btnText: "서비스 상세 보기", btnLink: "services.html" },
+        { id: 3, title: "친환경 세제 안심 공법", desc: "우리가족 건강을 생각하는 FDA 승인 친환경 약품 사용", url: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80", btnText: "브랜드 스토리", btnLink: "about.html" }
+    ];
+
+    const midDefaults = [
+        { id: 1, title: "완벽한 분해, 철저한 살균", desc: "보이지 않는 곳까지 클린앤파트너즈가 책임집니다.", url: "https://images.unsplash.com/photo-1558389186-438424b00a32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" },
+        { id: 2, title: "쾌적한 여름의 시작", desc: "지금 예약하고 시원한 바람을 만나보세요.", url: "https://images.unsplash.com/photo-1563453392212-326f5e854473?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" }
+    ];
+
+    const initSliders = () => {
+        // 메인 히어로 슬라이더
+        const heroSliderEl = document.querySelector('#hero-slider .slider-container');
+        if (heroSliderEl) {
+            setupSlider({
+                containerId: 'hero-slider-container', // HTML 구조에 맞춰 ID 부여 필요하거나 selector 사용
+                dotsId: 'hero-slider-dots',
+                prevId: 'hero-prev',
+                nextId: 'hero-next',
+                storageKey: 'banners',
+                defaults: heroDefaults
+            });
+        }
+        
+        // 중간 슬라이더
+        setupSlider({
+            containerId: 'mid-slider-container',
+            dotsId: 'mid-slider-dots',
+            prevId: 'mid-prev',
+            nextId: 'mid-next',
+            storageKey: 'midBanners',
+            defaults: midDefaults
+        });
+    };
+
+    // --- 7. 6단계 안심 공정 관리 로직 ---
     const defaultProcess = [
         { title: "사전 점검", desc: "작동 상태 및 오염도 확인", url: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", icon: "fa-clipboard-check" },
         { title: "부품 분해", desc: "완전 분해를 통한 내부 노출", url: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", icon: "fa-tools" },
@@ -293,57 +335,92 @@ document.addEventListener('DOMContentLoaded', () => {
     const setupProcessDisplay = () => {
         const container = document.getElementById('process-display-container');
         if (!container) return;
-
         let processData = JSON.parse(localStorage.getItem('processData') || '[]');
         if (processData.length === 0) processData = defaultProcess;
-
         container.innerHTML = '';
         processData.forEach((step, index) => {
             const box = document.createElement('div');
             box.classList.add('process-step-box');
-            box.innerHTML = `
-                <div class="step-badge">STEP 0${index + 1}</div>
-                <div class="step-img-wrapper">
-                    <img src="${step.url}" alt="${step.title}">
-                </div>
-                <div class="step-icon"><i class="fas ${step.icon}"></i></div>
-                <h4>${step.title}</h4>
-                <p>${step.desc}</p>
-            `;
+            box.innerHTML = `<div class="step-badge">STEP 0${index + 1}</div><div class="step-img-wrapper"><img src="${step.url}" alt="${step.title}"></div><div class="step-icon"><i class="fas ${step.icon}"></i></div><h4>${step.title}</h4><p>${step.desc}</p>`;
             container.appendChild(box);
         });
+    };
+
+    // --- 8. 관리자 페이지: 섹션 전환 및 배너 관리 ---
+    window.showSection = (sectionId) => {
+        const sections = ['reservations', 'banners', 'mid-banners', 'process'];
+        sections.forEach(s => {
+            const el = document.getElementById(`section-${s}`);
+            const menu = document.getElementById(`menu-${s}`);
+            if (el) el.style.display = s === sectionId ? 'block' : 'none';
+            if (menu) menu.classList.toggle('active', s === sectionId);
+        });
+        if (sectionId === 'banners') renderTable('banners', 'bannerTableBody');
+        if (sectionId === 'mid-banners') renderTable('midBanners', 'midBannerTableBody');
+        if (sectionId === 'process') renderProcessEditForm();
+    };
+
+    const renderTable = (storageKey, bodyId) => {
+        const body = document.getElementById(bodyId);
+        if (!body) return;
+        const items = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        body.innerHTML = items.length === 0 ? '<tr><td colspan="3" class="no-data">데이터가 없습니다.</td></tr>' : '';
+        items.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><img src="${item.url}" style="width: 120px; height: 60px; object-fit: cover; border-radius: 4px;"></td>
+                <td><strong>${item.title}</strong><br><small>${item.desc}</small></td>
+                <td><button class="btn-sm btn-cancel" onclick="deleteItem('${storageKey}', ${item.id})">삭제</button></td>
+            `;
+            body.appendChild(tr);
+        });
+    };
+
+    window.deleteItem = (storageKey, id) => {
+        if (!confirm('정말 삭제하시겠습니까?')) return;
+        let items = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        localStorage.setItem(storageKey, JSON.stringify(items.filter(i => i.id !== id)));
+        const bodyId = storageKey === 'banners' ? 'bannerTableBody' : 'midBannerTableBody';
+        renderTable(storageKey, bodyId);
+    };
+
+    const setupForms = () => {
+        // 메인 배너 폼
+        const bForm = document.getElementById('bannerForm');
+        if (bForm) {
+            bForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(bForm);
+                const items = JSON.parse(localStorage.getItem('banners') || '[]');
+                items.push({ id: Date.now(), title: formData.get('bannerTitle'), url: formData.get('bannerUrl'), desc: formData.get('bannerDesc'), btnText: formData.get('bannerBtnText'), btnLink: formData.get('bannerBtnLink') });
+                localStorage.setItem('banners', JSON.stringify(items));
+                alert('등록되었습니다.'); bForm.reset(); renderTable('banners', 'bannerTableBody');
+            });
+        }
+        // 중간 배너 폼
+        const mForm = document.getElementById('midBannerForm');
+        if (mForm) {
+            mForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(mForm);
+                const items = JSON.parse(localStorage.getItem('midBanners') || '[]');
+                items.push({ id: Date.now(), title: formData.get('midBannerTitle'), url: formData.get('midBannerUrl'), desc: formData.get('midBannerDesc') });
+                localStorage.setItem('midBanners', JSON.stringify(items));
+                alert('등록되었습니다.'); mForm.reset(); renderTable('midBanners', 'midBannerTableBody');
+            });
+        }
     };
 
     const renderProcessEditForm = () => {
         const container = document.getElementById('process-steps-edit-container');
         if (!container) return;
-
         let processData = JSON.parse(localStorage.getItem('processData') || '[]');
         if (processData.length === 0) processData = defaultProcess;
-
         container.innerHTML = '';
         processData.forEach((step, index) => {
             const card = document.createElement('div');
             card.classList.add('process-edit-card');
-            card.innerHTML = `
-                <h4>STEP 0${index + 1}</h4>
-                <div class="input-group">
-                    <label>단계 제목</label>
-                    <input type="text" class="proc-title" value="${step.title}" required>
-                </div>
-                <div class="input-group">
-                    <label>이미지 URL</label>
-                    <input type="url" class="proc-url" value="${step.url}" required>
-                </div>
-                <div class="input-group">
-                    <label>설명 문구</label>
-                    <input type="text" class="proc-desc" value="${step.desc}" required>
-                </div>
-                <div class="input-group">
-                    <label>아이콘 클래스 (FontAwesome)</label>
-                    <input type="text" class="proc-icon" value="${step.icon}" required>
-                </div>
-            `;
+            card.innerHTML = `<h4>STEP 0${index + 1}</h4><div class="input-group"><label>제목</label><input type="text" class="proc-title" value="${step.title}"></div><div class="input-group"><label>URL</label><input type="url" class="proc-url" value="${step.url}"></div><div class="input-group"><label>설명</label><input type="text" class="proc-desc" value="${step.desc}"></div><div class="input-group"><label>아이콘</label><input type="text" class="proc-icon" value="${step.icon}"></div>`;
             container.appendChild(card);
         });
     };
@@ -351,80 +428,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const setupProcessForm = () => {
         const form = document.getElementById('processForm');
         if (!form) return;
-
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            const titles = document.querySelectorAll('.proc-title');
-            const urls = document.querySelectorAll('.proc-url');
-            const descs = document.querySelectorAll('.proc-desc');
-            const icons = document.querySelectorAll('.proc-icon');
-
+            const titles = document.querySelectorAll('.proc-title'), urls = document.querySelectorAll('.proc-url'), descs = document.querySelectorAll('.proc-desc'), icons = document.querySelectorAll('.proc-icon');
             const newData = [];
-            for (let i = 0; i < titles.length; i++) {
-                newData.push({
-                    title: titles[i].value,
-                    url: urls[i].value,
-                    desc: descs[i].value,
-                    icon: icons[i].value
-                });
-            }
-
+            for (let i = 0; i < titles.length; i++) newData.push({ title: titles[i].value, url: urls[i].value, desc: descs[i].value, icon: icons[i].value });
             localStorage.setItem('processData', JSON.stringify(newData));
-            alert('모든 공정 정보가 저장되었습니다.');
-            setupProcessDisplay();
+            alert('저장되었습니다.'); setupProcessDisplay();
         });
-    };
-
-    // --- 7. 관리자 페이지 공통 로직 ---
-    window.showSection = (sectionId) => {
-        const sections = ['reservations', 'banners', 'process'];
-        sections.forEach(s => {
-            const el = document.getElementById(`section-${s}`);
-            const menu = document.getElementById(`menu-${s}`);
-            if (el) el.style.display = s === sectionId ? 'block' : 'none';
-            if (menu) menu.classList.toggle('active', s === sectionId);
-        });
-
-        if (sectionId === 'banners') renderBannerTable();
-        if (sectionId === 'process') renderProcessEditForm();
-    };
-
-    const renderBannerTable = () => {
-        const bannerTableBody = document.getElementById('bannerTableBody');
-        if (!bannerTableBody) return;
-        const banners = JSON.parse(localStorage.getItem('banners') || '[]');
-        bannerTableBody.innerHTML = banners.length === 0 ? '<tr><td colspan="3" class="no-data">등록된 배너가 없습니다.</td></tr>' : '';
-        banners.forEach(banner => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><img src="${banner.url}" style="width: 150px; height: 80px; object-fit: cover; border-radius: 4px;"></td>
-                <td><strong>${banner.title}</strong><br><small>${banner.desc}</small></td>
-                <td><button class="btn-sm btn-cancel" onclick="deleteBanner(${banner.id})">삭제</button></td>
-            `;
-            bannerTableBody.appendChild(tr);
-        });
-    };
-
-    const setupBannerForm = () => {
-        const bannerForm = document.getElementById('bannerForm');
-        if (!bannerForm) return;
-        bannerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = new FormData(bannerForm);
-            const banners = JSON.parse(localStorage.getItem('banners') || '[]');
-            banners.push({ id: Date.now(), title: formData.get('bannerTitle'), url: formData.get('bannerUrl'), desc: formData.get('bannerDesc'), btnText: formData.get('bannerBtnText'), btnLink: formData.get('bannerBtnLink') });
-            localStorage.setItem('banners', JSON.stringify(banners));
-            alert('배너가 등록되었습니다.');
-            bannerForm.reset();
-            renderBannerTable();
-        });
-    };
-
-    window.deleteBanner = (id) => {
-        if (!confirm('배너를 삭제하시겠습니까?')) return;
-        let banners = JSON.parse(localStorage.getItem('banners') || '[]');
-        localStorage.setItem('banners', JSON.stringify(banners.filter(b => b.id !== id)));
-        renderBannerTable();
     };
 
     // 실행
@@ -432,8 +443,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setupCalendar();
     setupBookingForm();
     setupAdminPage();
-    setupHeroSlider();
-    setupBannerForm();
+    
+    // 슬라이더 초기화 (메인/중간 분리)
+    setupSlider({ containerId: 'hero-slider-container', dotsId: 'hero-slider-dots', prevId: 'hero-prev', nextId: 'hero-next', storageKey: 'banners', defaults: heroDefaults });
+    setupSlider({ containerId: 'mid-slider-container', dotsId: 'mid-slider-dots', prevId: 'mid-prev', nextId: 'mid-next', storageKey: 'midBanners', defaults: midDefaults });
+    
     setupProcessDisplay();
+    setupForms();
     setupProcessForm();
 });

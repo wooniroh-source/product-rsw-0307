@@ -17,7 +17,8 @@
             </div>
             <ul class="sidebar-menu">
                 <li class="active" id="menu-reservations"><a href="#" onclick="showSection('reservations')"><i class="fas fa-list"></i> 예약 현황</a></li>
-                <li id="menu-banners"><a href="#" onclick="showSection('banners')"><i class="fas fa-images"></i> 배너 관리</a></li>
+                <li id="menu-banners"><a href="#" onclick="showSection('banners')"><i class="fas fa-images"></i> 메인 배너</a></li>
+                <li id="menu-mid-banners"><a href="#" onclick="showSection('mid-banners')"><i class="fas fa-film"></i> 중간 배너</a></li>
                 <li id="menu-process"><a href="#" onclick="showSection('process')"><i class="fas fa-tasks"></i> 공정 관리</a></li>
                 <li><a href="index.html"><i class="fas fa-home"></i> 홈페이지로</a></li>
             </ul>
@@ -76,14 +77,14 @@
                 </div>
             </div>
 
-            <!-- 배너 관리 섹션 -->
+            <!-- 메인 배너 관리 섹션 -->
             <div id="section-banners" style="display: none;">
                 <header class="admin-header">
                     <h1>메인 슬라이드 배너 관리</h1>
                 </header>
 
                 <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
-                    <h3>새 배너 추가</h3>
+                    <h3>새 메인 배너 추가</h3>
                     <form id="bannerForm" style="margin-top: 1.5rem;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                             <div class="input-group">
@@ -114,7 +115,7 @@
                 </div>
 
                 <div class="admin-table-wrapper">
-                    <h3>현재 등록된 배너 목록</h3>
+                    <h3>현재 등록된 메인 배너 목록</h3>
                     <table class="admin-table" style="margin-top: 1rem;">
                         <thead>
                             <tr>
@@ -124,6 +125,50 @@
                             </tr>
                         </thead>
                         <tbody id="bannerTableBody">
+                            <!-- JS로 데이터 로딩 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 중간 배너 관리 섹션 -->
+            <div id="section-mid-banners" style="display: none;">
+                <header class="admin-header">
+                    <h1>중간 슬라이드 배너 관리</h1>
+                </header>
+
+                <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+                    <h3>새 중간 배너 추가</h3>
+                    <form id="midBannerForm" style="margin-top: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div class="input-group">
+                                <label>배너 제목</label>
+                                <input type="text" name="midBannerTitle" placeholder="중간 배너 제목" required>
+                            </div>
+                            <div class="input-group">
+                                <label>배너 이미지 URL</label>
+                                <input type="url" name="midBannerUrl" placeholder="https://example.com/image.jpg" required>
+                            </div>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 1rem;">
+                            <label>배너 설명</label>
+                            <input type="text" name="midBannerDesc" placeholder="상세 설명" required>
+                        </div>
+                        <button type="submit" class="submit-booking-btn" style="width: auto; padding: 0.8rem 2rem;">중간 배너 등록하기</button>
+                    </form>
+                </div>
+
+                <div class="admin-table-wrapper">
+                    <h3>현재 등록된 중간 배너 목록</h3>
+                    <table class="admin-table" style="margin-top: 1rem;">
+                        <thead>
+                            <tr>
+                                <th>이미지 미리보기</th>
+                                <th>내용</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="midBannerTableBody">
                             <!-- JS로 데이터 로딩 -->
                         </tbody>
                     </table>
