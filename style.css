@@ -216,6 +216,9 @@ nav a:hover { color: var(--primary); }
 }
 
 section { padding: 4rem 5%; }
+.section-title { text-align: center; margin-bottom: 3rem; }
+.section-title h2 { font-size: 2.2rem; color: var(--primary); margin-bottom: 0.5rem; }
+
 .reservation-container { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem; }
 .calendar-wrapper { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow); }
 .calendar-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
@@ -332,6 +335,57 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
     line-height: 1.4;
 }
 
+/* Live Status Table */
+.status-table-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+}
+
+.status-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.status-table th, .status-table td {
+    padding: 1.2rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.status-table th {
+    background: #f8f9fa;
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-table td {
+    font-size: 0.95rem;
+    color: #444;
+}
+
+.status-table tr:last-child td {
+    border-bottom: none;
+}
+
+.status-table .status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.status-table .status-badge.pending { background: #fff3cd; color: #856404; }
+.status-table .status-badge.confirmed { background: #d4edda; color: #155724; }
+
 /* Admin Process Edit UI */
 .process-edit-card {
     background: #f9f9f9;
@@ -349,6 +403,13 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
 
 /* Mobile Media Query update for process */
 @media (max-width: 768px) {
+    nav ul { display: none; }
+    
+    #hero-slider { height: 60vh; }
+    .hero-content h2 { font-size: 2.2rem; }
+    .hero-content p { font-size: 1.1rem; }
+    .hero-btns .btn { padding: 1rem 2rem; font-size: 1.1rem; }
+
     .process-container {
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
@@ -356,18 +417,11 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
     .process-step-box { padding: 1.2rem 0.5rem; }
     .step-img-wrapper { height: 90px; }
     .process-step-box h4 { font-size: 1rem; }
-}
-    nav ul { display: none; }
     
-    #hero { height: 60vh; }
-    .hero-content h2 { font-size: 2.2rem; }
-    .hero-content p { font-size: 1.1rem; }
-    .hero-btns .btn { padding: 1rem 2rem; font-size: 1.1rem; }
+    .status-table-wrapper { padding: 0.5rem; }
+    .status-table th, .status-table td { padding: 0.8rem 0.5rem; font-size: 0.8rem; }
 
-    .day-cell { min-height: 70px; padding: 0.3rem; }
-    .day-num { font-size: 0.9rem; }
-    .day-status { font-size: 0.6rem; padding: 1px 3px; }
-    section { padding: 2rem 3%; }
+    section { padding: 3rem 3%; }
     
     /* Admin Mobile */
     .admin-container { flex-direction: column; }
