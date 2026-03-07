@@ -108,21 +108,19 @@
                 <h2>실시간 서비스 현황</h2>
                 <p>지금 이 시각, 많은 고객님들이 클린앤파트너즈와 함께하고 계십니다.</p>
             </div>
-            <div class="status-table-wrapper">
-                <table class="status-table">
-                    <thead>
-                        <tr>
-                            <th>신청일</th>
-                            <th>상태</th>
-                            <th>고객명</th>
-                            <th>연락처</th>
-                            <th>서비스</th>
-                        </tr>
-                    </thead>
-                    <tbody id="live-reservation-list">
-                        <!-- JS로 7개 리스트 렌더링 -->
-                    </tbody>
-                </table>
+            <div class="rolling-wrapper">
+                <div class="rolling-header">
+                    <div class="col">신청일</div>
+                    <div class="col">상태</div>
+                    <div class="col">고객명</div>
+                    <div class="col">연락처</div>
+                    <div class="col">서비스</div>
+                </div>
+                <div class="rolling-container">
+                    <div id="live-reservation-list" class="rolling-list">
+                        <!-- JS로 리스트 렌더링 -->
+                    </div>
+                </div>
             </div>
         </section>
         </main>

@@ -127,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('bookingFormSection').style.display = 'none';
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
-            // 실시간 현황 즉시 업데이트 (메인 페이지일 경우)
             if (document.getElementById('live-reservation-list')) setupLiveReservationStatus();
         });
     };
@@ -324,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // --- 8. 실시간 서비스 현황 로직 ---
+    // --- 8. 실시간 서비스 현황 로직 (롤링 5개) ---
     const setupLiveReservationStatus = () => {
         const container = document.getElementById('live-reservation-list');
         if (!container) return;
@@ -332,16 +331,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
 
         if (reservations.length === 0) {
-            container.innerHTML = '<tr><td colspan="5" style="padding: 3rem; color: #999;">현재 접수된 예약 내역이 없습니다.</td></tr>';
+            container.parentElement.innerHTML = '<div style="padding: 3rem; text-align: center; color: #999;">현재 접수된 예약 내역이 없습니다.</div>';
             return;
         }
 
+        // 최신순 5개 추출
         const recentReservations = reservations
             .sort((a, b) => b.id - a.id)
-            .slice(0, 7);
+            .slice(0, 5);
+
+        // 롤링을 위해 데이터 복제 (연속성 확보)
+        const displayList = [...recentReservations, ...recentReservations];
 
         container.innerHTML = '';
-        recentReservations.forEach(res => {
+        displayList.forEach(res => {
             const maskedName = res.name.length > 2 
                 ? res.name[0] + '*'.repeat(res.name.length - 2) + res.name[res.name.length - 1]
                 : res.name[0] + '*';
@@ -366,16 +369,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 default: serviceName = res.service;
             }
 
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${res.date}</td>
-                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                <td>${maskedName} 고객님</td>
-                <td>${maskedPhone}</td>
-                <td>${serviceName}</td>
+            const item = document.createElement('div');
+            item.classList.add('rolling-item');
+            item.innerHTML = `
+                <div class="col">${res.date}</div>
+                <div class="col"><span class="status-badge ${statusClass}">${statusText}</span></div>
+                <div class="col">${maskedName}</div>
+                <div class="col">${maskedPhone}</div>
+                <div class="col">${serviceName}</div>
             `;
-            container.appendChild(tr);
+            container.appendChild(item);
         });
+
+        // 롤링 애니메이션 시간 동적 조절 (아이템 개수에 따라)
+        container.style.animationDuration = `${displayList.length * 2}s`;
     };
 
     // --- 9. 관리자 페이지 공통 로직 ---

@@ -335,56 +335,68 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
     line-height: 1.4;
 }
 
-/* Live Status Table */
-.status-table-wrapper {
+/* Rolling List Styles */
+.rolling-wrapper {
     max-width: 900px;
     margin: 0 auto;
     background: #fff;
-    padding: 1rem;
     border-radius: 12px;
+    overflow: hidden;
     box-shadow: var(--shadow);
-    overflow-x: auto;
 }
 
-.status-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px;
-}
-
-.status-table th, .status-table td {
-    padding: 1.2rem 1rem;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-}
-
-.status-table th {
+.rolling-header {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1.5fr 1fr;
     background: #f8f9fa;
+    padding: 1rem;
+    border-bottom: 2px solid var(--light);
     font-weight: 700;
     color: var(--primary);
+    text-align: center;
     font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
-.status-table td {
-    font-size: 0.95rem;
-    color: #444;
+.rolling-container {
+    height: 300px; /* 5 rows * 60px */
+    overflow: hidden;
+    position: relative;
 }
 
-.status-table tr:last-child td {
-    border-bottom: none;
+.rolling-list {
+    position: absolute;
+    width: 100%;
+    animation: rollUp 20s linear infinite;
 }
 
-.status-table .status-badge {
+.rolling-list:hover {
+    animation-play-state: paused;
+}
+
+.rolling-item {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1.5fr 1fr;
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    align-items: center;
+    background: #fff;
+    height: 60px;
+}
+
+@keyframes rollUp {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); } /* Halfway because we duplicate items */
+}
+
+.status-badge {
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 700;
 }
-
-.status-table .status-badge.pending { background: #fff3cd; color: #856404; }
-.status-table .status-badge.confirmed { background: #d4edda; color: #155724; }
+.status-badge.pending { background: #fff3cd; color: #856404; }
+.status-badge.confirmed { background: #d4edda; color: #155724; }
 
 /* Admin Process Edit UI */
 .process-edit-card {
