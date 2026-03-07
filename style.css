@@ -268,11 +268,29 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 2rem 1rem;
+    padding: 1.5rem 1rem;
     text-align: center;
     position: relative;
     transition: all 0.3s ease;
     box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.step-img-wrapper {
+    width: 100%;
+    height: 120px;
+    margin-bottom: 1.2rem;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #eee;
+}
+
+.step-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .process-step-box:hover {
@@ -293,12 +311,13 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
     padding: 4px 12px;
     border-radius: 20px;
     box-shadow: 0 4px 8px rgba(0,102,204,0.2);
+    z-index: 5;
 }
 
 .step-icon {
     font-size: 2.2rem;
     color: var(--secondary);
-    margin-bottom: 1.2rem;
+    margin-bottom: 1rem;
 }
 
 .process-step-box h4 {
@@ -313,13 +332,29 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
     line-height: 1.4;
 }
 
+/* Admin Process Edit UI */
+.process-edit-card {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.2rem;
+}
+
+.process-edit-card h4 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
 /* Mobile Media Query update for process */
 @media (max-width: 768px) {
     .process-container {
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
     }
-    .process-step-box { padding: 1.5rem 0.5rem; }
+    .process-step-box { padding: 1.2rem 0.5rem; }
+    .step-img-wrapper { height: 90px; }
     .process-step-box h4 { font-size: 1rem; }
 }
     nav ul { display: none; }
