@@ -331,7 +331,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
 
         if (reservations.length === 0) {
-            container.parentElement.innerHTML = '<div style="padding: 3rem; text-align: center; color: #999;">현재 접수된 예약 내역이 없습니다.</div>';
+            container.innerHTML = '<div style="padding: 3rem; text-align: center; color: #999; width: 100%;">현재 접수된 예약 내역이 없습니다.</div>';
+            container.style.animation = 'none';
             return;
         }
 
@@ -381,8 +382,12 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(item);
         });
 
-        // 롤링 애니메이션 시간 동적 조절 (아이템 개수에 따라)
-        container.style.animationDuration = `${displayList.length * 2}s`;
+        // 롤링 애니메이션 시간 및 활성화 조절
+        if (recentReservations.length > 0) {
+            container.style.animation = `rollUp ${recentReservations.length * 4}s linear infinite`;
+        } else {
+            container.style.animation = 'none';
+        }
     };
 
     // --- 9. 관리자 페이지 공통 로직 ---

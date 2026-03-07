@@ -12,19 +12,26 @@
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'Pretendard', sans-serif; color: var(--dark); line-height: 1.6; background: #fff; }
+body { font-family: 'Pretendard', sans-serif; color: var(--dark); line-height: 1.6; background: #fff; overflow-x: hidden; }
 
 header { background: #fff; border-bottom: 1px solid var(--border); padding: 1rem 5%; position: sticky; top:0; z-index: 100; }
-nav { display: flex; justify-content: space-between; align-items: center; }
+nav { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
 .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); text-decoration: none; }
 nav ul { display: flex; list-style: none; gap: 1.5rem; }
 nav a { text-decoration: none; color: var(--dark); font-weight: 600; font-size: 0.95rem; }
 nav a:hover { color: var(--primary); }
 
+/* Section Common */
+section { padding: 5rem 5%; max-width: 1400px; margin: 0 auto; width: 100%; }
+.section-title { text-align: center; margin-bottom: 4rem; }
+.section-title h2 { font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem; font-weight: 800; }
+.section-title p { font-size: 1.1rem; color: #666; }
+
 /* Hero Slider */
 #hero-slider {
     position: relative;
     height: 70vh;
+    min-height: 500px;
     overflow: hidden;
     margin-top: -1px;
 }
@@ -54,6 +61,11 @@ nav a:hover { color: var(--primary); }
 .slide.active {
     opacity: 1;
     z-index: 1;
+}
+
+.hero-content {
+    padding: 0 5%;
+    max-width: 900px;
 }
 
 .hero-content h2 {
@@ -117,6 +129,9 @@ nav a:hover { color: var(--primary); }
     z-index: 10;
     transition: 0.3s;
     font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .slider-arrow:hover {
@@ -156,15 +171,13 @@ nav a:hover { color: var(--primary); }
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
 }
 
 .pro-box {
     background: var(--white);
     border: 1px solid var(--border);
-    padding: 2.5rem 2rem;
-    border-radius: 12px;
+    padding: 3rem 2rem;
+    border-radius: 16px;
     text-align: center;
     transition: all 0.3s ease;
     box-shadow: var(--shadow);
@@ -177,19 +190,20 @@ nav a:hover { color: var(--primary); }
 }
 
 .pro-icon {
-    font-size: 2.5rem;
+    font-size: 3rem;
     color: var(--primary);
     margin-bottom: 1.5rem;
 }
 
 .pro-box h3 {
-    font-size: 1.25rem;
+    font-size: 1.3rem;
     margin-bottom: 1rem;
     color: var(--dark);
+    font-weight: 700;
 }
 
 .pro-box p {
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: #666;
     line-height: 1.7;
 }
@@ -203,74 +217,39 @@ nav a:hover { color: var(--primary); }
 
 .service-card {
     background: #fff;
-    padding: 2rem;
-    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
     box-shadow: var(--shadow);
     text-align: center;
+    transition: 0.3s;
+}
+
+.service-card:hover {
+    transform: scale(1.02);
 }
 
 .service-card i {
-    font-size: 2.5rem;
+    font-size: 3rem;
     color: var(--primary);
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-section { padding: 4rem 5%; }
-.section-title { text-align: center; margin-bottom: 3rem; }
-.section-title h2 { font-size: 2.2rem; color: var(--primary); margin-bottom: 0.5rem; }
-
-.reservation-container { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem; }
-.calendar-wrapper { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow); }
-.calendar-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.calendar-controls button { background: none; border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
-.calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; padding-bottom: 1rem; border-bottom: 1px solid var(--light); }
-.calendar-weekdays .sun { color: var(--red); }
-.calendar-weekdays .sat { color: var(--primary); }
-
-.calendar-days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); }
-.day-cell { background: #fff; min-height: 100px; padding: 0.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: 0.2s; }
-.day-cell:hover:not(.disabled) { background: var(--light); }
-.day-cell.active { border: 2px solid var(--primary); background: #eef6ff; }
-.day-cell.disabled { cursor: not-allowed; background: #f9f9f9; }
-.day-num { font-weight: bold; font-size: 1.1rem; }
-.day-status { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; text-align: center; align-self: flex-start; }
-.status.avail { background: #e8f5e9; color: #2e7d32; }
-.status.full { background: #ffebee; color: #c62828; }
-.status.past { background: #f5f5f5; color: #9e9e9e; }
-
-.calendar-legend { display: flex; gap: 1rem; margin-top: 1rem; font-size: 0.85rem; justify-content: flex-end; }
-.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; }
-.dot.avail { background: #2ecc71; }
-.dot.full { background: #ff4d4d; }
-
-/* Booking Form */
-.booking-form-wrapper { animation: fadeIn 0.4s ease-out; }
-.form-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; box-shadow: var(--shadow); max-width: 600px; margin: 0 auto; }
-.form-card h3 { margin-bottom: 1.5rem; color: var(--primary); border-bottom: 2px solid var(--light); padding-bottom: 0.5rem; }
-
-.input-group { margin-bottom: 1.2rem; }
-.input-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
-.input-group input, .input-group select { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; }
-.submit-booking-btn { width: 100%; padding: 1rem; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
-.submit-booking-btn:hover { background: var(--secondary); }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; margin-top: 4rem; }
+.service-card h3 {
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
 
 /* Process Section */
 .process-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1.5rem;
-    max-width: 1300px;
-    margin: 0 auto;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
 }
 
 .process-step-box {
     background: var(--white);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 1.5rem 1rem;
     text-align: center;
     position: relative;
@@ -283,9 +262,9 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
 
 .step-img-wrapper {
     width: 100%;
-    height: 120px;
-    margin-bottom: 1.2rem;
-    border-radius: 8px;
+    height: 140px;
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
     overflow: hidden;
     background: #eee;
 }
@@ -309,38 +288,39 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
     transform: translateX(-50%);
     background: var(--primary);
     color: var(--white);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 700;
-    padding: 4px 12px;
+    padding: 5px 15px;
     border-radius: 20px;
     box-shadow: 0 4px 8px rgba(0,102,204,0.2);
     z-index: 5;
 }
 
 .step-icon {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     color: var(--secondary);
     margin-bottom: 1rem;
 }
 
 .process-step-box h4 {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: var(--dark);
     margin-bottom: 0.5rem;
+    font-weight: 700;
 }
 
 .process-step-box p {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     color: var(--gray);
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 /* Rolling List Styles */
 .rolling-wrapper {
-    max-width: 900px;
+    max-width: 1000px;
     margin: 0 auto;
     background: #fff;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
     box-shadow: var(--shadow);
 }
@@ -349,16 +329,16 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
     display: grid;
     grid-template-columns: 1.2fr 1fr 1fr 1.5fr 1fr;
     background: #f8f9fa;
-    padding: 1rem;
+    padding: 1.2rem 1rem;
     border-bottom: 2px solid var(--light);
     font-weight: 700;
     color: var(--primary);
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 .rolling-container {
-    height: 300px; /* 5 rows * 60px */
+    height: 350px;
     overflow: hidden;
     position: relative;
 }
@@ -366,7 +346,7 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
 .rolling-list {
     position: absolute;
     width: 100%;
-    animation: rollUp 20s linear infinite;
+    animation: rollUp 25s linear infinite;
 }
 
 .rolling-list:hover {
@@ -376,113 +356,131 @@ footer { background: #222; color: #fff; padding: 3rem 5%; text-align: center; ma
 .rolling-item {
     display: grid;
     grid-template-columns: 1.2fr 1fr 1fr 1.5fr 1fr;
-    padding: 1.2rem 1rem;
+    padding: 0 1rem;
     border-bottom: 1px solid #eee;
     text-align: center;
     align-items: center;
     background: #fff;
-    height: 60px;
+    height: 70px;
 }
 
 @keyframes rollUp {
     0% { transform: translateY(0); }
-    100% { transform: translateY(-50%); } /* Halfway because we duplicate items */
+    100% { transform: translateY(-50%); }
 }
 
 .status-badge {
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 700;
 }
 .status-badge.pending { background: #fff3cd; color: #856404; }
 .status-badge.confirmed { background: #d4edda; color: #155724; }
 
-/* Admin Process Edit UI */
-.process-edit-card {
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1.2rem;
+/* Reservation Page Calendar */
+.reservation-container { max-width: 1100px; margin: 0 auto; }
+.calendar-wrapper { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; box-shadow: var(--shadow); }
+.calendar-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.calendar-controls h3 { font-size: 1.5rem; color: var(--primary); }
+.calendar-days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.day-cell { min-height: 120px; border: 1px solid #f0f0f0; border-radius: 8px; padding: 0.8rem; }
+
+/* Footer */
+footer { background: #1a1a1a; color: #eee; padding: 4rem 5%; text-align: center; margin-top: 5rem; }
+.footer-content p { margin-bottom: 0.5rem; opacity: 0.8; }
+
+/* ---------------------------------------------------
+   RESPONSIVE DESIGN (Comprehensive)
+--------------------------------------------------- */
+
+/* Table & Desktop (under 1200px) */
+@media (max-width: 1200px) {
+    .hero-content h2 { font-size: 3rem; }
+    .pro-grid { grid-template-columns: repeat(2, 1fr); }
+    .process-container { grid-template-columns: repeat(3, 1fr); }
 }
 
-.process-edit-card h4 {
-    margin-bottom: 1rem;
-    color: var(--primary);
-    border-bottom: 1px solid #eee;
-    padding-bottom: 0.5rem;
+/* Small Desktop & Tablet (under 992px) */
+@media (max-width: 992px) {
+    header { padding: 1rem 3%; }
+    section { padding: 4rem 3%; }
+    .section-title h2 { font-size: 2.2rem; }
+    
+    .hero-content h2 { font-size: 2.5rem; }
+    .hero-content p { font-size: 1.2rem; }
+    
+    .rolling-header { font-size: 0.9rem; }
+    .rolling-item { font-size: 0.85rem; }
 }
 
-/* Mobile Media Query update for process */
+/* Tablet & Large Mobile (under 768px) */
 @media (max-width: 768px) {
-    nav ul { display: none; }
+    nav ul { display: none; } /* Mobile menu toggle would be better, but for now simple hide */
     
-    #hero-slider { height: 60vh; }
-    .hero-content h2 { font-size: 2.2rem; }
-    .hero-content p { font-size: 1.1rem; }
+    #hero-slider { height: 60vh; min-height: 400px; }
+    .hero-content h2 { font-size: 2rem; }
+    .hero-content p { font-size: 1.1rem; margin-bottom: 1.5rem; }
     .hero-btns .btn { padding: 1rem 2rem; font-size: 1.1rem; }
-
-    .process-container {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
+    
+    .slider-arrow { width: 40px; height: 40px; font-size: 1rem; }
+    
+    .pro-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+    .pro-box { padding: 2.5rem 1.5rem; }
+    
+    .service-grid { grid-template-columns: 1fr; }
+    
+    .process-container { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .process-step-box { padding: 1.2rem 0.8rem; }
+    .step-img-wrapper { height: 110px; }
+    .process-step-box h4 { font-size: 1.1rem; }
+    
+    /* Rolling List Mobile optimization - Hide less important columns */
+    .rolling-header, .rolling-item {
+        grid-template-columns: 1fr 1fr 1fr;
     }
-    .process-step-box { padding: 1.2rem 0.5rem; }
-    .step-img-wrapper { height: 90px; }
-    .process-step-box h4 { font-size: 1rem; }
+    .rolling-header .col:nth-child(4), .rolling-header .col:nth-child(5),
+    .rolling-item .col:nth-child(4), .rolling-item .col:nth-child(5) {
+        display: none;
+    }
     
-    .status-table-wrapper { padding: 0.5rem; }
-    .status-table th, .status-table td { padding: 0.8rem 0.5rem; font-size: 0.8rem; }
-
-    section { padding: 3rem 3%; }
+    .calendar-days-grid { gap: 2px; }
+    .day-cell { min-height: 80px; padding: 0.4rem; }
+    .day-num { font-size: 0.9rem; }
+    .day-status { font-size: 0.7rem; padding: 2px 4px; }
     
-    /* Admin Mobile */
     .admin-container { flex-direction: column; }
-    .admin-sidebar { width: 100%; height: auto; padding: 1rem; }
-    .admin-content { padding: 1rem; }
-    .admin-table { font-size: 0.8rem; }
+    .admin-sidebar { width: 100%; height: auto; padding: 1rem; position: static; }
+    .admin-content { padding: 1.5rem 1rem; }
+    .dashboard-stats { grid-template-columns: 1fr; }
 }
 
-/* --- Admin Dashboard Styles --- */
+/* Small Mobile (under 480px) */
+@media (max-width: 480px) {
+    .section-title h2 { font-size: 1.8rem; }
+    .hero-content h2 { font-size: 1.7rem; }
+    
+    .process-container { grid-template-columns: 1fr; }
+    .step-img-wrapper { height: 160px; }
+    
+    .rolling-container { height: 250px; }
+    .rolling-item { height: 50px; font-size: 0.75rem; }
+    
+    footer { padding: 3rem 5%; font-size: 0.85rem; }
+}
+
+/* --- Admin Specific Styles --- */
 .admin-body { background: #f0f2f5; }
 .admin-container { display: flex; min-height: 100vh; }
-
-/* Sidebar */
-.admin-sidebar { width: 250px; background: #2c3e50; color: #fff; padding: 2rem; display: flex; flex-direction: column; }
+.admin-sidebar { width: 250px; background: #2c3e50; color: #fff; padding: 2rem; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
 .sidebar-header { margin-bottom: 3rem; text-align: center; }
-.sidebar-header h2 { color: #fff; margin-bottom: 0.5rem; }
 .sidebar-menu { list-style: none; }
-.sidebar-menu li { margin-bottom: 1rem; }
-.sidebar-menu a { color: #bdc3c7; text-decoration: none; display: block; padding: 0.8rem; border-radius: 6px; transition: 0.3s; }
+.sidebar-menu li { margin-bottom: 0.5rem; }
+.sidebar-menu a { color: #bdc3c7; text-decoration: none; display: block; padding: 1rem; border-radius: 8px; transition: 0.3s; }
 .sidebar-menu a:hover, .sidebar-menu li.active a { background: var(--primary); color: #fff; }
-.sidebar-menu i { width: 25px; }
-
-/* Main Content */
-.admin-content { flex: 1; padding: 2rem 3rem; overflow-y: auto; }
-.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: var(--shadow); }
-.dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-.stat-card { background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: var(--shadow); text-align: center; }
-.stat-card h3 { font-size: 0.9rem; color: var(--gray); margin-bottom: 0.5rem; }
-.stat-card p { font-size: 2rem; font-weight: bold; color: var(--dark); }
-.stat-card.pending p { color: var(--accent-color); }
-.stat-card.confirmed p { color: var(--green); }
-
-/* Admin Table */
-.admin-table-wrapper { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: var(--shadow); }
-.table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.admin-table { width: 100%; border-collapse: collapse; }
-.admin-table th, .admin-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
-.admin-table th { background: #f8f9fa; font-weight: 600; color: #555; }
-.admin-table tr:hover { background: #f8f9fa; }
-
-/* Status Badges */
-.badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-.badge.pending { background: #fff3cd; color: #856404; }
-.badge.confirmed { background: #d4edda; color: #155724; }
-.badge.cancelled { background: #f8d7da; color: #721c24; }
-
-/* Admin Buttons */
-.btn-sm { padding: 5px 10px; font-size: 0.85rem; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px; }
-.btn-approve { background: var(--green); color: #fff; }
-.btn-cancel { background: var(--red); color: #fff; }
-.btn-delete { background: #999; color: #fff; }
-.no-data { text-align: center; padding: 3rem; color: var(--gray); }
+.admin-content { flex: 1; padding: 2.5rem; overflow-y: auto; }
+.admin-header { margin-bottom: 2rem; }
+.stat-card { background: #fff; padding: 2rem; border-radius: 12px; box-shadow: var(--shadow); text-align: center; }
+.admin-table-wrapper { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); overflow-x: auto; }
+.admin-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+.admin-table th, .admin-table td { padding: 1.2rem 1rem; text-align: left; border-bottom: 1px solid #eee; }
