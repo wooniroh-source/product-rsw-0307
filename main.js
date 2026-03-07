@@ -1,17 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. 내비게이션 및 스크롤 로직 ---
+    // --- 1. 내비게이션 및 모바일 메뉴 로직 ---
     const setupNavigation = () => {
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    e.preventDefault();
-                    targetElement.scrollIntoView({ behavior: 'smooth' });
+        const menuToggle = document.getElementById('mobile-menu');
+        const navMenu = document.querySelector('.nav-menu');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+        }
+
+        // 메뉴 클릭 시 자동으로 닫기 (앵커 링크인 경우)
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navMenu.classList.contains('active')) {
+                    menuToggle.classList.remove('active');
+                    navMenu.classList.remove('active');
                 }
             });
+        });
+
+        // 스크롤 시 헤더 스타일 변경
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.style.padding = '0.8rem 5%';
+                header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            } else {
+                header.style.padding = '1.2rem 5%';
+                header.style.boxShadow = 'none';
+            }
         });
     };
 
@@ -82,17 +102,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        prevMonthBtn.addEventListener('click', () => {
-            viewDate.setMonth(viewDate.getMonth() - 1);
-            bookingFormSection.style.display = 'none';
-            render();
-        });
+        if (prevMonthBtn) {
+            prevMonthBtn.addEventListener('click', () => {
+                viewDate.setMonth(viewDate.getMonth() - 1);
+                if (bookingFormSection) bookingFormSection.style.display = 'none';
+                render();
+            });
+        }
 
-        nextMonthBtn.addEventListener('click', () => {
-            viewDate.setMonth(viewDate.getMonth() + 1);
-            bookingFormSection.style.display = 'none';
-            render();
-        });
+        if (nextMonthBtn) {
+            nextMonthBtn.addEventListener('click', () => {
+                viewDate.setMonth(viewDate.getMonth() + 1);
+                if (bookingFormSection) bookingFormSection.style.display = 'none';
+                render();
+            });
+        }
 
         render();
     };
@@ -152,10 +176,10 @@ document.addEventListener('DOMContentLoaded', () => {
             tableBody.innerHTML = '';
 
             if (reservations.length === 0) {
-                noDataMessage.style.display = 'block';
+                if (noDataMessage) noDataMessage.style.display = 'block';
                 return;
             } else {
-                noDataMessage.style.display = 'none';
+                if (noDataMessage) noDataMessage.style.display = 'none';
             }
 
             reservations.sort((a, b) => b.id - a.id).forEach(res => {
@@ -287,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startAutoSlide();
     };
 
-    // --- 6. 배너 초기화 데이터 ---
+    // --- 6. 배너 데이터 ---
     const heroDefaults = [
         { id: 1, title: "당신의 숨결을 디자인합니다", desc: "전문 분해 세척으로 시작하는 깨끗한 실내 공기 솔루션", url: "https://images.unsplash.com/photo-1590402444816-05d848218571?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80", btnText: "온라인 예약하기", btnLink: "reservation.html" },
         { id: 2, title: "10년 경력의 베테랑 엔지니어", desc: "까다로운 시스템 에어컨부터 가정용까지 완벽하게 케어합니다", url: "https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80", btnText: "서비스 상세 보기", btnLink: "services.html" },
@@ -336,12 +360,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 최신순 5개 추출
         const recentReservations = reservations
             .sort((a, b) => b.id - a.id)
             .slice(0, 5);
 
-        // 롤링을 위해 데이터 복제 (연속성 확보)
         const displayList = [...recentReservations, ...recentReservations];
 
         container.innerHTML = '';
@@ -382,7 +404,6 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(item);
         });
 
-        // 롤링 애니메이션 시간 및 활성화 조절
         if (recentReservations.length > 0) {
             container.style.animation = `rollUp ${recentReservations.length * 4}s linear infinite`;
         } else {
