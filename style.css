@@ -242,8 +242,8 @@ section { padding: 5rem 5%; max-width: 1400px; margin: 0 auto; width: 100%; }
 /* Process Section */
 .process-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem 2rem;
 }
 
 .process-step-box {
