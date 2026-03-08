@@ -6,13 +6,19 @@
 // 0-A. Admin 인증 시스템 (SHA-256 + sessionStorage)
 // =============================================
 
-// 기본 비밀번호: Clean2026!  (변경 시 admin > 보안 설정 메뉴 사용)
-const DEFAULT_ADMIN_HASH = '0d8970f09c86da5b91e82d8f90c14fdf0688fe6b250eeca03bdb838afe132978';
+// 기본 비밀번호: 1234  (변경 시 admin > 보안 설정 메뉴 사용)
+const DEFAULT_ADMIN_HASH = '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
 
 const hashPassword = async (pw) => {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 };
+
+// 기본 비밀번호가 변경된 경우 이전 커스텀 해시 초기화
+if (localStorage.getItem('adminDefaultHash') !== DEFAULT_ADMIN_HASH) {
+    localStorage.removeItem('adminPasswordHash');
+    localStorage.setItem('adminDefaultHash', DEFAULT_ADMIN_HASH);
+}
 
 const getAdminHash = () => localStorage.getItem('adminPasswordHash') || DEFAULT_ADMIN_HASH;
 
@@ -68,8 +74,8 @@ window.changeAdminPassword = async (e) => {
         errorEl.textContent = '새 비밀번호가 일치하지 않습니다.';
         return errorEl.style.display = 'block';
     }
-    if (newPw.length < 8) {
-        errorEl.textContent = '비밀번호는 8자 이상이어야 합니다.';
+    if (newPw.length < 4) {
+        errorEl.textContent = '비밀번호는 4자 이상이어야 합니다.';
         return errorEl.style.display = 'block';
     }
     const currentHash = await hashPassword(current);
