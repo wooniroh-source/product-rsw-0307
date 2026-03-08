@@ -8,12 +8,40 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="admin-body">
-    <div class="admin-container">
+
+    <!-- 로그인 오버레이 -->
+    <div id="admin-login-overlay">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fas fa-shield-alt"></i>
+                <h2>관리자 로그인</h2>
+                <p>클린앤파트너즈 관리 시스템</p>
+            </div>
+            <form id="admin-login-form" onsubmit="adminLogin(event)">
+                <div class="input-group" style="text-align:left;">
+                    <label>비밀번호</label>
+                    <div class="pw-input-wrap">
+                        <input type="password" id="admin-password-input" placeholder="비밀번호를 입력하세요" required autofocus>
+                        <button type="button" class="pw-toggle" onclick="togglePwVisibility()">
+                            <i class="fas fa-eye" id="pw-eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="login-error" class="login-error" style="display:none;">비밀번호가 올바르지 않습니다.</div>
+                <button type="submit" class="submit-booking-btn" style="margin-top:0.5rem;">로그인</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="admin-main-container" class="admin-container" style="display:none;">
         <!-- 사이드바 -->
         <aside class="admin-sidebar">
             <div class="sidebar-header">
                 <h2>Admin</h2>
                 <p>관리 시스템</p>
+                <button class="logout-btn" onclick="adminLogout()">
+                    <i class="fas fa-sign-out-alt"></i> 로그아웃
+                </button>
             </div>
             <ul class="sidebar-menu">
                 <li class="active" id="menu-reservations">
@@ -54,6 +82,11 @@
                 <li id="menu-contacts">
                     <a href="javascript:void(0)" onclick="showSection('contacts')">
                         <i class="fas fa-comments"></i> <span>상담 문의</span>
+                    </a>
+                </li>
+                <li id="menu-security">
+                    <a href="javascript:void(0)" onclick="showSection('security')">
+                        <i class="fas fa-lock"></i> <span>보안 설정</span>
                     </a>
                 </li>
                 <li class="menu-divider"></li>
@@ -456,8 +489,46 @@
                     </form>
                 </div>
             </div>
+            <!-- 보안 설정 섹션 -->
+            <div id="section-security" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1>보안 설정</h1>
+                </header>
+
+                <div class="admin-table-wrapper" style="max-width: 500px;">
+                    <h3><i class="fas fa-key" style="margin-right:0.5rem;color:var(--primary);"></i>비밀번호 변경</h3>
+                    <form id="pw-change-form" class="admin-form" onsubmit="changeAdminPassword(event)" style="margin-top:1.5rem;">
+                        <div class="input-group">
+                            <label>현재 비밀번호</label>
+                            <input type="password" id="current-password" placeholder="현재 비밀번호 입력" required>
+                        </div>
+                        <div class="input-group">
+                            <label>새 비밀번호 <small style="color:#888;">(8자 이상)</small></label>
+                            <input type="password" id="new-password" placeholder="새 비밀번호 입력" required minlength="8">
+                        </div>
+                        <div class="input-group">
+                            <label>새 비밀번호 확인</label>
+                            <input type="password" id="confirm-password" placeholder="새 비밀번호 재입력" required>
+                        </div>
+                        <div id="pw-change-error" style="display:none; color:#dc2626; background:#fef2f2; padding:0.7rem 1rem; border-radius:8px; font-size:0.9rem; margin-bottom:1rem;"></div>
+                        <div id="pw-change-success" style="display:none; color:#065f46; background:#d1fae5; padding:0.7rem 1rem; border-radius:8px; font-size:0.9rem; margin-bottom:1rem;">✅ 비밀번호가 변경되었습니다. 다음 로그인부터 적용됩니다.</div>
+                        <button type="submit" class="submit-booking-btn" style="width:auto; padding:0.8rem 2rem;">비밀번호 변경</button>
+                    </form>
+                </div>
+
+                <div class="admin-table-wrapper" style="max-width: 500px; margin-top: 2rem;">
+                    <h3><i class="fas fa-info-circle" style="margin-right:0.5rem;color:#64748b;"></i>보안 안내</h3>
+                    <ul style="margin-top:1rem; padding-left:1.2rem; line-height:2; color:#475569; font-size:0.92rem;">
+                        <li>비밀번호는 SHA-256으로 암호화되어 저장됩니다.</li>
+                        <li>로그인 세션은 브라우저 탭을 닫으면 자동 만료됩니다.</li>
+                        <li>비밀번호는 8자 이상, 영문+숫자 혼합을 권장합니다.</li>
+                        <li>비밀번호를 분실한 경우 개발자에게 초기화를 요청하세요.</li>
+                    </ul>
+                </div>
+            </div>
         </main>
     </div>
     <script src="main.js"></script>
+</div><!-- /admin-main-container -->
 </body>
 </html>

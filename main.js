@@ -3,6 +3,86 @@
  */
 
 // =============================================
+// 0-A. Admin 인증 시스템 (SHA-256 + sessionStorage)
+// =============================================
+
+// 기본 비밀번호: Clean2026!  (변경 시 admin > 보안 설정 메뉴 사용)
+const DEFAULT_ADMIN_HASH = '0d8970f09c86da5b91e82d8f90c14fdf0688fe6b250eeca03bdb838afe132978';
+
+const hashPassword = async (pw) => {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
+const getAdminHash = () => localStorage.getItem('adminPasswordHash') || DEFAULT_ADMIN_HASH;
+
+window.adminLogin = async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('admin-password-input').value;
+    const errorEl = document.getElementById('login-error');
+    const inputHash = await hashPassword(input);
+
+    if (inputHash === getAdminHash()) {
+        sessionStorage.setItem('adminAuth', '1');
+        document.getElementById('admin-login-overlay').style.display = 'none';
+        document.getElementById('admin-main-container').style.display = 'flex';
+        showSection('reservations');
+    } else {
+        errorEl.style.display = 'block';
+        document.getElementById('admin-password-input').value = '';
+        const card = document.querySelector('.login-card');
+        card.classList.remove('shake');
+        void card.offsetWidth; // reflow for re-trigger
+        card.classList.add('shake');
+    }
+};
+
+window.adminLogout = () => {
+    sessionStorage.removeItem('adminAuth');
+    document.getElementById('admin-main-container').style.display = 'none';
+    document.getElementById('admin-login-overlay').style.display = 'flex';
+    document.getElementById('admin-password-input').value = '';
+    document.getElementById('login-error').style.display = 'none';
+};
+
+window.togglePwVisibility = () => {
+    const input = document.getElementById('admin-password-input');
+    const icon = document.getElementById('pw-eye-icon');
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    icon.className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+};
+
+window.changeAdminPassword = async (e) => {
+    e.preventDefault();
+    const current  = document.getElementById('current-password').value;
+    const newPw    = document.getElementById('new-password').value;
+    const confirm  = document.getElementById('confirm-password').value;
+    const errorEl  = document.getElementById('pw-change-error');
+    const successEl = document.getElementById('pw-change-success');
+
+    errorEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    if (newPw !== confirm) {
+        errorEl.textContent = '새 비밀번호가 일치하지 않습니다.';
+        return errorEl.style.display = 'block';
+    }
+    if (newPw.length < 8) {
+        errorEl.textContent = '비밀번호는 8자 이상이어야 합니다.';
+        return errorEl.style.display = 'block';
+    }
+    const currentHash = await hashPassword(current);
+    if (currentHash !== getAdminHash()) {
+        errorEl.textContent = '현재 비밀번호가 올바르지 않습니다.';
+        return errorEl.style.display = 'block';
+    }
+    localStorage.setItem('adminPasswordHash', await hashPassword(newPw));
+    successEl.style.display = 'block';
+    e.target.reset();
+};
+
+// =============================================
 // 0. 이메일 알림 설정 (Web3Forms)
 // ▶ https://web3forms.com 에서 Access Key 발급 후 아래에 입력
 // =============================================
@@ -74,7 +154,7 @@ const PROCESS_DEFAULTS = [
 // =============================================
 
 window.showSection = (sectionId) => {
-    const sections = ['reservations', 'banners', 'mid-banners', 'res-banners', 'svc-banners', 'about-banners', 'process', 'contacts'];
+    const sections = ['reservations', 'banners', 'mid-banners', 'res-banners', 'svc-banners', 'about-banners', 'process', 'contacts', 'security'];
     sections.forEach(s => {
         const el = document.getElementById(`section-${s}`);
         const menu = document.getElementById(`menu-${s}`);
@@ -1074,6 +1154,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 관리자 페이지 초기화 ---
     if (document.body.classList.contains('admin-body')) {
-        showSection('reservations');
+        if (sessionStorage.getItem('adminAuth') === '1') {
+            document.getElementById('admin-login-overlay').style.display = 'none';
+            document.getElementById('admin-main-container').style.display = 'flex';
+            showSection('reservations');
+        }
+        // 로그인 전에는 오버레이가 보임 (기본 상태)
     }
 });
