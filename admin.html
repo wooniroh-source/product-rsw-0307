@@ -36,6 +36,11 @@
                         <i class="fas fa-ticket"></i> <span>예약 이벤트 배너</span>
                     </a>
                 </li>
+                <li id="menu-svc-banners">
+                    <a href="javascript:void(0)" onclick="showSection('svc-banners')">
+                        <i class="fas fa-tags"></i> <span>서비스 이벤트 배너</span>
+                    </a>
+                </li>
                 <li id="menu-process">
                     <a href="javascript:void(0)" onclick="showSection('process')">
                         <i class="fas fa-tasks"></i> <span>공정 관리</span>
@@ -266,6 +271,61 @@
                         </table>
                     </div>
                     <div id="noResBannerMessage" class="no-data" style="display:none;">등록된 배너가 없습니다.</div>
+                </div>
+            </div>
+
+            <!-- 서비스 이벤트 배너 관리 섹션 -->
+            <div id="section-svc-banners" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1>서비스 이벤트 배너 관리</h1>
+                </header>
+
+                <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+                    <h3>새 이벤트 배너 추가 / 수정</h3>
+                    <form id="svcBannerForm" class="admin-form" onsubmit="handleSvcBannerSubmit(event)">
+                        <input type="hidden" id="svcBannerEditId" value="">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>뱃지 텍스트 <small style="color:#888;">(예: 이벤트, 할인, NEW)</small></label>
+                                <input type="text" id="svcBannerBadge" name="svcBannerBadge" placeholder="할인" required>
+                            </div>
+                            <div class="input-group">
+                                <label>배너 제목</label>
+                                <input type="text" id="svcBannerTitle" name="svcBannerTitle" placeholder="봄맞이 서비스 특가!" required>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>배너 설명</label>
+                                <input type="text" id="svcBannerDesc" name="svcBannerDesc" placeholder="배너에 표시될 상세 설명 문구" required>
+                            </div>
+                            <div class="input-group">
+                                <label>배너 이미지 URL</label>
+                                <input type="url" id="svcBannerUrl" name="svcBannerUrl" placeholder="https://images.unsplash.com/..." required>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:1rem; align-items:center;">
+                            <button type="submit" id="svcBannerSubmitBtn" class="submit-booking-btn" style="width: auto; padding: 0.8rem 2rem;">배너 등록하기</button>
+                            <button type="button" id="svcBannerCancelBtn" onclick="cancelSvcBannerEdit()" style="display:none; padding: 0.8rem 1.5rem; background:#eee; border:none; border-radius:8px; cursor:pointer; font-size:1rem;">취소</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="admin-table-wrapper">
+                    <h3>현재 등록된 이벤트 배너 목록</h3>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>미리보기</th>
+                                    <th>내용</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="svcBannerTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="noSvcBannerMessage" class="no-data" style="display:none;">등록된 배너가 없습니다.</div>
                 </div>
             </div>
 

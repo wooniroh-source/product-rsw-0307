@@ -17,6 +17,12 @@ const MID_DEFAULTS = [
     { id: 2, title: "쾌적한 여름의 시작", desc: "지금 예약하고 시원한 바람을 만나보세요.", url: "https://images.unsplash.com/photo-1563453392212-326f5e854473?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" }
 ];
 
+const SVC_BANNER_DEFAULTS = [
+    { id: 1, badge: "할인", title: "벽걸이 에어컨 세척 20% 할인", desc: "3월 한 달간 벽걸이형 단독 예약 시 할인 혜택을 드립니다.", url: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" },
+    { id: 2, badge: "패키지", title: "2-in-1 멀티형 세트 특가", desc: "스탠드 + 벽걸이 동시 신청 시 세트 할인가 적용됩니다.", url: "https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" },
+    { id: 3, badge: "안내", title: "천장형 시스템 에어컨 전문 케어", desc: "상업용 4Way 시스템 에어컨도 클린앤파트너즈가 책임집니다.", url: "https://images.unsplash.com/photo-1563453392212-326f5e854473?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" }
+];
+
 const RES_BANNER_DEFAULTS = [
     { id: 1, badge: "이벤트", title: "봄맞이 에어컨 세척 특가!", desc: "3월 한 달간 벽걸이형 20% 할인 혜택을 드립니다.", url: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" },
     { id: 2, badge: "NEW", title: "신규 고객 첫 예약 10% 할인", desc: "클린앤파트너즈 첫 이용 고객님께 드리는 특별 혜택", url: "https://images.unsplash.com/photo-1558389186-438424b00a32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" },
@@ -37,7 +43,7 @@ const PROCESS_DEFAULTS = [
 // =============================================
 
 window.showSection = (sectionId) => {
-    const sections = ['reservations', 'banners', 'mid-banners', 'res-banners', 'process', 'contacts'];
+    const sections = ['reservations', 'banners', 'mid-banners', 'res-banners', 'svc-banners', 'process', 'contacts'];
     sections.forEach(s => {
         const el = document.getElementById(`section-${s}`);
         const menu = document.getElementById(`menu-${s}`);
@@ -49,6 +55,7 @@ window.showSection = (sectionId) => {
     else if (sectionId === 'banners') renderAdminDataTable('banners', 'bannerTableBody');
     else if (sectionId === 'mid-banners') renderAdminDataTable('midBanners', 'midBannerTableBody');
     else if (sectionId === 'res-banners') renderResBannerTable();
+    else if (sectionId === 'svc-banners') renderSvcBannerTable();
     else if (sectionId === 'process') renderProcessEditForm();
     else if (sectionId === 'contacts') renderContactTable();
 };
@@ -324,6 +331,92 @@ window.deleteResBanner = (id) => {
     renderResBannerTable();
 };
 
+window.renderSvcBannerTable = () => {
+    const body = document.getElementById('svcBannerTableBody');
+    const noMsg = document.getElementById('noSvcBannerMessage');
+    if (!body) return;
+    let items = JSON.parse(localStorage.getItem('svcBanners') || '[]');
+    if (items.length === 0) items = SVC_BANNER_DEFAULTS;
+    body.innerHTML = '';
+    if (items.length === 0) {
+        if (noMsg) noMsg.style.display = 'block';
+        return;
+    }
+    if (noMsg) noMsg.style.display = 'none';
+    items.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="banner-thumb-cell"><img src="${item.url}" class="banner-thumb-img" onerror="this.alt='이미지 없음';"></td>
+            <td class="banner-info-cell">
+                <span style="display:inline-block;background:var(--primary);color:#fff;font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:4px;margin-bottom:4px;">${item.badge}</span>
+                <strong style="display:block;">${item.title}</strong>
+                <small>${item.desc}</small>
+            </td>
+            <td>
+                <div class="btn-group">
+                    <button class="btn-action btn-approve" onclick="editSvcBanner(${item.id})" title="수정"><i class="fas fa-edit"></i></button>
+                    <button class="btn-action btn-delete" onclick="deleteSvcBanner(${item.id})" title="삭제"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        `;
+        body.appendChild(tr);
+    });
+};
+
+window.handleSvcBannerSubmit = (e) => {
+    e.preventDefault();
+    const editId = document.getElementById('svcBannerEditId').value;
+    const badge = document.getElementById('svcBannerBadge').value;
+    const title = document.getElementById('svcBannerTitle').value;
+    const desc = document.getElementById('svcBannerDesc').value;
+    const url = document.getElementById('svcBannerUrl').value;
+
+    let items = JSON.parse(localStorage.getItem('svcBanners') || '[]');
+    if (items.length === 0) items = [...SVC_BANNER_DEFAULTS];
+
+    if (editId) {
+        const idx = items.findIndex(i => String(i.id) === editId);
+        if (idx !== -1) items[idx] = { id: items[idx].id, badge, title, desc, url };
+        alert('배너가 수정되었습니다.');
+    } else {
+        items.push({ id: Date.now(), badge, title, desc, url });
+        alert('배너가 등록되었습니다.');
+    }
+    localStorage.setItem('svcBanners', JSON.stringify(items));
+    cancelSvcBannerEdit();
+    renderSvcBannerTable();
+};
+
+window.editSvcBanner = (id) => {
+    let items = JSON.parse(localStorage.getItem('svcBanners') || '[]');
+    if (items.length === 0) items = [...SVC_BANNER_DEFAULTS];
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    document.getElementById('svcBannerEditId').value = item.id;
+    document.getElementById('svcBannerBadge').value = item.badge;
+    document.getElementById('svcBannerTitle').value = item.title;
+    document.getElementById('svcBannerDesc').value = item.desc;
+    document.getElementById('svcBannerUrl').value = item.url;
+    document.getElementById('svcBannerSubmitBtn').textContent = '배너 수정 저장';
+    document.getElementById('svcBannerCancelBtn').style.display = 'inline-block';
+    document.getElementById('svcBannerForm').scrollIntoView({ behavior: 'smooth' });
+};
+
+window.cancelSvcBannerEdit = () => {
+    document.getElementById('svcBannerEditId').value = '';
+    document.getElementById('svcBannerForm').reset();
+    document.getElementById('svcBannerSubmitBtn').textContent = '배너 등록하기';
+    document.getElementById('svcBannerCancelBtn').style.display = 'none';
+};
+
+window.deleteSvcBanner = (id) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    let items = JSON.parse(localStorage.getItem('svcBanners') || '[]');
+    if (items.length === 0) items = [...SVC_BANNER_DEFAULTS];
+    localStorage.setItem('svcBanners', JSON.stringify(items.filter(i => i.id !== id)));
+    renderSvcBannerTable();
+};
+
 window.handleProcessSubmit = (e) => {
     e.preventDefault();
     const titles = document.querySelectorAll('.proc-title');
@@ -524,6 +617,70 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             liveList.style.animation = `rollUp ${recent.length * 4}s linear infinite`;
         }
+    }
+
+    // --- 서비스 이벤트 배너 슬라이더 (services.html) ---
+    const svcBannerContainer = document.getElementById('svc-banner-container');
+    if (svcBannerContainer) {
+        let bannerData = JSON.parse(localStorage.getItem('svcBanners') || '[]');
+        if (bannerData.length === 0) bannerData = SVC_BANNER_DEFAULTS;
+
+        const dotsContainer = document.getElementById('svc-banner-dots');
+        const prevBtn = document.getElementById('svc-banner-prev');
+        const nextBtn = document.getElementById('svc-banner-next');
+
+        svcBannerContainer.innerHTML = '';
+        if (dotsContainer) dotsContainer.innerHTML = '';
+
+        bannerData.forEach((item, index) => {
+            const slide = document.createElement('div');
+            slide.classList.add('res-banner-slide');
+            if (index === 0) slide.classList.add('active');
+            slide.style.backgroundImage = `linear-gradient(to right, rgba(0,0,0,0.65) 40%, rgba(0,0,0,0.25)), url('${item.url}')`;
+            slide.innerHTML = `
+                <div class="res-banner-content">
+                    <span class="res-banner-badge">${item.badge}</span>
+                    <h4>${item.title}</h4>
+                    <p>${item.desc}</p>
+                </div>
+            `;
+            svcBannerContainer.appendChild(slide);
+
+            if (dotsContainer) {
+                const dot = document.createElement('span');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+                dot.dataset.index = index;
+                dotsContainer.appendChild(dot);
+            }
+        });
+
+        const slides = svcBannerContainer.querySelectorAll('.res-banner-slide');
+        const dots = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
+        let current = 0;
+        let timer;
+
+        const showSlide = (idx) => {
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+            if (slides[idx]) { slides[idx].classList.add('active'); current = idx; }
+            if (dots[idx]) dots[idx].classList.add('active');
+        };
+        const next = () => showSlide((current + 1) % slides.length);
+        const prev = () => showSlide((current - 1 + slides.length) % slides.length);
+        const startAuto = () => { clearInterval(timer); if (slides.length > 1) timer = setInterval(next, 4000); };
+
+        if (nextBtn) nextBtn.addEventListener('click', () => { next(); startAuto(); });
+        if (prevBtn) prevBtn.addEventListener('click', () => { prev(); startAuto(); });
+        if (dotsContainer) {
+            dotsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('dot')) {
+                    showSlide(parseInt(e.target.dataset.index));
+                    startAuto();
+                }
+            });
+        }
+        startAuto();
     }
 
     // --- 예약 이벤트 배너 슬라이더 (reservation.html) ---
