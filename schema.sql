@@ -1,8 +1,6 @@
 -- 클린앤파트너즈 DB 스키마
--- Railway MySQL 또는 로컬 MySQL에서 실행
-
-CREATE DATABASE IF NOT EXISTS cleanpartners CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE cleanpartners;
+-- Railway MySQL: 아래 명령어를 Railway MySQL 콘솔에서 실행하세요.
+-- (CREATE DATABASE / USE 불필요 - Railway가 자동으로 'railway' DB 생성)
 
 -- 예약
 CREATE TABLE IF NOT EXISTS reservations (
