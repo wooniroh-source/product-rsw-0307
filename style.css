@@ -597,6 +597,20 @@ td.no-data { padding: 3rem 0; }
     .rolling-header .col:nth-child(4), .rolling-header .col:nth-child(5),
     .rolling-item .col:nth-child(4), .rolling-item .col:nth-child(5) { display: none; }
 
+    /* 달력 모바일 대응 */
+    #reservation-page { padding: 3rem 4%; }
+    #reservation-page .section-title { margin-bottom: 1.5rem; }
+    #reservation-page .section-title h2 { font-size: 1.6rem; margin-bottom: 0.4rem; }
+    #reservation-page .section-title p { font-size: 0.9rem; }
+    .calendar-wrapper { padding: 1rem 0.6rem; }
+    .calendar-controls { margin-bottom: 0.8rem; }
+    .calendar-controls h3 { font-size: 1rem; }
+    .calendar-weekdays { font-size: 0.72rem; padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
+    .calendar-days-grid { gap: 3px; }
+    .day-cell { min-height: 50px; padding: 0.3rem 0.2rem; border-radius: 5px; }
+    .day-cell .day-num { font-size: 0.8rem; }
+    .day-cell .day-status { font-size: 0.55rem; padding: 1px 2px; }
+
     #contact form, .form-card { padding: 2.5rem 1.5rem; }
 
     /* Admin */
@@ -621,4 +635,19 @@ td.no-data { padding: 3rem 0; }
     .rolling-item { height: 60px; font-size: 0.8rem; }
     .price-table { font-size: 0.8rem; }
     .price-table th, .price-table td { padding: 0.8rem 0.5rem; }
+
+    /* 달력 소형 모바일 추가 대응 */
+    #reservation-page { padding: 2rem 3%; }
+    #reservation-page .section-title { margin-bottom: 1rem; }
+    #reservation-page .section-title h2 { font-size: 1.3rem; margin-bottom: 0.3rem; }
+    #reservation-page .section-title p { font-size: 0.78rem; }
+    .calendar-wrapper { padding: 0.8rem 0.4rem; }
+    .calendar-controls { margin-bottom: 0.6rem; }
+    .calendar-controls h3 { font-size: 0.9rem; }
+    .calendar-weekdays { font-size: 0.65rem; padding-bottom: 0.4rem; margin-bottom: 0.4rem; }
+    .calendar-days-grid { gap: 2px; }
+    .day-cell { min-height: 44px; padding: 0.25rem 0.15rem; border-radius: 4px; }
+    .day-cell .day-num { font-size: 0.72rem; }
+    .day-cell .day-status { display: none; }
+    .calendar-legend { font-size: 0.7rem; margin-top: 0.5rem; }
 }
