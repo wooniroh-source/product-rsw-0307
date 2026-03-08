@@ -17,6 +17,12 @@ const MID_DEFAULTS = [
     { id: 2, title: "쾌적한 여름의 시작", desc: "지금 예약하고 시원한 바람을 만나보세요.", url: "https://images.unsplash.com/photo-1563453392212-326f5e854473?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" }
 ];
 
+const RES_BANNER_DEFAULTS = [
+    { id: 1, badge: "이벤트", title: "봄맞이 에어컨 세척 특가!", desc: "3월 한 달간 벽걸이형 20% 할인 혜택을 드립니다.", url: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" },
+    { id: 2, badge: "NEW", title: "신규 고객 첫 예약 10% 할인", desc: "클린앤파트너즈 첫 이용 고객님께 드리는 특별 혜택", url: "https://images.unsplash.com/photo-1558389186-438424b00a32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" },
+    { id: 3, badge: "안내", title: "정기 관리 고객 우선 예약", desc: "연 2회 이상 정기 이용 고객님께 우선 예약 혜택을 제공합니다.", url: "https://images.unsplash.com/photo-1563453392212-326f5e854473?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" }
+];
+
 const PROCESS_DEFAULTS = [
     { title: "사전 점검", desc: "작동 상태 및 오염도 확인", url: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", icon: "fa-clipboard-check" },
     { title: "부품 분해", desc: "완전 분해를 통한 내부 노출", url: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", icon: "fa-tools" },
@@ -31,7 +37,7 @@ const PROCESS_DEFAULTS = [
 // =============================================
 
 window.showSection = (sectionId) => {
-    const sections = ['reservations', 'banners', 'mid-banners', 'process', 'contacts'];
+    const sections = ['reservations', 'banners', 'mid-banners', 'res-banners', 'process', 'contacts'];
     sections.forEach(s => {
         const el = document.getElementById(`section-${s}`);
         const menu = document.getElementById(`menu-${s}`);
@@ -42,6 +48,7 @@ window.showSection = (sectionId) => {
     if (sectionId === 'reservations') renderReservationTable();
     else if (sectionId === 'banners') renderAdminDataTable('banners', 'bannerTableBody');
     else if (sectionId === 'mid-banners') renderAdminDataTable('midBanners', 'midBannerTableBody');
+    else if (sectionId === 'res-banners') renderResBannerTable();
     else if (sectionId === 'process') renderProcessEditForm();
     else if (sectionId === 'contacts') renderContactTable();
 };
@@ -229,6 +236,92 @@ window.deleteContact = (id) => {
     const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
     localStorage.setItem('contacts', JSON.stringify(contacts.filter(c => c.id !== id)));
     renderContactTable();
+};
+
+window.renderResBannerTable = () => {
+    const body = document.getElementById('resBannerTableBody');
+    const noMsg = document.getElementById('noResBannerMessage');
+    if (!body) return;
+    let items = JSON.parse(localStorage.getItem('resBanners') || '[]');
+    if (items.length === 0) items = RES_BANNER_DEFAULTS;
+    body.innerHTML = '';
+    if (items.length === 0) {
+        if (noMsg) noMsg.style.display = 'block';
+        return;
+    }
+    if (noMsg) noMsg.style.display = 'none';
+    items.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="banner-thumb-cell"><img src="${item.url}" class="banner-thumb-img" onerror="this.alt='이미지 없음';"></td>
+            <td class="banner-info-cell">
+                <span style="display:inline-block;background:var(--primary);color:#fff;font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:4px;margin-bottom:4px;">${item.badge}</span>
+                <strong style="display:block;">${item.title}</strong>
+                <small>${item.desc}</small>
+            </td>
+            <td>
+                <div class="btn-group">
+                    <button class="btn-action btn-approve" onclick="editResBanner(${item.id})" title="수정"><i class="fas fa-edit"></i></button>
+                    <button class="btn-action btn-delete" onclick="deleteResBanner(${item.id})" title="삭제"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        `;
+        body.appendChild(tr);
+    });
+};
+
+window.handleResBannerSubmit = (e) => {
+    e.preventDefault();
+    const editId = document.getElementById('resBannerEditId').value;
+    const badge = document.getElementById('resBannerBadge').value;
+    const title = document.getElementById('resBannerTitle').value;
+    const desc = document.getElementById('resBannerDesc').value;
+    const url = document.getElementById('resBannerUrl').value;
+
+    let items = JSON.parse(localStorage.getItem('resBanners') || '[]');
+    if (items.length === 0) items = [...RES_BANNER_DEFAULTS];
+
+    if (editId) {
+        const idx = items.findIndex(i => String(i.id) === editId);
+        if (idx !== -1) items[idx] = { id: items[idx].id, badge, title, desc, url };
+        alert('배너가 수정되었습니다.');
+    } else {
+        items.push({ id: Date.now(), badge, title, desc, url });
+        alert('배너가 등록되었습니다.');
+    }
+    localStorage.setItem('resBanners', JSON.stringify(items));
+    cancelResBannerEdit();
+    renderResBannerTable();
+};
+
+window.editResBanner = (id) => {
+    let items = JSON.parse(localStorage.getItem('resBanners') || '[]');
+    if (items.length === 0) items = [...RES_BANNER_DEFAULTS];
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    document.getElementById('resBannerEditId').value = item.id;
+    document.getElementById('resBannerBadge').value = item.badge;
+    document.getElementById('resBannerTitle').value = item.title;
+    document.getElementById('resBannerDesc').value = item.desc;
+    document.getElementById('resBannerUrl').value = item.url;
+    document.getElementById('resBannerSubmitBtn').textContent = '배너 수정 저장';
+    document.getElementById('resBannerCancelBtn').style.display = 'inline-block';
+    document.getElementById('resBannerForm').scrollIntoView({ behavior: 'smooth' });
+};
+
+window.cancelResBannerEdit = () => {
+    document.getElementById('resBannerEditId').value = '';
+    document.getElementById('resBannerForm').reset();
+    document.getElementById('resBannerSubmitBtn').textContent = '배너 등록하기';
+    document.getElementById('resBannerCancelBtn').style.display = 'none';
+};
+
+window.deleteResBanner = (id) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    let items = JSON.parse(localStorage.getItem('resBanners') || '[]');
+    if (items.length === 0) items = [...RES_BANNER_DEFAULTS];
+    localStorage.setItem('resBanners', JSON.stringify(items.filter(i => i.id !== id)));
+    renderResBannerTable();
 };
 
 window.handleProcessSubmit = (e) => {
@@ -431,6 +524,70 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             liveList.style.animation = `rollUp ${recent.length * 4}s linear infinite`;
         }
+    }
+
+    // --- 예약 이벤트 배너 슬라이더 (reservation.html) ---
+    const resBannerContainer = document.getElementById('res-banner-container');
+    if (resBannerContainer) {
+        let bannerData = JSON.parse(localStorage.getItem('resBanners') || '[]');
+        if (bannerData.length === 0) bannerData = RES_BANNER_DEFAULTS;
+
+        const dotsContainer = document.getElementById('res-banner-dots');
+        const prevBtn = document.getElementById('res-banner-prev');
+        const nextBtn = document.getElementById('res-banner-next');
+
+        resBannerContainer.innerHTML = '';
+        if (dotsContainer) dotsContainer.innerHTML = '';
+
+        bannerData.forEach((item, index) => {
+            const slide = document.createElement('div');
+            slide.classList.add('res-banner-slide');
+            if (index === 0) slide.classList.add('active');
+            slide.style.backgroundImage = `linear-gradient(to right, rgba(0,0,0,0.65) 40%, rgba(0,0,0,0.25)), url('${item.url}')`;
+            slide.innerHTML = `
+                <div class="res-banner-content">
+                    <span class="res-banner-badge">${item.badge}</span>
+                    <h4>${item.title}</h4>
+                    <p>${item.desc}</p>
+                </div>
+            `;
+            resBannerContainer.appendChild(slide);
+
+            if (dotsContainer) {
+                const dot = document.createElement('span');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+                dot.dataset.index = index;
+                dotsContainer.appendChild(dot);
+            }
+        });
+
+        const slides = resBannerContainer.querySelectorAll('.res-banner-slide');
+        const dots = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
+        let current = 0;
+        let timer;
+
+        const showBannerSlide = (idx) => {
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+            if (slides[idx]) { slides[idx].classList.add('active'); current = idx; }
+            if (dots[idx]) dots[idx].classList.add('active');
+        };
+        const nextBanner = () => showBannerSlide((current + 1) % slides.length);
+        const prevBanner = () => showBannerSlide((current - 1 + slides.length) % slides.length);
+        const startBannerAuto = () => { clearInterval(timer); if (slides.length > 1) timer = setInterval(nextBanner, 4000); };
+
+        if (nextBtn) nextBtn.addEventListener('click', () => { nextBanner(); startBannerAuto(); });
+        if (prevBtn) prevBtn.addEventListener('click', () => { prevBanner(); startBannerAuto(); });
+        if (dotsContainer) {
+            dotsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('dot')) {
+                    showBannerSlide(parseInt(e.target.dataset.index));
+                    startBannerAuto();
+                }
+            });
+        }
+        startBannerAuto();
     }
 
     // --- 예약 달력 (reservation.html) ---
