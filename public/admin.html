@@ -163,32 +163,36 @@
 
                 <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
                     <h3>새 메인 배너 추가</h3>
-                    <form id="bannerForm" class="admin-form" onsubmit="handleBannerSubmit(event)">
+                    <form id="bannerForm" class="admin-form" onsubmit="handleBannerSubmitHero(event)">
+                        <input type="hidden" id="bannerEditId" value="">
                         <div class="form-grid">
                             <div class="input-group">
                                 <label>배너 제목</label>
-                                <input type="text" name="bannerTitle" placeholder="예: 프리미엄 에어컨 케어" required>
+                                <input type="text" id="bannerTitle" placeholder="예: 프리미엄 에어컨 케어" required>
                             </div>
                             <div class="input-group">
                                 <label>배너 이미지 URL</label>
-                                <input type="url" name="bannerUrl" placeholder="https://images.unsplash.com/..." required>
+                                <input type="url" id="bannerUrl" placeholder="https://images.unsplash.com/..." required>
                             </div>
                         </div>
                         <div class="input-group">
                             <label>배너 설명</label>
-                            <input type="text" name="bannerDesc" placeholder="배너에 표시될 상세 설명 문구" required>
+                            <input type="text" id="bannerDesc" placeholder="배너에 표시될 상세 설명 문구" required>
                         </div>
                         <div class="form-grid">
                             <div class="input-group">
                                 <label>버튼 텍스트</label>
-                                <input type="text" name="bannerBtnText" value="온라인 예약하기" required>
+                                <input type="text" id="bannerBtnText" value="온라인 예약하기" required>
                             </div>
                             <div class="input-group">
                                 <label>버튼 링크</label>
-                                <input type="text" name="bannerBtnLink" value="reservation.html" required>
+                                <input type="text" id="bannerBtnLink" value="reservation.html" required>
                             </div>
                         </div>
-                        <button type="submit" class="submit-booking-btn" style="width: auto; padding: 0.8rem 2rem;">배너 등록하기</button>
+                        <div style="display:flex;gap:1rem;align-items:center;">
+                            <button type="submit" id="bannerSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">배너 등록하기</button>
+                            <button type="button" id="bannerCancelBtn" onclick="cancelBannerEdit('hero')" style="display:none;padding:0.8rem 1.5rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">취소</button>
+                        </div>
                     </form>
                 </div>
 
@@ -220,21 +224,25 @@
                 <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
                     <h3>새 중간 배너 추가</h3>
                     <form id="midBannerForm" class="admin-form" onsubmit="handleMidBannerSubmit(event)">
+                        <input type="hidden" id="midBannerEditId" value="">
                         <div class="form-grid">
                             <div class="input-group">
                                 <label>배너 제목</label>
-                                <input type="text" name="midBannerTitle" required>
+                                <input type="text" id="midBannerTitle" required>
                             </div>
                             <div class="input-group">
                                 <label>배너 이미지 URL</label>
-                                <input type="url" name="midBannerUrl" required>
+                                <input type="url" id="midBannerUrl" required>
                             </div>
                         </div>
                         <div class="input-group">
                             <label>배너 설명</label>
-                            <input type="text" name="midBannerDesc" required>
+                            <input type="text" id="midBannerDesc" required>
                         </div>
-                        <button type="submit" class="submit-booking-btn" style="width: auto; padding: 0.8rem 2rem;">중간 배너 등록하기</button>
+                        <div style="display:flex;gap:1rem;align-items:center;">
+                            <button type="submit" id="midBannerSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">중간 배너 등록하기</button>
+                            <button type="button" id="midBannerCancelBtn" onclick="cancelBannerEdit('mid')" style="display:none;padding:0.8rem 1.5rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">취소</button>
+                        </div>
                     </form>
                 </div>
 

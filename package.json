@@ -1,0 +1,20 @@
+{
+  "name": "clean-and-partners",
+  "version": "1.0.0",
+  "description": "클린앤파트너즈 에어컨 토탈 케어",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.9.7"
+  }
+}
