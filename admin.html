@@ -16,18 +16,39 @@
                 <p>관리 시스템</p>
             </div>
             <ul class="sidebar-menu">
-                <li class="active" id="menu-reservations"><a href="#" onclick="showSection('reservations')"><i class="fas fa-list"></i> 예약 현황</a></li>
-                <li id="menu-banners"><a href="#" onclick="showSection('banners')"><i class="fas fa-images"></i> 메인 배너</a></li>
-                <li id="menu-mid-banners"><a href="#" onclick="showSection('mid-banners')"><i class="fas fa-film"></i> 중간 배너</a></li>
-                <li id="menu-process"><a href="#" onclick="showSection('process')"><i class="fas fa-tasks"></i> 공정 관리</a></li>
-                <li><a href="index.html"><i class="fas fa-home"></i> 홈페이지로</a></li>
+                <li class="active" id="menu-reservations">
+                    <a href="javascript:void(0)" onclick="showSection('reservations')">
+                        <i class="fas fa-list"></i> <span>예약 현황</span>
+                    </a>
+                </li>
+                <li id="menu-banners">
+                    <a href="javascript:void(0)" onclick="showSection('banners')">
+                        <i class="fas fa-images"></i> <span>메인 배너</span>
+                    </a>
+                </li>
+                <li id="menu-mid-banners">
+                    <a href="javascript:void(0)" onclick="showSection('mid-banners')">
+                        <i class="fas fa-film"></i> <span>중간 배너</span>
+                    </a>
+                </li>
+                <li id="menu-process">
+                    <a href="javascript:void(0)" onclick="showSection('process')">
+                        <i class="fas fa-tasks"></i> <span>공정 관리</span>
+                    </a>
+                </li>
+                <li class="menu-divider"></li>
+                <li>
+                    <a href="index.html">
+                        <i class="fas fa-home"></i> <span>홈페이지로</span>
+                    </a>
+                </li>
             </ul>
         </aside>
 
         <!-- 메인 콘텐츠 -->
         <main class="admin-content">
             <!-- 예약 현황 섹션 -->
-            <div id="section-reservations">
+            <div id="section-reservations" class="admin-section">
                 <header class="admin-header">
                     <h1>예약 현황 대시보드</h1>
                     <div class="admin-user">
@@ -53,24 +74,28 @@
                 <div class="admin-table-wrapper">
                     <div class="table-header">
                         <h3>최신 예약 목록</h3>
-                        <button id="refreshBtn" class="btn-sm"><i class="fas fa-sync-alt"></i> 새로고침</button>
+                        <button id="refreshBtn" class="btn-sm" onclick="renderReservationTable()">
+                            <i class="fas fa-sync-alt"></i> 새로고침
+                        </button>
                     </div>
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>신청일</th>
-                                <th>예약일시</th>
-                                <th>고객명</th>
-                                <th>연락처</th>
-                                <th>서비스</th>
-                                <th>상태</th>
-                                <th>관리</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reservationTableBody">
-                            <!-- JS로 데이터 로딩 -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>신청일</th>
+                                    <th>예약일시</th>
+                                    <th>고객명</th>
+                                    <th>연락처</th>
+                                    <th>서비스</th>
+                                    <th>상태</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reservationTableBody">
+                                <!-- JS로 데이터 로딩 -->
+                            </tbody>
+                        </table>
+                    </div>
                     <div id="noDataMessage" class="no-data" style="display: none;">
                         접수된 예약이 없습니다.
                     </div>
@@ -78,36 +103,36 @@
             </div>
 
             <!-- 메인 배너 관리 섹션 -->
-            <div id="section-banners" style="display: none;">
+            <div id="section-banners" class="admin-section" style="display: none;">
                 <header class="admin-header">
                     <h1>메인 슬라이드 배너 관리</h1>
                 </header>
 
                 <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
                     <h3>새 메인 배너 추가</h3>
-                    <form id="bannerForm" style="margin-top: 1.5rem;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <form id="bannerForm" class="admin-form" onsubmit="handleBannerSubmit(event)">
+                        <div class="form-grid">
                             <div class="input-group">
                                 <label>배너 제목</label>
                                 <input type="text" name="bannerTitle" placeholder="예: 프리미엄 에어컨 케어" required>
                             </div>
                             <div class="input-group">
                                 <label>배너 이미지 URL</label>
-                                <input type="url" name="bannerUrl" placeholder="https://example.com/image.jpg" required>
+                                <input type="url" name="bannerUrl" placeholder="https://images.unsplash.com/..." required>
                             </div>
                         </div>
-                        <div class="input-group" style="margin-bottom: 1rem;">
+                        <div class="input-group">
                             <label>배너 설명</label>
                             <input type="text" name="bannerDesc" placeholder="배너에 표시될 상세 설명 문구" required>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="form-grid">
                             <div class="input-group">
                                 <label>버튼 텍스트</label>
-                                <input type="text" name="bannerBtnText" placeholder="예: 예약하기" required>
+                                <input type="text" name="bannerBtnText" value="온라인 예약하기" required>
                             </div>
                             <div class="input-group">
                                 <label>버튼 링크</label>
-                                <input type="text" name="bannerBtnLink" placeholder="reservation.html" required>
+                                <input type="text" name="bannerBtnLink" value="reservation.html" required>
                             </div>
                         </div>
                         <button type="submit" class="submit-booking-btn" style="width: auto; padding: 0.8rem 2rem;">배너 등록하기</button>
@@ -116,43 +141,45 @@
 
                 <div class="admin-table-wrapper">
                     <h3>현재 등록된 메인 배너 목록</h3>
-                    <table class="admin-table" style="margin-top: 1rem;">
-                        <thead>
-                            <tr>
-                                <th>이미지 미리보기</th>
-                                <th>내용</th>
-                                <th>관리</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bannerTableBody">
-                            <!-- JS로 데이터 로딩 -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>미리보기</th>
+                                    <th>내용</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bannerTableBody">
+                                <!-- JS로 데이터 로딩 -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- 중간 배너 관리 섹션 -->
-            <div id="section-mid-banners" style="display: none;">
+            <div id="section-mid-banners" class="admin-section" style="display: none;">
                 <header class="admin-header">
                     <h1>중간 슬라이드 배너 관리</h1>
                 </header>
 
                 <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
                     <h3>새 중간 배너 추가</h3>
-                    <form id="midBannerForm" style="margin-top: 1.5rem;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <form id="midBannerForm" class="admin-form" onsubmit="handleMidBannerSubmit(event)">
+                        <div class="form-grid">
                             <div class="input-group">
                                 <label>배너 제목</label>
-                                <input type="text" name="midBannerTitle" placeholder="중간 배너 제목" required>
+                                <input type="text" name="midBannerTitle" required>
                             </div>
                             <div class="input-group">
                                 <label>배너 이미지 URL</label>
-                                <input type="url" name="midBannerUrl" placeholder="https://example.com/image.jpg" required>
+                                <input type="url" name="midBannerUrl" required>
                             </div>
                         </div>
-                        <div class="input-group" style="margin-bottom: 1rem;">
+                        <div class="input-group">
                             <label>배너 설명</label>
-                            <input type="text" name="midBannerDesc" placeholder="상세 설명" required>
+                            <input type="text" name="midBannerDesc" required>
                         </div>
                         <button type="submit" class="submit-booking-btn" style="width: auto; padding: 0.8rem 2rem;">중간 배너 등록하기</button>
                     </form>
@@ -160,33 +187,33 @@
 
                 <div class="admin-table-wrapper">
                     <h3>현재 등록된 중간 배너 목록</h3>
-                    <table class="admin-table" style="margin-top: 1rem;">
-                        <thead>
-                            <tr>
-                                <th>이미지 미리보기</th>
-                                <th>내용</th>
-                                <th>관리</th>
-                            </tr>
-                        </thead>
-                        <tbody id="midBannerTableBody">
-                            <!-- JS로 데이터 로딩 -->
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>미리보기</th>
+                                    <th>내용</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="midBannerTableBody">
+                                <!-- JS로 데이터 로딩 -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- 공정 관리 섹션 -->
-            <div id="section-process" style="display: none;">
+            <div id="section-process" class="admin-section" style="display: none;">
                 <header class="admin-header">
                     <h1>6단계 안심 공정 관리</h1>
                 </header>
 
                 <div class="admin-table-wrapper">
                     <h3>단계별 이미지 및 내용 수정</h3>
-                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 1.5rem;">각 단계의 이미지 URL과 설명을 입력하고 저장하세요.</p>
-                    
-                    <form id="processForm">
-                        <div id="process-steps-edit-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <form id="processForm" onsubmit="handleProcessSubmit(event)">
+                        <div id="process-steps-edit-container" class="form-grid-3">
                             <!-- JS로 6개 단계 폼 생성됨 -->
                         </div>
                         <div style="margin-top: 2rem; text-align: center;">
