@@ -3,29 +3,28 @@
  */
 
 // =============================================
-// 0. EmailJS 설정 (아래 값을 직접 입력하세요)
+// 0. 이메일 알림 설정 (Web3Forms)
+// ▶ https://web3forms.com 에서 Access Key 발급 후 아래에 입력
 // =============================================
-const EMAILJS_CONFIG = {
-    publicKey:              'YOUR_PUBLIC_KEY',           // EmailJS > Account > Public Key
-    serviceId:              'YOUR_SERVICE_ID',           // EmailJS > Email Services > Service ID
-    reservationTemplateId:  'YOUR_RESERVATION_TEMPLATE_ID', // 예약 알림 템플릿 ID
-    contactTemplateId:      'YOUR_CONTACT_TEMPLATE_ID'  // 문의 알림 템플릿 ID
-};
-
-// EmailJS 초기화
-if (typeof emailjs !== 'undefined' && EMAILJS_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY') {
-    emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
-}
+const WEB3FORMS_ACCESS_KEY = 'YOUR_ACCESS_KEY_HERE';
 
 /**
- * 이메일 알림 발송
- * @param {string} templateId - 사용할 템플릿 ID
- * @param {object} params     - 템플릿에 전달할 변수
+ * 이메일 알림 발송 (Web3Forms)
+ * @param {string} subject - 메일 제목
+ * @param {string} html    - 메일 본문 (HTML)
  */
-const sendEmailNotification = (templateId, params) => {
-    if (typeof emailjs === 'undefined' || EMAILJS_CONFIG.publicKey === 'YOUR_PUBLIC_KEY') return;
-    emailjs.send(EMAILJS_CONFIG.serviceId, templateId, params)
-        .catch(err => console.error('[EmailJS] 전송 실패:', err));
+const sendEmailNotification = (subject, html) => {
+    if (WEB3FORMS_ACCESS_KEY === 'YOUR_ACCESS_KEY_HERE') return;
+    fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            access_key: WEB3FORMS_ACCESS_KEY,
+            subject,
+            html,
+            from_name: '클린앤파트너즈 알림'
+        })
+    }).catch(err => console.error('[Web3Forms] 전송 실패:', err));
 };
 
 // =============================================
@@ -1015,15 +1014,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 이메일 알림 발송
             const serviceNames = { wall: '벽걸이 에어컨', stand: '스탠드 에어컨', multi: '2-in-1 멀티형', system: '천장형 시스템' };
-            sendEmailNotification(EMAILJS_CONFIG.reservationTemplateId, {
-                to_email:         'wooniroh@gmail.com',
-                customer_name:    data.user_name,
-                customer_phone:   data.user_phone,
-                service_type:     serviceNames[data.service_type] || data.service_type,
-                reservation_date: data.selected_date,
-                reservation_time: data.booking_time,
-                submitted_at:     new Date().toLocaleString('ko-KR')
-            });
+            sendEmailNotification(
+                `[클린앤파트너즈] 새 예약 접수 - ${data.user_name} (${data.selected_date})`,
+                `<table style="width:100%;max-width:500px;border-collapse:collapse;font-family:sans-serif;font-size:15px;">
+                  <tr><td colspan="2" style="background:#1a56db;color:#fff;padding:16px 20px;font-size:18px;font-weight:bold;">📋 새 예약이 접수되었습니다</td></tr>
+                  <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;width:35%;">고객명</td><td style="padding:12px 20px;border-bottom:1px solid #eee;font-weight:bold;">${data.user_name}</td></tr>
+                  <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">연락처</td><td style="padding:12px 20px;border-bottom:1px solid #eee;">${data.user_phone}</td></tr>
+                  <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">서비스</td><td style="padding:12px 20px;border-bottom:1px solid #eee;">${serviceNames[data.service_type] || data.service_type}</td></tr>
+                  <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">예약 날짜</td><td style="padding:12px 20px;border-bottom:1px solid #eee;font-weight:bold;color:#1a56db;">${data.selected_date}</td></tr>
+                  <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">희망 시간</td><td style="padding:12px 20px;border-bottom:1px solid #eee;">${data.booking_time}</td></tr>
+                  <tr><td style="padding:12px 20px;color:#555;">신청 시각</td><td style="padding:12px 20px;color:#999;">${new Date().toLocaleString('ko-KR')}</td></tr>
+                </table>`
+            );
 
             alert('예약이 성공적으로 접수되었습니다!');
             bookingForm.reset();
@@ -1052,13 +1054,16 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('contacts', JSON.stringify(contacts));
 
             // 이메일 알림 발송
-            sendEmailNotification(EMAILJS_CONFIG.contactTemplateId, {
-                to_email:       'wooniroh@gmail.com',
-                customer_name:  contact.name,
-                customer_phone: contact.phone,
-                message:        contact.message,
-                submitted_at:   contact.createdAt
-            });
+            sendEmailNotification(
+                `[클린앤파트너즈] 새 문의 접수 - ${contact.name}`,
+                `<table style="width:100%;max-width:500px;border-collapse:collapse;font-family:sans-serif;font-size:15px;">
+                  <tr><td colspan="2" style="background:#0e9f6e;color:#fff;padding:16px 20px;font-size:18px;font-weight:bold;">💬 새 문의가 접수되었습니다</td></tr>
+                  <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;width:35%;">고객명</td><td style="padding:12px 20px;border-bottom:1px solid #eee;font-weight:bold;">${contact.name}</td></tr>
+                  <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">연락처</td><td style="padding:12px 20px;border-bottom:1px solid #eee;">${contact.phone}</td></tr>
+                  <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">문의 내용</td><td style="padding:12px 20px;border-bottom:1px solid #eee;white-space:pre-wrap;">${contact.message}</td></tr>
+                  <tr><td style="padding:12px 20px;color:#555;">접수 시각</td><td style="padding:12px 20px;color:#999;">${contact.createdAt}</td></tr>
+                </table>`
+            );
 
             contactForm.style.display = 'none';
             const successEl = document.getElementById('contact-success');
