@@ -31,7 +31,7 @@ const PROCESS_DEFAULTS = [
 // =============================================
 
 window.showSection = (sectionId) => {
-    const sections = ['reservations', 'banners', 'mid-banners', 'process'];
+    const sections = ['reservations', 'banners', 'mid-banners', 'process', 'contacts'];
     sections.forEach(s => {
         const el = document.getElementById(`section-${s}`);
         const menu = document.getElementById(`menu-${s}`);
@@ -43,6 +43,7 @@ window.showSection = (sectionId) => {
     else if (sectionId === 'banners') renderAdminDataTable('banners', 'bannerTableBody');
     else if (sectionId === 'mid-banners') renderAdminDataTable('midBanners', 'midBannerTableBody');
     else if (sectionId === 'process') renderProcessEditForm();
+    else if (sectionId === 'contacts') renderContactTable();
 };
 
 window.renderReservationTable = () => {
@@ -176,6 +177,58 @@ window.renderProcessEditForm = () => {
         `;
         container.appendChild(div);
     });
+};
+
+window.renderContactTable = () => {
+    const tableBody = document.getElementById('contactTableBody');
+    const totalCount = document.getElementById('contactTotalCount');
+    const unreadCount = document.getElementById('contactUnreadCount');
+    const readCount = document.getElementById('contactReadCount');
+    const noMsg = document.getElementById('noContactMessage');
+    if (!tableBody) return;
+
+    const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+    if (totalCount) totalCount.textContent = `${contacts.length}건`;
+    if (unreadCount) unreadCount.textContent = `${contacts.filter(c => !c.read).length}건`;
+    if (readCount) readCount.textContent = `${contacts.filter(c => c.read).length}건`;
+
+    tableBody.innerHTML = '';
+    if (contacts.length === 0) {
+        if (noMsg) noMsg.style.display = 'block';
+        return;
+    }
+    if (noMsg) noMsg.style.display = 'none';
+
+    contacts.sort((a, b) => b.id - a.id).forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="text-muted" style="white-space:nowrap;">${c.createdAt}</td>
+            <td class="text-bold">${c.name}</td>
+            <td>${c.phone}</td>
+            <td class="contact-message-cell">${c.message}</td>
+            <td><span class="badge ${c.read ? 'confirmed' : 'pending'}">${c.read ? '확인완료' : '미확인'}</span></td>
+            <td>
+                <div class="btn-group">
+                    ${!c.read ? `<button class="btn-action btn-approve" onclick="markContactRead(${c.id})" title="확인완료"><i class="fas fa-check"></i></button>` : ''}
+                    <button class="btn-action btn-delete" onclick="deleteContact(${c.id})" title="삭제"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(tr);
+    });
+};
+
+window.markContactRead = (id) => {
+    const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+    const idx = contacts.findIndex(c => c.id === id);
+    if (idx !== -1) { contacts[idx].read = true; localStorage.setItem('contacts', JSON.stringify(contacts)); renderContactTable(); }
+};
+
+window.deleteContact = (id) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+    localStorage.setItem('contacts', JSON.stringify(contacts.filter(c => c.id !== id)));
+    renderContactTable();
 };
 
 window.handleProcessSubmit = (e) => {
@@ -480,6 +533,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const bookingFormSection = document.getElementById('bookingFormSection');
             if (bookingFormSection) bookingFormSection.style.display = 'none';
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // --- 상담 문의 폼 (contact.html) ---
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const data = new FormData(contactForm);
+            const contact = {
+                id: Date.now(),
+                createdAt: new Date().toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+                name: data.get('name'),
+                phone: data.get('phone'),
+                message: data.get('message'),
+                read: false
+            };
+            const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+            contacts.push(contact);
+            localStorage.setItem('contacts', JSON.stringify(contacts));
+
+            contactForm.style.display = 'none';
+            const successEl = document.getElementById('contact-success');
+            if (successEl) successEl.style.display = 'block';
+            contactForm.reset();
         });
     }
 
