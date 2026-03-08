@@ -3,6 +3,32 @@
  */
 
 // =============================================
+// 0. EmailJS 설정 (아래 값을 직접 입력하세요)
+// =============================================
+const EMAILJS_CONFIG = {
+    publicKey:              'YOUR_PUBLIC_KEY',           // EmailJS > Account > Public Key
+    serviceId:              'YOUR_SERVICE_ID',           // EmailJS > Email Services > Service ID
+    reservationTemplateId:  'YOUR_RESERVATION_TEMPLATE_ID', // 예약 알림 템플릿 ID
+    contactTemplateId:      'YOUR_CONTACT_TEMPLATE_ID'  // 문의 알림 템플릿 ID
+};
+
+// EmailJS 초기화
+if (typeof emailjs !== 'undefined' && EMAILJS_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY') {
+    emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+}
+
+/**
+ * 이메일 알림 발송
+ * @param {string} templateId - 사용할 템플릿 ID
+ * @param {object} params     - 템플릿에 전달할 변수
+ */
+const sendEmailNotification = (templateId, params) => {
+    if (typeof emailjs === 'undefined' || EMAILJS_CONFIG.publicKey === 'YOUR_PUBLIC_KEY') return;
+    emailjs.send(EMAILJS_CONFIG.serviceId, templateId, params)
+        .catch(err => console.error('[EmailJS] 전송 실패:', err));
+};
+
+// =============================================
 // 1. 기본 데이터 상수
 // =============================================
 
@@ -986,6 +1012,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
             reservations.push(newReservation);
             localStorage.setItem('reservations', JSON.stringify(reservations));
+
+            // 이메일 알림 발송
+            const serviceNames = { wall: '벽걸이 에어컨', stand: '스탠드 에어컨', multi: '2-in-1 멀티형', system: '천장형 시스템' };
+            sendEmailNotification(EMAILJS_CONFIG.reservationTemplateId, {
+                to_email:         'wooniroh@gmail.com',
+                customer_name:    data.user_name,
+                customer_phone:   data.user_phone,
+                service_type:     serviceNames[data.service_type] || data.service_type,
+                reservation_date: data.selected_date,
+                reservation_time: data.booking_time,
+                submitted_at:     new Date().toLocaleString('ko-KR')
+            });
+
             alert('예약이 성공적으로 접수되었습니다!');
             bookingForm.reset();
             const bookingFormSection = document.getElementById('bookingFormSection');
@@ -1011,6 +1050,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
             contacts.push(contact);
             localStorage.setItem('contacts', JSON.stringify(contacts));
+
+            // 이메일 알림 발송
+            sendEmailNotification(EMAILJS_CONFIG.contactTemplateId, {
+                to_email:       'wooniroh@gmail.com',
+                customer_name:  contact.name,
+                customer_phone: contact.phone,
+                message:        contact.message,
+                submitted_at:   contact.createdAt
+            });
 
             contactForm.style.display = 'none';
             const successEl = document.getElementById('contact-success');
