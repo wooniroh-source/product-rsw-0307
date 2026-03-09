@@ -16,6 +16,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 // =============================================
 async function initDB() {
   try {
+    // 1. 관리자 설정 테이블 (가장 중요하므로 먼저 생성)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS admin_config (
+        id            INT AUTO_INCREMENT PRIMARY KEY,
+        password_hash VARCHAR(64) NOT NULL
+      )
+    `);
+    
+    // 관리자 비밀번호 기본값: 1234 (SHA-256)
+    const [adminRows] = await pool.query('SELECT id FROM admin_config LIMIT 1');
+    if (!adminRows.length) {
+      await pool.query(
+        "INSERT INTO admin_config (password_hash) VALUES ('03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4')"
+      );
+      console.log('✅ 기본 관리자 비밀번호 생성 완료 (1234)');
+    }
+
+    // 2. 나머지 테이블 생성
     await pool.query(`
       CREATE TABLE IF NOT EXISTS reservations (
         id         INT AUTO_INCREMENT PRIMARY KEY,
@@ -66,22 +84,8 @@ async function initDB() {
       )
     `);
 
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS admin_config (
-        id            INT AUTO_INCREMENT PRIMARY KEY,
-        password_hash VARCHAR(64) NOT NULL
-      )
-    `);
-
-    // 관리자 비밀번호 기본값: 1234 (SHA-256)
-    const [adminRows] = await pool.query('SELECT id FROM admin_config LIMIT 1');
-    if (!adminRows.length) {
-      await pool.query(
-        "INSERT INTO admin_config (password_hash) VALUES ('03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4')"
-      );
-      console.log('✅ 기본 관리자 비밀번호 생성 완료 (1234)');
-    }
-
+    // 3. 기본 데이터 채우기 (이미 존재하지 않는 경우에만)
+    
     // 배너 기본 데이터
     const [bannerRows] = await pool.query('SELECT id FROM banners LIMIT 1');
     if (!bannerRows.length) {
@@ -126,6 +130,7 @@ async function initDB() {
     console.log('✅ DB 초기화 완료');
   } catch (e) {
     console.error('❌ DB 초기화 실패:', e.message);
+    throw e; // 서버 시작을 중단시키기 위해 에러를 다시 던짐
   }
 }
 
@@ -135,13 +140,20 @@ async function initDB() {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { hash } = req.body;
+    console.log('[Auth] Login attempt with hash:', hash);
     const [rows] = await pool.query('SELECT password_hash FROM admin_config LIMIT 1');
-    if (!rows.length || rows[0].password_hash !== hash) {
+    if (!rows.length) {
+      console.warn('[Auth] No admin_config record found!');
+      return res.status(401).json({ error: '관리자 계정이 존재하지 않습니다.' });
+    }
+    if (rows[0].password_hash !== hash) {
+      console.warn('[Auth] Invalid hash. Expected:', rows[0].password_hash, 'Got:', hash);
       return res.status(401).json({ error: '비밀번호가 올바르지 않습니다.' });
     }
     const token = jwt.sign({ admin: true }, JWT_SECRET, { expiresIn: '8h' });
     res.json({ token });
   } catch (e) {
+    console.error('[Auth] Login error:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
@@ -318,4 +330,7 @@ app.get('*', (req, res) => {
 const PORT = process.env.PORT || 3000;
 initDB().then(() => {
   app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+}).catch(err => {
+  console.error('❌ 서버 시작 실패 (DB 초기화 오류):', err.message);
+  process.exit(1);
 });
