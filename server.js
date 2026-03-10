@@ -16,9 +16,15 @@ const sendEmail = async (subject, message) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, message, from_name: '클린앤파트너즈 알림' })
     });
-    const data = await res.json();
-    if (data.success) console.log('[Email] 발송 성공:', subject);
-    else console.error('[Email] 발송 실패:', data);
+    const text = await res.text();
+    console.log('[Email] 응답 status:', res.status, '| body:', text.slice(0, 200));
+    try {
+      const data = JSON.parse(text);
+      if (data.success) console.log('[Email] 발송 성공');
+      else console.error('[Email] 발송 실패:', data);
+    } catch (_) {
+      console.error('[Email] JSON 파싱 실패 - HTML 응답:', text.slice(0, 300));
+    }
   } catch (err) {
     console.error('[Email] 오류:', err.message);
   }
