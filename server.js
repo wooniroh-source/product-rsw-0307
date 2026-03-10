@@ -7,28 +7,6 @@ const auth    = require('./src/middleware/auth');
 
 const app = express();
 const JWT_SECRET = process.env.JWT_SECRET || 'cleanpartners_secret';
-const WEB3FORMS_KEY = process.env.WEB3FORMS_KEY || '962f5bff-992d-4cc2-b8bf-0b4966759efa';
-
-const sendEmail = async (subject, message) => {
-  try {
-    const res = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, message, from_name: '클린앤파트너즈 알림' })
-    });
-    const text = await res.text();
-    console.log('[Email] 응답 status:', res.status, '| body:', text.slice(0, 200));
-    try {
-      const data = JSON.parse(text);
-      if (data.success) console.log('[Email] 발송 성공');
-      else console.error('[Email] 발송 실패:', data);
-    } catch (_) {
-      console.error('[Email] JSON 파싱 실패 - HTML 응답:', text.slice(0, 300));
-    }
-  } catch (err) {
-    console.error('[Email] 오류:', err.message);
-  }
-};
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -232,11 +210,6 @@ app.post('/api/reservations', async (req, res) => {
       [name, phone, service, date, time]
     );
     res.json({ id: result.insertId });
-    const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
-    sendEmail(
-      `[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`,
-      `새 예약이 접수되었습니다.\n\n고객명: ${name}\n연락처: ${phone}\n서비스: ${svcNames[service]||service}\n예약날짜: ${date}\n희망시간: ${time}`
-    );
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -272,10 +245,6 @@ app.post('/api/contacts', async (req, res) => {
       [name, phone, message]
     );
     res.json({ id: result.insertId });
-    sendEmail(
-      `[클린앤파트너즈] 새 문의 접수 - ${name}`,
-      `새 문의가 접수되었습니다.\n\n고객명: ${name}\n연락처: ${phone}\n문의내용: ${message}`
-    );
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -362,29 +331,6 @@ app.put('/api/process', auth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// =============================================
-// 이메일 테스트 (배포 환경 확인용)
-// =============================================
-app.get('/api/test-email', async (req, res) => {
-  try {
-    const result = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        access_key: WEB3FORMS_KEY,
-        subject: '[클린앤파트너즈] 이메일 테스트',
-        message: '서버에서 발송한 테스트 이메일입니다.',
-        from_name: '클린앤파트너즈 알림'
-      })
-    });
-    const data = await result.json();
-    console.log('[Email Test]', data);
-    res.json(data);
-  } catch (err) {
-    console.error('[Email Test Error]', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
 
 // =============================================
 // Fallback → index.html
