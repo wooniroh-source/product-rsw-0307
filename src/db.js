@@ -2,7 +2,7 @@ const mysql = require('mysql2/promise');
 
 // Railway 표준 변수명 및 기존 변수명 모두 지원
 const dbConfig = {
-  host:     process.env.MYSQLHOST || process.env.DB_HOST || '127.0.0.1',
+  host:     process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
   port:     parseInt(process.env.MYSQLPORT || process.env.DB_PORT) || 3306,
   user:     process.env.MYSQLUSER || process.env.DB_USER || 'root',
   password: process.env.MYSQLPASSWORD || process.env.DB_PASS || '',
