@@ -343,6 +343,30 @@ app.put('/api/process', auth, async (req, res) => {
 });
 
 // =============================================
+// 이메일 테스트 (배포 환경 확인용)
+// =============================================
+app.get('/api/test-email', async (req, res) => {
+  try {
+    const result = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        access_key: WEB3FORMS_KEY,
+        subject: '[클린앤파트너즈] 이메일 테스트',
+        message: '서버에서 발송한 테스트 이메일입니다.',
+        from_name: '클린앤파트너즈 알림'
+      })
+    });
+    const data = await result.json();
+    console.log('[Email Test]', data);
+    res.json(data);
+  } catch (err) {
+    console.error('[Email Test Error]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// =============================================
 // Fallback → index.html
 // =============================================
 app.get('*', (req, res) => {
