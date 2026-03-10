@@ -484,10 +484,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const cell = document.createElement('div');
         cell.classList.add('day-cell');
         const date = new Date(year, month, day);
-        const isPast = date < today, isWknd = (date.getDay()===0||date.getDay()===6);
-        cell.innerHTML = `<span class="day-num">${day}</span><span class="day-status ${isPast?'past':isWknd?'full':'avail'}">${isPast?'종료':isWknd?'마감':'가능'}</span>`;
+        const isPast = date < today;
+        cell.innerHTML = `<span class="day-num">${day}</span><span class="day-status ${isPast?'past':'avail'}">${isPast?'종료':'가능'}</span>`;
         if (date.getTime()===today.getTime()) cell.classList.add('today');
-        if (isPast||isWknd) { cell.classList.add('disabled'); }
+        if (isPast) { cell.classList.add('disabled'); }
         else {
           cell.addEventListener('click', () => {
             document.querySelectorAll('.day-cell').forEach(c=>c.classList.remove('active'));
