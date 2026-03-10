@@ -325,7 +325,7 @@ const sendEmailNotification = (subject, html) => {
   if (WEB3FORMS_ACCESS_KEY === 'YOUR_ACCESS_KEY_HERE') return;
   fetch('https://api.web3forms.com/submit', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ access_key: WEB3FORMS_ACCESS_KEY, subject, html, from_name: '클린앤파트너즈 알림' })
+    body: JSON.stringify({ access_key: WEB3FORMS_ACCESS_KEY, subject, message: html, from_name: '클린앤파트너즈 알림' })
   }).catch(err => console.error('[Web3Forms]', err));
 };
 
