@@ -132,6 +132,20 @@ async function initDB() {
     `);
 
     // 3. 기본 데이터 채우기 (생략 가능 시 건너뜀)
+    const [processRows] = await pool.query('SELECT id FROM process_steps LIMIT 1');
+    if (!processRows.length) {
+      await pool.query(`
+        INSERT INTO process_steps (step_order, title, description, image_url, icon) VALUES
+        (1, '현장 방문 및 점검', '전문 엔지니어가 방문하여 에어컨 상태를 꼼꼼히 점검합니다.', 'https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?auto=format&fit=crop&w=800&q=80', 'fa-search'),
+        (2, '필터 및 외부 분해', '에어컨 필터와 외부 커버를 안전하게 분해합니다.', 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=800&q=80', 'fa-tools'),
+        (3, '고압 세척', '고압 스팀으로 내부 열교환기와 팬을 세척합니다.', 'https://images.unsplash.com/photo-1558389186-438424b00a32?auto=format&fit=crop&w=800&q=80', 'fa-shower'),
+        (4, '친환경 살균 처리', 'FDA 승인 친환경 약품으로 세균과 곰팡이를 완벽 제거합니다.', 'https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=800&q=80', 'fa-leaf'),
+        (5, '건조 및 조립', '완전 건조 후 부품을 꼼꼼하게 재조립합니다.', 'https://images.unsplash.com/photo-1590402444816-05d848218571?auto=format&fit=crop&w=800&q=80', 'fa-wrench'),
+        (6, '작동 점검 및 완료', '정상 작동 여부를 최종 확인 후 서비스를 완료합니다.', 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80', 'fa-check-circle')
+      `);
+      console.log('✅ 기본 공정 데이터 생성 완료');
+    }
+
     const [bannerRows] = await pool.query('SELECT id FROM banners LIMIT 1');
     if (!bannerRows.length) {
       await pool.query(`
