@@ -7,7 +7,22 @@ const auth    = require('./src/middleware/auth');
 
 const app = express();
 const JWT_SECRET = process.env.JWT_SECRET || 'cleanpartners_secret';
-const WEB3FORMS_KEY = '962f5bff-992d-4cc2-b8bf-0b4966759efa';
+const WEB3FORMS_KEY = process.env.WEB3FORMS_KEY || '962f5bff-992d-4cc2-b8bf-0b4966759efa';
+
+const sendEmail = async (subject, message) => {
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, message, from_name: '클린앤파트너즈 알림' })
+    });
+    const data = await res.json();
+    if (data.success) console.log('[Email] 발송 성공:', subject);
+    else console.error('[Email] 발송 실패:', data);
+  } catch (err) {
+    console.error('[Email] 오류:', err.message);
+  }
+};
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -196,24 +211,12 @@ app.post('/api/reservations', async (req, res) => {
       'INSERT INTO reservations (name, phone, service, date, time) VALUES (?, ?, ?, ?, ?)',
       [name, phone, service, date, time]
     );
-    const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
-    try {
-      const emailRes = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_KEY,
-          subject: `[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`,
-          message: `고객명: ${name}\n연락처: ${phone}\n서비스: ${svcNames[service]||service}\n예약날짜: ${date}\n희망시간: ${time}`,
-          from_name: '클린앤파트너즈'
-        })
-      });
-      const emailData = await emailRes.json();
-      console.log('[Email] 예약:', emailData);
-    } catch (emailErr) {
-      console.error('[Email] 예약 오류:', emailErr.message);
-    }
     res.json({ id: result.insertId });
+    const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
+    sendEmail(
+      `[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`,
+      `새 예약이 접수되었습니다.\n\n고객명: ${name}\n연락처: ${phone}\n서비스: ${svcNames[service]||service}\n예약날짜: ${date}\n희망시간: ${time}`
+    );
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -248,23 +251,11 @@ app.post('/api/contacts', async (req, res) => {
       'INSERT INTO contacts (name, phone, message) VALUES (?, ?, ?)',
       [name, phone, message]
     );
-    try {
-      const emailRes = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_KEY,
-          subject: `[클린앤파트너즈] 새 문의 접수 - ${name}`,
-          message: `고객명: ${name}\n연락처: ${phone}\n문의내용: ${message}`,
-          from_name: '클린앤파트너즈'
-        })
-      });
-      const emailData = await emailRes.json();
-      console.log('[Email] 문의:', emailData);
-    } catch (emailErr) {
-      console.error('[Email] 문의 오류:', emailErr.message);
-    }
     res.json({ id: result.insertId });
+    sendEmail(
+      `[클린앤파트너즈] 새 문의 접수 - ${name}`,
+      `새 문의가 접수되었습니다.\n\n고객명: ${name}\n연락처: ${phone}\n문의내용: ${message}`
+    );
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
