@@ -215,14 +215,7 @@ app.post('/api/reservations', async (req, res) => {
     const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
     sendEmail(
       `[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`,
-      `<h2 style="color:#1a56db;">📋 새 예약이 접수되었습니다</h2>
-      <table style="border-collapse:collapse;font-size:15px;font-family:sans-serif;">
-        <tr><td style="padding:8px 16px;color:#555;width:100px;">고객명</td><td style="padding:8px 16px;font-weight:bold;">${name}</td></tr>
-        <tr><td style="padding:8px 16px;color:#555;">연락처</td><td style="padding:8px 16px;">${phone}</td></tr>
-        <tr><td style="padding:8px 16px;color:#555;">서비스</td><td style="padding:8px 16px;">${svcNames[service]||service}</td></tr>
-        <tr><td style="padding:8px 16px;color:#555;">예약날짜</td><td style="padding:8px 16px;font-weight:bold;color:#1a56db;">${date}</td></tr>
-        <tr><td style="padding:8px 16px;color:#555;">희망시간</td><td style="padding:8px 16px;">${time}</td></tr>
-      </table>`
+      `새 예약이 접수되었습니다.\n\n고객명: ${name}\n연락처: ${phone}\n서비스: ${svcNames[service]||service}\n예약날짜: ${date}\n희망시간: ${time}`
     );
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -261,12 +254,7 @@ app.post('/api/contacts', async (req, res) => {
     res.json({ id: result.insertId });
     sendEmail(
       `[클린앤파트너즈] 새 문의 접수 - ${name}`,
-      `<h2 style="color:#0e9f6e;">💬 새 문의가 접수되었습니다</h2>
-      <table style="border-collapse:collapse;font-size:15px;font-family:sans-serif;">
-        <tr><td style="padding:8px 16px;color:#555;width:100px;">고객명</td><td style="padding:8px 16px;font-weight:bold;">${name}</td></tr>
-        <tr><td style="padding:8px 16px;color:#555;">연락처</td><td style="padding:8px 16px;">${phone}</td></tr>
-        <tr><td style="padding:8px 16px;color:#555;vertical-align:top;">문의내용</td><td style="padding:8px 16px;white-space:pre-wrap;">${message}</td></tr>
-      </table>`
+      `새 문의가 접수되었습니다.\n\n고객명: ${name}\n연락처: ${phone}\n문의내용: ${message}`
     );
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
