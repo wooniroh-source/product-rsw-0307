@@ -211,13 +211,13 @@ app.post('/api/reservations', async (req, res) => {
       'INSERT INTO reservations (name, phone, service, date, time) VALUES (?, ?, ?, ?, ?)',
       [name, phone, service, date, time]
     );
-    res.json({ id: result.insertId });
     const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
     console.log('[Email] 예약 이메일 발송 시도:', name, date);
     await sendEmail(
       `[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`,
       `새 예약이 접수되었습니다.\n\n고객명: ${name}\n연락처: ${phone}\n서비스: ${svcNames[service]||service}\n예약날짜: ${date}\n희망시간: ${time}`
     );
+    res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -252,12 +252,12 @@ app.post('/api/contacts', async (req, res) => {
       'INSERT INTO contacts (name, phone, message) VALUES (?, ?, ?)',
       [name, phone, message]
     );
-    res.json({ id: result.insertId });
     console.log('[Email] 문의 이메일 발송 시도:', name);
     await sendEmail(
       `[클린앤파트너즈] 새 문의 접수 - ${name}`,
       `새 문의가 접수되었습니다.\n\n고객명: ${name}\n연락처: ${phone}\n문의내용: ${message}`
     );
+    res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
