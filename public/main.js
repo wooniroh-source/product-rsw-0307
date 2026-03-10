@@ -317,17 +317,8 @@ window.handleProcessSubmit = async (e) => {
   alert('공정 정보가 저장되었습니다.');
 };
 
-// =============================================
-// 6. 이메일 알림 (Web3Forms)
-// =============================================
-const WEB3FORMS_ACCESS_KEY = '962f5bff-992d-4cc2-b8bf-0b4966759efa';
-const sendEmailNotification = (subject, html) => {
-  if (WEB3FORMS_ACCESS_KEY === 'YOUR_ACCESS_KEY_HERE') return;
-  fetch('https://api.web3forms.com/submit', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ access_key: WEB3FORMS_ACCESS_KEY, subject, message: html, from_name: '클린앤파트너즈 알림' })
-  }).catch(err => console.error('[Web3Forms]', err));
-};
+// 6. 이메일 알림은 서버(server.js)에서 처리
+const sendEmailNotification = () => {};
 
 // =============================================
 // 7. 공통 배너 슬라이더
