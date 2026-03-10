@@ -14,7 +14,7 @@ const sendEmail = async (subject, message) => {
     const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, message, from_name: '클린앤파트너즈 알림', is_html: true })
+      body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, message, from_name: '클린앤파트너즈 알림' })
     });
     const data = await res.json();
     if (data.success) console.log('[Email] 발송 성공:', subject);
