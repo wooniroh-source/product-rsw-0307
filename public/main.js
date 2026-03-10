@@ -320,7 +320,7 @@ window.handleProcessSubmit = async (e) => {
 // =============================================
 // 6. 이메일 알림 (Web3Forms)
 // =============================================
-const WEB3FORMS_ACCESS_KEY = 'YOUR_ACCESS_KEY_HERE';
+const WEB3FORMS_ACCESS_KEY = '962f5bff-992d-4cc2-b8bf-0b4966759efa';
 const sendEmailNotification = (subject, html) => {
   if (WEB3FORMS_ACCESS_KEY === 'YOUR_ACCESS_KEY_HERE') return;
   fetch('https://api.web3forms.com/submit', {
