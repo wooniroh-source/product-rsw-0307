@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   },
   "engines": {
     "node": ">=18"
@@ -17,5 +19,8 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.9.7",
     "nodemailer": "^8.0.2"
+  },
+  "devDependencies": {
+    "wrangler": "^4.73.0"
   }
 }
