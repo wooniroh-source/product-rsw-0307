@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>서비스 안내 - 클린앤파트너즈</title>
+    <title>서비스 안내 및 요금표 - 클린앤파트너즈</title>
+    <meta name="description" content="에어컨 종류별 투명한 가격 안내. 벽걸이·스탠드·무풍·시스템 에어컨 청소 비용을 확인하고 합리적인 가격에 전문 세척 서비스를 이용하세요. 3대 이상 단체 할인 혜택 제공.">
+    <meta name="keywords" content="에어컨청소 가격, 에어컨세척 비용, 벽걸이에어컨청소, 스탠드에어컨청소, 시스템에어컨청소, 에어컨청소 요금표">
+    <meta name="robots" content="index, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="서비스 안내 및 요금표 - 클린앤파트너즈">
+    <meta property="og:description" content="에어컨 종류별 투명한 요금표. 벽걸이부터 시스템 에어컨까지 전 기종 전문 세척 서비스 안내.">
+    <meta property="og:locale" content="ko_KR">
+    <link rel="canonical" href="https://www.cleannpartners.com/services.html">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -15,20 +23,28 @@
                 <li><a href="index.html">홈</a></li>
                 <li><a href="services.html">서비스 안내</a></li>
                 <li><a href="reservation.html">실시간 예약</a></li>
+                <li><a href="estimate.html">간편 견적</a></li>
                 <li><a href="about.html">브랜드 소개</a></li>
                 <li><a href="contact.html">고객센터</a></li>
             </ul>
-            <div class="menu-toggle" id="mobile-menu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+            <div class="nav-actions">
+                <a href="tel:15888776" class="nav-phone-btn">
+                    <i class="fas fa-phone"></i>
+                    <span class="phone-label">1588-8776</span>
+                </a>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
             </div>
         </nav>
     </header>
 
     <main>
         <section id="services-page">
-            <!-- 서비스 이벤트 배너 슬라이더 -->
+
+            <!-- 이벤트 배너 슬라이더 -->
             <div class="res-banner-slider">
                 <div id="svc-banner-container" class="res-banner-inner"></div>
                 <button class="res-banner-arrow res-banner-prev" id="svc-banner-prev"><i class="fas fa-chevron-left"></i></button>
@@ -36,58 +52,205 @@
                 <div id="svc-banner-dots" class="res-banner-dots"></div>
             </div>
 
+            <!-- 서비스 소개 -->
             <div class="section-title">
-                <h2>합리적인 가격 안내</h2>
-                <p>제품 모델별 투명한 정찰제로 운영됩니다.</p>
+                <h2>전문 에어컨 청소 서비스</h2>
+                <p>기종별 최적화된 세척 방식으로 에어컨 성능과 위생을 동시에 되살립니다.</p>
             </div>
-            
+
+            <div class="service-grid" style="margin-bottom: 5rem;">
+                <article class="service-card">
+                    <i class="fas fa-wind"></i>
+                    <h3>벽걸이 에어컨 청소</h3>
+                    <p>가정에서 가장 많이 사용되는 벽걸이 에어컨은 내부 필터와 열교환기에 먼지·곰팡이가 쉽게 쌓입니다. 커버를 완전 분리 후 고압 세척으로 구석구석 세균을 제거합니다.</p>
+                    <p style="margin-top:0.8rem; color:var(--primary); font-weight:700;">60,000원~</p>
+                </article>
+                <article class="service-card">
+                    <i class="fas fa-server"></i>
+                    <h3>스탠드 에어컨 청소</h3>
+                    <p>대용량 스탠드 에어컨은 구조상 내부 오염이 더 심각하게 진행됩니다. 전문 장비로 냉각핀과 드레인팬을 완전 분해 세척하여 냉방 효율을 회복시킵니다.</p>
+                    <p style="margin-top:0.8rem; color:var(--primary); font-weight:700;">110,000원~</p>
+                </article>
+                <article class="service-card">
+                    <i class="fas fa-th-large"></i>
+                    <h3>시스템 에어컨 청소</h3>
+                    <p>천장 매립형 시스템 에어컨은 일반 청소로는 접근이 어렵습니다. 1Way · 4Way 구조에 맞는 전용 공구와 세척 장비로 내부를 완벽하게 케어합니다.</p>
+                    <p style="margin-top:0.8rem; color:var(--primary); font-weight:700;">80,000원~</p>
+                </article>
+                <article class="service-card">
+                    <i class="fas fa-building"></i>
+                    <h3>상업용 에어컨 청소</h3>
+                    <p>사무실·매장·음식점 등 상업 공간의 에어컨은 가동 시간이 길어 오염이 빠릅니다. 영업에 지장 없도록 효율적인 일정을 조율하고 단체 할인 혜택을 제공합니다.</p>
+                    <p style="margin-top:0.8rem; color:var(--primary); font-weight:700;">별도 문의</p>
+                </article>
+                <article class="service-card">
+                    <i class="fas fa-tint"></i>
+                    <h3>냉매 충전 서비스</h3>
+                    <p>냉방 효율이 현저히 떨어진다면 냉매 부족이 원인일 수 있습니다. 냉매 압력을 정밀 측정한 후 필요한 경우에만 충전하여 불필요한 비용 없이 최적 상태를 유지합니다.</p>
+                    <p style="margin-top:0.8rem; color:var(--primary); font-weight:700;">80,000원~</p>
+                </article>
+                <article class="service-card">
+                    <i class="fas fa-shield-virus"></i>
+                    <h3>항균 코팅 처리</h3>
+                    <p>세척 후 항균 코팅제를 도포하면 세균·곰팡이 재번식을 최대 6개월간 억제합니다. 알레르기·호흡기 질환이 있는 가족이 있다면 특히 권장되는 서비스입니다.</p>
+                    <p style="margin-top:0.8rem; color:var(--primary); font-weight:700;">15,000원~</p>
+                </article>
+            </div>
+
+            <!-- 요금표 -->
+            <div class="section-title">
+                <h2>투명한 정찰 요금표</h2>
+                <p>숨겨진 비용 없이 사전에 안내드리는 정직한 가격 정책을 운영합니다.</p>
+            </div>
+
             <div style="max-width: 1000px; margin: 0 auto; overflow-x: auto;">
                 <table class="price-table">
                     <thead>
                         <tr>
                             <th>서비스 항목</th>
-                            <th>표준 가격</th>
+                            <th>기본 요금</th>
+                            <th>상세 안내</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>벽걸이 에어컨</strong></td>
+                            <td>60,000원~</td>
+                            <td>가정용 일반 벽걸이 모델 (완전 분해 세척)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>스탠드 에어컨</strong></td>
+                            <td>110,000원~</td>
+                            <td>가정용 스탠드 모델 (냉각핀·드레인팬 포함)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>무풍/고급형</strong></td>
+                            <td>130,000원~</td>
+                            <td>삼성 무풍, 특수 고급 모델</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2in1 멀티형</strong></td>
+                            <td>170,000원~</td>
+                            <td>스탠드 + 벽걸이 동시 세척</td>
+                        </tr>
+                        <tr>
+                            <td><strong>시스템 1Way</strong></td>
+                            <td>80,000원~</td>
+                            <td>천장 매립형 1방향 시스템 에어컨</td>
+                        </tr>
+                        <tr>
+                            <td><strong>시스템 4Way</strong></td>
+                            <td>130,000원~</td>
+                            <td>천장형 분리작업 포함</td>
+                        </tr>
+                        <tr>
+                            <td><strong>시스템원형 360</strong></td>
+                            <td>150,000원~</td>
+                            <td>360° 원형 디자인 시스템 에어컨</td>
+                        </tr>
+                        <tr>
+                            <td><strong>상업용 스탠드</strong></td>
+                            <td>140,000원~</td>
+                            <td>사무실·매장용 대용량 스탠드</td>
+                        </tr>
+                        <tr>
+                            <td><strong>FCU 팬코일유닛</strong></td>
+                            <td>90,000원~</td>
+                            <td>중앙공조 시스템 팬코일 유닛</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 추가 옵션 요금 -->
+            <div style="max-width:1000px; margin: 2rem auto 0;">
+                <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem; color:var(--dark);">추가 옵션 요금</h3>
+                <table class="price-table">
+                    <thead>
+                        <tr>
+                            <th>옵션 항목</th>
+                            <th>추가 요금</th>
                             <th>설명</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>벽걸이 에어컨</td>
-                            <td>80,000원 ~</td>
-                            <td>가정용 일반 벽걸이 모델</td>
+                            <td>실외기 포함 청소</td>
+                            <td>+20,000원</td>
+                            <td>실외기 내부 세척 및 핀 청소</td>
                         </tr>
                         <tr>
-                            <td>스탠드 에어컨</td>
-                            <td>130,000원 ~</td>
-                            <td>가정용 일반 스탠드 모델</td>
+                            <td>곰팡이 심한 경우</td>
+                            <td>+30,000원</td>
+                            <td>심한 오염·곰팡이 특수 세척 처리</td>
                         </tr>
                         <tr>
-                            <td>2-in-1 멀티형</td>
-                            <td>180,000원 ~</td>
-                            <td>스탠드 + 벽걸이 동시 세척</td>
+                            <td>항균 코팅 처리</td>
+                            <td>+15,000원</td>
+                            <td>세균·곰팡이 재번식 억제 코팅</td>
                         </tr>
                         <tr>
-                            <td>천장형 (1Way)</td>
-                            <td>90,000원 ~</td>
-                            <td>주거용 시스템 에어컨</td>
-                        </tr>
-                        <tr>
-                            <td>천장형 (4Way)</td>
-                            <td>150,000원 ~</td>
-                            <td>상업용 시스템 에어컨</td>
+                            <td>냉매충전</td>
+                            <td>+80,000원</td>
+                            <td>냉매 압력 체크 후 부족 시 충전</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <p style="margin-top: 2rem; color: #888; font-size: 0.95rem; text-align: center;">* 오염도 및 특수 모델에 따라 추가 비용이 발생할 수 있습니다.</p>
+
+            <p style="margin-top: 2rem; color: #888; font-size: 0.95rem; text-align: center;">
+                * 오염도 및 특수 모델에 따라 추가 비용이 발생할 수 있으며, 방문 전 정확한 견적을 안내해 드립니다.<br>
+                * 3대 이상 5% · 10대 이상 10% · 15대 이상 15% · 20대 이상 20% 단체 할인이 적용됩니다.
+            </p>
+
+            <!-- 서비스 절차 -->
+            <div class="section-title" style="margin-top: 5rem;">
+                <h2>서비스 진행 절차</h2>
+                <p>예약부터 완료까지 5단계로 빠르고 깔끔하게 진행됩니다.</p>
+            </div>
+            <div class="process-container" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1.5rem;">
+                <div class="pro-box" style="padding:2rem 1.2rem;">
+                    <div class="pro-icon" style="font-size:2rem;">📞</div>
+                    <h3>① 상담 예약</h3>
+                    <p>전화·온라인·카카오톡으로 간편하게 예약 및 사전 상담</p>
+                </div>
+                <div class="pro-box" style="padding:2rem 1.2rem;">
+                    <div class="pro-icon" style="font-size:2rem;">🚗</div>
+                    <h3>② 기사 방문</h3>
+                    <p>약속된 시간에 전문 엔지니어가 정확하게 방문</p>
+                </div>
+                <div class="pro-box" style="padding:2rem 1.2rem;">
+                    <div class="pro-icon" style="font-size:2rem;">🔍</div>
+                    <h3>③ 현장 점검</h3>
+                    <p>에어컨 상태와 오염도 확인 후 최종 견적 안내</p>
+                </div>
+                <div class="pro-box" style="padding:2rem 1.2rem;">
+                    <div class="pro-icon" style="font-size:2rem;">✨</div>
+                    <h3>④ 전문 세척</h3>
+                    <p>완전 분해 후 고압 세척·친환경 약품으로 정밀 케어</p>
+                </div>
+                <div class="pro-box" style="padding:2rem 1.2rem;">
+                    <div class="pro-icon" style="font-size:2rem;">✅</div>
+                    <h3>⑤ 완료 확인</h3>
+                    <p>작동 테스트 및 3개월 무상 A/S 보장 안내</p>
+                </div>
+            </div>
+
         </section>
     </main>
 
     <footer>
         <div class="footer-content">
-            <p>클린앤파트너즈 에어컨 토탈 케어 | 상담전화: 1588-8776</p>
-            <p>&copy; 2026 클린앤파트너즈. All rights reserved.</p>
-            <p style="margin-top: 10px; font-size: 0.8rem;"><a href="admin.html" style="color: #444; text-decoration: none;">Admin</a></p>
+            <p><strong>클린앤파트너즈</strong> | 프리미엄 에어컨 토탈 케어 전문</p>
+            <p>상담전화: <a href="tel:15888776" style="color:#ccc;">1588-8776</a> | 운영시간: 평일 09:00 ~ 18:00 (주말·공휴일 휴무)</p>
+            <p style="margin-top:0.4rem; font-size:0.85rem; opacity:0.7;">대표: 김미영 | 사업자등록번호: 739-81-03458 | 서울시 영등포로28길 5, 지층 29호</p>
+            <div style="margin-top:1.2rem; display:flex; justify-content:center; gap:2rem; font-size:0.85rem; flex-wrap:wrap;">
+                <a href="privacy.html" style="color:#bbb; text-decoration:none;">개인정보처리방침</a>
+                <a href="contact.html" style="color:#bbb; text-decoration:none;">고객센터</a>
+                <a href="estimate.html" style="color:#bbb; text-decoration:none;">간편 견적</a>
+            </div>
+            <p style="margin-top:1rem;">&copy; 2026 클린앤파트너즈. All rights reserved.</p>
+            <p style="margin-top:5px; font-size:0.75rem;"><a href="admin.html" style="color:#333; text-decoration:none;">Admin</a></p>
         </div>
     </footer>
     <script src="main.js"></script>
