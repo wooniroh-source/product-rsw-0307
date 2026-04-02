@@ -97,7 +97,11 @@
         }
         .ac-type-btn .ac-icon {
             font-size: 1.6rem;
+            color: var(--gray);
+            transition: color 0.2s;
         }
+        .ac-type-btn.selected .ac-icon { color: var(--primary); }
+        .ac-type-btn:hover .ac-icon { color: var(--secondary); }
         .ac-type-btn .ac-name {
             font-size: 0.82rem;
             font-weight: 700;
@@ -422,47 +426,47 @@
                 </h3>
                 <div class="ac-type-grid" id="ac-type-grid">
                     <button class="ac-type-btn selected" data-price="60000" data-name="벽걸이">
-                        <span class="ac-icon">🖼️</span>
+                        <span class="ac-icon"><i class="fas fa-wind"></i></span>
                         <span class="ac-name">벽걸이</span>
                         <span class="ac-price">60,000원~</span>
                     </button>
                     <button class="ac-type-btn" data-price="110000" data-name="스탠드">
-                        <span class="ac-icon">🗄️</span>
+                        <span class="ac-icon"><i class="fas fa-server"></i></span>
                         <span class="ac-name">스탠드</span>
                         <span class="ac-price">110,000원~</span>
                     </button>
                     <button class="ac-type-btn" data-price="130000" data-name="무풍/고급">
-                        <span class="ac-icon">💨</span>
+                        <span class="ac-icon"><i class="fas fa-snowflake"></i></span>
                         <span class="ac-name">무풍/고급</span>
                         <span class="ac-price">130,000원~</span>
                     </button>
                     <button class="ac-type-btn" data-price="80000" data-name="시스템 1way">
-                        <span class="ac-icon">📐</span>
+                        <span class="ac-icon"><i class="fas fa-th-large"></i></span>
                         <span class="ac-name">시스템 1way</span>
                         <span class="ac-price">80,000원~</span>
                     </button>
                     <button class="ac-type-btn" data-price="130000" data-name="시스템 4way">
-                        <span class="ac-icon">🔲</span>
+                        <span class="ac-icon"><i class="fas fa-border-all"></i></span>
                         <span class="ac-name">시스템 4way</span>
                         <span class="ac-price">130,000원~</span>
                     </button>
                     <button class="ac-type-btn" data-price="170000" data-name="2in1">
-                        <span class="ac-icon">⚡</span>
+                        <span class="ac-icon"><i class="fas fa-layer-group"></i></span>
                         <span class="ac-name">2in1</span>
                         <span class="ac-price">170,000원~</span>
                     </button>
                     <button class="ac-type-btn" data-price="140000" data-name="상업용 스탠드">
-                        <span class="ac-icon">🏢</span>
+                        <span class="ac-icon"><i class="fas fa-building"></i></span>
                         <span class="ac-name">상업용 스탠드</span>
                         <span class="ac-price">140,000원~</span>
                     </button>
                     <button class="ac-type-btn" data-price="90000" data-name="FCU 팬코일유닛">
-                        <span class="ac-icon">🌀</span>
+                        <span class="ac-icon"><i class="fas fa-fan"></i></span>
                         <span class="ac-name">FCU 팬코일유닛</span>
                         <span class="ac-price">90,000원~</span>
                     </button>
                     <button class="ac-type-btn" data-price="150000" data-name="시스템원형 360">
-                        <span class="ac-icon">🔵</span>
+                        <span class="ac-icon"><i class="fas fa-circle-notch"></i></span>
                         <span class="ac-name">시스템원형 360</span>
                         <span class="ac-price">150,000원~</span>
                     </button>
