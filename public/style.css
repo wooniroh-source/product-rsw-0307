@@ -803,13 +803,18 @@ td.no-data { padding: 3rem 0; }
     font-size: 13px;
     font-weight: 700;
     border-radius: 8px;
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
     opacity: 0;
     transition: opacity 0.15s;
     white-space: nowrap;
     z-index: 20;
     transform: translate(-50%, -130%);
     box-shadow: 0 6px 16px rgba(0,0,0,0.22);
+}
+
+.map-tooltip:hover {
+    background: #334155;
 }
 
 .map-tooltip::after {

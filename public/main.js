@@ -572,6 +572,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   const mapTooltip   = document.getElementById('map-tooltip');
   const seoulMap     = document.getElementById('seoul-map');
 
+  // 툴팁 클릭/터치 → 예약 페이지 이동
+  if (mapTooltip) {
+    mapTooltip.addEventListener('click', () => {
+      window.location.href = 'reservation.html';
+    });
+    mapTooltip.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      window.location.href = 'reservation.html';
+    }, { passive: false });
+  }
+
   if (districtGroup && seoulMap) {
     // 지역별 색상
     const REGION_STYLE = {
