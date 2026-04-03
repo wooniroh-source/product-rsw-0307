@@ -573,12 +573,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const seoulMap     = document.getElementById('seoul-map');
 
   if (districtGroup && seoulMap) {
-    // 지역별 색상·반지름
+    // 지역별 색상
     const REGION_STYLE = {
-      seoul:    { fill: '#1d4ed8', r: 16 },
-      incheon:  { fill: '#0284c7', r: 15 },
-      gyeonggi: { fill: '#059669', r: 14 },
+      seoul:    { fill: '#1d4ed8' },
+      incheon:  { fill: '#0284c7' },
+      gyeonggi: { fill: '#059669' },
     };
+    // 뱃지 공통 치수 (SVG 단위, viewBox 720×560 기준)
+    const BADGE = { charW: 10, padX: 7, padY: 5, lineH: 11, rx: 6 };
 
     // 서울 (viewBox 720×560, 원본 480×440 → ×0.75 + offset 270,80)
     // 인천·경기 – 직접 좌표 지정
@@ -652,21 +654,35 @@ document.addEventListener('DOMContentLoaded', async () => {
       g.setAttribute('role', 'button');
       g.setAttribute('aria-label', d.name + ' 예약하기');
 
-      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circle.setAttribute('cx', d.cx);
-      circle.setAttribute('cy', d.cy);
-      circle.setAttribute('r',  style.r);
-      circle.setAttribute('fill', style.fill);
+      // 뱃지 크기: 글자 수에 맞춰 동적 계산
+      const isMultiLine = d.name.length >= 4;
+      const mid = isMultiLine ? Math.ceil(d.name.length / 2) : 0;
+      const maxChars = isMultiLine ? mid : d.name.length;
+      const bw = maxChars * BADGE.charW + BADGE.padX * 2;
+      const bh = isMultiLine
+        ? BADGE.lineH * 2 + BADGE.padY * 2
+        : BADGE.lineH     + BADGE.padY * 2;
 
-      // 긴 이름(4자 이상)은 두 줄로 분리
+      // 둥근 사각형 뱃지
+      const badge = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      badge.setAttribute('x', d.cx - bw / 2);
+      badge.setAttribute('y', d.cy - bh / 2);
+      badge.setAttribute('width', bw);
+      badge.setAttribute('height', bh);
+      badge.setAttribute('rx', BADGE.rx);
+      badge.setAttribute('ry', BADGE.rx);
+      badge.setAttribute('fill', style.fill);
+      badge.setAttribute('stroke', 'rgba(255,255,255,0.45)');
+      badge.setAttribute('stroke-width', '1');
+
+      // 텍스트 (4자 이상은 두 줄로 분리)
       const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      if (d.name.length >= 4) {
-        const mid = Math.ceil(d.name.length / 2);
+      if (isMultiLine) {
         const t1 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-        t1.setAttribute('x', d.cx); t1.setAttribute('dy', '-3.2');
+        t1.setAttribute('x', d.cx); t1.setAttribute('dy', '-5.5');
         t1.textContent = d.name.slice(0, mid);
         const t2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-        t2.setAttribute('x', d.cx); t2.setAttribute('dy', '6.4');
+        t2.setAttribute('x', d.cx); t2.setAttribute('dy', '11');
         t2.textContent = d.name.slice(mid);
         label.appendChild(t1); label.appendChild(t2);
       } else {
@@ -675,30 +691,44 @@ document.addEventListener('DOMContentLoaded', async () => {
       label.setAttribute('x', d.cx);
       label.setAttribute('y', d.cy);
 
-      g.appendChild(circle);
+      g.appendChild(badge);
       g.appendChild(label);
       districtGroup.appendChild(g);
 
-      // 마우스 진입 → 툴팁 표시 + 버블 확대
+      // 마우스 진입 → 툴팁 표시
       g.addEventListener('mouseenter', () => {
         mapTooltip.innerHTML = d.name + '<span>클릭하여 예약하기</span>';
         mapTooltip.style.opacity = '1';
-        circle.setAttribute('r', style.r + 3);
       });
 
       // 마우스 이동 → 툴팁 위치 갱신
       g.addEventListener('mousemove', (e) => {
-        const rect = seoulMap.getBoundingClientRect();
         const containerRect = seoulMap.parentElement.getBoundingClientRect();
         mapTooltip.style.left = (e.clientX - containerRect.left) + 'px';
         mapTooltip.style.top  = (e.clientY - containerRect.top)  + 'px';
       });
 
-      // 마우스 이탈 → 툴팁 숨김 + 버블 복원
+      // 마우스 이탈 → 툴팁 숨김
       g.addEventListener('mouseleave', () => {
         mapTooltip.style.opacity = '0';
-        circle.setAttribute('r', style.r);
       });
+
+      // 터치 → 툴팁 표시 후 예약 페이지 이동
+      g.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        mapTooltip.innerHTML = d.name + '<span>탭하여 예약하기</span>';
+        mapTooltip.style.opacity = '1';
+        const touch = e.touches[0];
+        const containerRect = seoulMap.parentElement.getBoundingClientRect();
+        mapTooltip.style.left = (touch.clientX - containerRect.left) + 'px';
+        mapTooltip.style.top  = (touch.clientY - containerRect.top)  + 'px';
+      }, { passive: false });
+
+      g.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        setTimeout(() => { mapTooltip.style.opacity = '0'; }, 200);
+        window.location.href = 'reservation.html';
+      }, { passive: false });
 
       // 클릭 → 실시간 예약 페이지
       g.addEventListener('click', () => {

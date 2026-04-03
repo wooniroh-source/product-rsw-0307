@@ -756,36 +756,43 @@ td.no-data { padding: 3rem 0; }
 
 .river-label {
     fill: rgba(29, 78, 216, 0.65);
+    font-size: 12px;
+    font-family: -apple-system, 'Pretendard', sans-serif;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+    letter-spacing: 4px;
+}
+
+.district-bubble {
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.district-bubble rect {
+    opacity: 0.92;
+    transition: opacity 0.18s ease, filter 0.18s ease, transform 0.18s ease;
+    transform-box: fill-box;
+    transform-origin: center;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.28));
+}
+
+.district-bubble:hover rect,
+.district-bubble:active rect {
+    opacity: 1;
+    filter: brightness(1.18) drop-shadow(0 4px 10px rgba(0,0,0,0.38));
+    transform: scale(1.1);
+}
+
+.district-bubble text {
+    fill: #fff;
     font-size: 9px;
     font-family: -apple-system, 'Pretendard', sans-serif;
     text-anchor: middle;
     dominant-baseline: middle;
     pointer-events: none;
-    letter-spacing: 3px;
-}
-
-.district-bubble {
-    cursor: pointer;
-}
-
-.district-bubble circle {
-    opacity: 0.88;
-    transition: r 0.18s ease, opacity 0.18s ease, filter 0.18s ease;
-}
-
-.district-bubble:hover circle {
-    opacity: 1;
-    filter: brightness(1.15);
-}
-
-.district-bubble text {
-    fill: #fff;
-    font-size: 6.5px;
-    font-family: -apple-system, 'Pretendard', sans-serif;
-    text-anchor: middle;
-    dominant-baseline: middle;
-    pointer-events: none;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: 0.3px;
 }
 
 .map-tooltip {
@@ -994,6 +1001,7 @@ td.no-data { padding: 3rem 0; }
     /* Service Area Map */
     .service-area-layout { flex-direction: column; gap: 2rem; }
     .district-legend { flex: none; width: 100%; }
+    .seoul-map-container { min-height: 260px; }
 
     /* Admin */
     .admin-container { flex-direction: column; }
