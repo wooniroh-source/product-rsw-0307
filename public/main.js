@@ -647,6 +647,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       { name: '이천시',   cx: 628, cy: 472, region: 'gyeonggi' },
     ];
 
+    let activeTooltipBubble = null; // 첫 번째 탭으로 툴팁이 표시된 버블 추적
+
     DISTRICTS.forEach(d => {
       const style = REGION_STYLE[d.region];
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -713,21 +715,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         mapTooltip.style.opacity = '0';
       });
 
-      // 터치 → 툴팁 표시 후 예약 페이지 이동
+      // 터치: 1탭 → 툴팁 표시, 2탭 → 예약 페이지 이동
       g.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        mapTooltip.innerHTML = d.name + '<span>탭하여 예약하기</span>';
-        mapTooltip.style.opacity = '1';
-        const touch = e.touches[0];
-        const containerRect = seoulMap.parentElement.getBoundingClientRect();
-        mapTooltip.style.left = (touch.clientX - containerRect.left) + 'px';
-        mapTooltip.style.top  = (touch.clientY - containerRect.top)  + 'px';
       }, { passive: false });
 
       g.addEventListener('touchend', (e) => {
         e.preventDefault();
-        setTimeout(() => { mapTooltip.style.opacity = '0'; }, 200);
-        window.location.href = 'reservation.html';
+        const touch = e.changedTouches[0];
+        const containerRect = seoulMap.parentElement.getBoundingClientRect();
+
+        if (activeTooltipBubble === g) {
+          // 두 번째 탭 → 예약 페이지 이동
+          mapTooltip.style.opacity = '0';
+          activeTooltipBubble = null;
+          window.location.href = 'reservation.html';
+        } else {
+          // 첫 번째 탭 → 툴팁 표시
+          mapTooltip.innerHTML = d.name + '<span>탭하여 예약하기</span>';
+          mapTooltip.style.left = (touch.clientX - containerRect.left) + 'px';
+          mapTooltip.style.top  = (touch.clientY - containerRect.top)  + 'px';
+          mapTooltip.style.opacity = '1';
+          activeTooltipBubble = g;
+        }
       }, { passive: false });
 
       // 클릭 → 실시간 예약 페이지
