@@ -333,6 +333,18 @@ app.put('/api/process', auth, async (req, res) => {
 
 
 // =============================================
+// 검색엔진 필수 파일 (와일드카드 폴백보다 먼저 처리)
+// =============================================
+app.get('/robots.txt', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain');
+  res.sendFile(path.join(__dirname, 'public', 'robots.txt'));
+});
+app.get('/sitemap.xml', (req, res) => {
+  res.setHeader('Content-Type', 'application/xml');
+  res.sendFile(path.join(__dirname, 'public', 'sitemap.xml'));
+});
+
+// =============================================
 // Fallback → index.html
 // =============================================
 app.get('*', (req, res) => {
