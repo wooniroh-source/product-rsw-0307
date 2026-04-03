@@ -2,4 +2,10 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 
+# 네이버 검색 로봇 (Yeti) 설정
+User-agent: Yeti
+Allow: /
+Disallow: /admin.html
+Crawl-delay: 1
+
 Sitemap: https://www.cleannpartners.com/sitemap.xml
