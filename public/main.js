@@ -565,6 +565,148 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // =============================================
+  // 서울 서비스 지역 지도
+  // =============================================
+  const districtGroup = document.getElementById('district-group');
+  const mapTooltip   = document.getElementById('map-tooltip');
+  const seoulMap     = document.getElementById('seoul-map');
+
+  if (districtGroup && seoulMap) {
+    // 지역별 색상·반지름
+    const REGION_STYLE = {
+      seoul:    { fill: '#1d4ed8', r: 16 },
+      incheon:  { fill: '#0284c7', r: 15 },
+      gyeonggi: { fill: '#059669', r: 14 },
+    };
+
+    // 서울 (viewBox 720×560, 원본 480×440 → ×0.75 + offset 270,80)
+    // 인천·경기 – 직접 좌표 지정
+    const DISTRICTS = [
+      // ── 서울 25개 구 ──────────────────────────────
+      { name: '강북구',   cx: 428, cy: 112, region: 'seoul' },
+      { name: '도봉구',   cx: 480, cy: 104, region: 'seoul' },
+      { name: '노원구',   cx: 540, cy: 109, region: 'seoul' },
+      { name: '은평구',   cx: 329, cy: 161, region: 'seoul' },
+      { name: '성북구',   cx: 454, cy: 154, region: 'seoul' },
+      { name: '중랑구',   cx: 557, cy: 161, region: 'seoul' },
+      { name: '서대문구', cx: 364, cy: 209, region: 'seoul' },
+      { name: '종로구',   cx: 428, cy: 202, region: 'seoul' },
+      { name: '동대문구', cx: 491, cy: 200, region: 'seoul' },
+      { name: '광진구',   cx: 551, cy: 209, region: 'seoul' },
+      { name: '강서구',   cx: 303, cy: 249, region: 'seoul' },
+      { name: '마포구',   cx: 351, cy: 241, region: 'seoul' },
+      { name: '용산구',   cx: 428, cy: 247, region: 'seoul' },
+      { name: '중구',     cx: 434, cy: 229, region: 'seoul' },
+      { name: '성동구',   cx: 499, cy: 244, region: 'seoul' },
+      { name: '영등포구', cx: 351, cy: 304, region: 'seoul' },
+      { name: '양천구',   cx: 311, cy: 309, region: 'seoul' },
+      { name: '동작구',   cx: 409, cy: 320, region: 'seoul' },
+      { name: '서초구',   cx: 471, cy: 334, region: 'seoul' },
+      { name: '강남구',   cx: 534, cy: 322, region: 'seoul' },
+      { name: '강동구',   cx: 587, cy: 296, region: 'seoul' },
+      { name: '송파구',   cx: 563, cy: 361, region: 'seoul' },
+      { name: '구로구',   cx: 332, cy: 352, region: 'seoul' },
+      { name: '관악구',   cx: 404, cy: 369, region: 'seoul' },
+      { name: '금천구',   cx: 341, cy: 386, region: 'seoul' },
+      // ── 인천 8개 구 ──────────────────────────────
+      { name: '계양구',   cx: 196, cy: 148, region: 'incheon' },
+      { name: '서구',     cx: 100, cy: 168, region: 'incheon' },
+      { name: '부평구',   cx: 158, cy: 195, region: 'incheon' },
+      { name: '동구',     cx: 70,  cy: 248, region: 'incheon' },
+      { name: '중구',     cx: 52,  cy: 278, region: 'incheon' },
+      { name: '미추홀구', cx: 100, cy: 305, region: 'incheon' },
+      { name: '남동구',   cx: 152, cy: 348, region: 'incheon' },
+      { name: '연수구',   cx: 88,  cy: 383, region: 'incheon' },
+      // ── 경기도 주요 시·군 ──────────────────────────
+      { name: '파주시',   cx: 210, cy: 68,  region: 'gyeonggi' },
+      { name: '고양시',   cx: 265, cy: 100, region: 'gyeonggi' },
+      { name: '김포시',   cx: 182, cy: 115, region: 'gyeonggi' },
+      { name: '의정부시', cx: 490, cy: 58,  region: 'gyeonggi' },
+      { name: '양주시',   cx: 530, cy: 38,  region: 'gyeonggi' },
+      { name: '동두천시', cx: 558, cy: 22,  region: 'gyeonggi' },
+      { name: '남양주시', cx: 625, cy: 88,  region: 'gyeonggi' },
+      { name: '구리시',   cx: 622, cy: 142, region: 'gyeonggi' },
+      { name: '부천시',   cx: 248, cy: 272, region: 'gyeonggi' },
+      { name: '광명시',   cx: 286, cy: 358, region: 'gyeonggi' },
+      { name: '시흥시',   cx: 215, cy: 420, region: 'gyeonggi' },
+      { name: '안산시',   cx: 148, cy: 458, region: 'gyeonggi' },
+      { name: '안양시',   cx: 352, cy: 428, region: 'gyeonggi' },
+      { name: '군포시',   cx: 378, cy: 452, region: 'gyeonggi' },
+      { name: '의왕시',   cx: 408, cy: 450, region: 'gyeonggi' },
+      { name: '과천시',   cx: 428, cy: 414, region: 'gyeonggi' },
+      { name: '수원시',   cx: 398, cy: 492, region: 'gyeonggi' },
+      { name: '화성시',   cx: 320, cy: 524, region: 'gyeonggi' },
+      { name: '오산시',   cx: 432, cy: 522, region: 'gyeonggi' },
+      { name: '성남시',   cx: 525, cy: 412, region: 'gyeonggi' },
+      { name: '용인시',   cx: 514, cy: 472, region: 'gyeonggi' },
+      { name: '하남시',   cx: 622, cy: 328, region: 'gyeonggi' },
+      { name: '광주시',   cx: 618, cy: 412, region: 'gyeonggi' },
+      { name: '이천시',   cx: 628, cy: 472, region: 'gyeonggi' },
+    ];
+
+    DISTRICTS.forEach(d => {
+      const style = REGION_STYLE[d.region];
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('class', 'district-bubble');
+      g.setAttribute('role', 'button');
+      g.setAttribute('aria-label', d.name + ' 예약하기');
+
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', d.cx);
+      circle.setAttribute('cy', d.cy);
+      circle.setAttribute('r',  style.r);
+      circle.setAttribute('fill', style.fill);
+
+      // 긴 이름(4자 이상)은 두 줄로 분리
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      if (d.name.length >= 4) {
+        const mid = Math.ceil(d.name.length / 2);
+        const t1 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+        t1.setAttribute('x', d.cx); t1.setAttribute('dy', '-3.2');
+        t1.textContent = d.name.slice(0, mid);
+        const t2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+        t2.setAttribute('x', d.cx); t2.setAttribute('dy', '6.4');
+        t2.textContent = d.name.slice(mid);
+        label.appendChild(t1); label.appendChild(t2);
+      } else {
+        label.textContent = d.name;
+      }
+      label.setAttribute('x', d.cx);
+      label.setAttribute('y', d.cy);
+
+      g.appendChild(circle);
+      g.appendChild(label);
+      districtGroup.appendChild(g);
+
+      // 마우스 진입 → 툴팁 표시 + 버블 확대
+      g.addEventListener('mouseenter', () => {
+        mapTooltip.innerHTML = d.name + '<span>클릭하여 예약하기</span>';
+        mapTooltip.style.opacity = '1';
+        circle.setAttribute('r', style.r + 3);
+      });
+
+      // 마우스 이동 → 툴팁 위치 갱신
+      g.addEventListener('mousemove', (e) => {
+        const rect = seoulMap.getBoundingClientRect();
+        const containerRect = seoulMap.parentElement.getBoundingClientRect();
+        mapTooltip.style.left = (e.clientX - containerRect.left) + 'px';
+        mapTooltip.style.top  = (e.clientY - containerRect.top)  + 'px';
+      });
+
+      // 마우스 이탈 → 툴팁 숨김 + 버블 복원
+      g.addEventListener('mouseleave', () => {
+        mapTooltip.style.opacity = '0';
+        circle.setAttribute('r', style.r);
+      });
+
+      // 클릭 → 실시간 예약 페이지
+      g.addEventListener('click', () => {
+        window.location.href = 'reservation.html';
+      });
+    });
+  }
+
   // Admin 초기화
   if (document.body.classList.contains('admin-body')) {
     if (sessionStorage.getItem('adminToken')) {
