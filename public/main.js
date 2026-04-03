@@ -579,8 +579,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       incheon:  { fill: '#0284c7' },
       gyeonggi: { fill: '#059669' },
     };
-    // 뱃지 공통 치수 (SVG 단위, viewBox 720×560 기준)
-    const BADGE = { charW: 10, padX: 7, padY: 5, lineH: 11, rx: 6 };
+    // 뱃지 공통 치수 (SVG 단위, viewBox 720×560 기준, font-size 10px 기준)
+    const BADGE = { charW: 11, padX: 7, padY: 5, lineH: 12, rx: 6 };
 
     // 서울 (viewBox 720×560, 원본 480×440 → ×0.75 + offset 270,80)
     // 인천·경기 – 직접 좌표 지정
@@ -598,11 +598,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       { name: '광진구',   cx: 551, cy: 209, region: 'seoul' },
       { name: '강서구',   cx: 303, cy: 249, region: 'seoul' },
       { name: '마포구',   cx: 351, cy: 241, region: 'seoul' },
-      { name: '용산구',   cx: 428, cy: 247, region: 'seoul' },
+      { name: '용산구',   cx: 428, cy: 254, region: 'seoul' },
       { name: '중구',     cx: 434, cy: 229, region: 'seoul' },
       { name: '성동구',   cx: 499, cy: 244, region: 'seoul' },
       { name: '영등포구', cx: 351, cy: 304, region: 'seoul' },
-      { name: '양천구',   cx: 311, cy: 309, region: 'seoul' },
+      { name: '양천구',   cx: 305, cy: 312, region: 'seoul' },
       { name: '동작구',   cx: 409, cy: 320, region: 'seoul' },
       { name: '서초구',   cx: 471, cy: 334, region: 'seoul' },
       { name: '강남구',   cx: 534, cy: 322, region: 'seoul' },
@@ -624,18 +624,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       { name: '파주시',   cx: 210, cy: 68,  region: 'gyeonggi' },
       { name: '고양시',   cx: 265, cy: 100, region: 'gyeonggi' },
       { name: '김포시',   cx: 182, cy: 115, region: 'gyeonggi' },
-      { name: '의정부시', cx: 490, cy: 58,  region: 'gyeonggi' },
-      { name: '양주시',   cx: 530, cy: 38,  region: 'gyeonggi' },
-      { name: '동두천시', cx: 558, cy: 22,  region: 'gyeonggi' },
+      { name: '의정부시', cx: 487, cy: 62,  region: 'gyeonggi' },
+      { name: '양주시',   cx: 525, cy: 40,  region: 'gyeonggi' },
+      { name: '동두천시', cx: 563, cy: 20,  region: 'gyeonggi' },
       { name: '남양주시', cx: 625, cy: 88,  region: 'gyeonggi' },
       { name: '구리시',   cx: 622, cy: 142, region: 'gyeonggi' },
       { name: '부천시',   cx: 248, cy: 272, region: 'gyeonggi' },
-      { name: '광명시',   cx: 286, cy: 358, region: 'gyeonggi' },
+      { name: '광명시',   cx: 278, cy: 360, region: 'gyeonggi' },
       { name: '시흥시',   cx: 215, cy: 420, region: 'gyeonggi' },
       { name: '안산시',   cx: 148, cy: 458, region: 'gyeonggi' },
-      { name: '안양시',   cx: 352, cy: 428, region: 'gyeonggi' },
-      { name: '군포시',   cx: 378, cy: 452, region: 'gyeonggi' },
-      { name: '의왕시',   cx: 408, cy: 450, region: 'gyeonggi' },
+      { name: '안양시',   cx: 340, cy: 425, region: 'gyeonggi' },
+      { name: '군포시',   cx: 385, cy: 458, region: 'gyeonggi' },
+      { name: '의왕시',   cx: 425, cy: 454, region: 'gyeonggi' },
       { name: '과천시',   cx: 428, cy: 414, region: 'gyeonggi' },
       { name: '수원시',   cx: 398, cy: 492, region: 'gyeonggi' },
       { name: '화성시',   cx: 320, cy: 524, region: 'gyeonggi' },
@@ -679,10 +679,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       if (isMultiLine) {
         const t1 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-        t1.setAttribute('x', d.cx); t1.setAttribute('dy', '-5.5');
+        t1.setAttribute('x', d.cx); t1.setAttribute('dy', '-6');
         t1.textContent = d.name.slice(0, mid);
         const t2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-        t2.setAttribute('x', d.cx); t2.setAttribute('dy', '11');
+        t2.setAttribute('x', d.cx); t2.setAttribute('dy', '12');
         t2.textContent = d.name.slice(mid);
         label.appendChild(t1); label.appendChild(t2);
       } else {

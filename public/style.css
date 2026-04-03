@@ -786,7 +786,7 @@ td.no-data { padding: 3rem 0; }
 
 .district-bubble text {
     fill: #fff;
-    font-size: 9px;
+    font-size: 10px;
     font-family: -apple-system, 'Pretendard', sans-serif;
     text-anchor: middle;
     dominant-baseline: middle;
