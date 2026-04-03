@@ -8,4 +8,4 @@ Allow: /
 Disallow: /admin.html
 Crawl-delay: 1
 
-Sitemap: https://www.cleannpartners.com/sitemap.xml
+Sitemap: https://cleannpartners.com/sitemap.xml
