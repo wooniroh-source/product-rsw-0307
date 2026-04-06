@@ -358,6 +358,43 @@ app.get('/sitemap.xml', (req, res) => {
 });
 
 // =============================================
+// .html URL → 클린 URL 301 리디렉션 (SEO)
+// =============================================
+const htmlRedirects = {
+  '/index.html':       '/',
+  '/services.html':    '/services',
+  '/reservation.html': '/reservation',
+  '/estimate.html':    '/estimate',
+  '/about.html':       '/about',
+  '/contact.html':     '/contact',
+  '/privacy.html':     '/privacy',
+};
+app.use((req, res, next) => {
+  const target = htmlRedirects[req.path];
+  if (target) return res.redirect(301, target);
+  next();
+});
+
+// =============================================
+// 클린 URL → 해당 HTML 파일 서빙 (200 직접 응답)
+// =============================================
+const cleanRoutes = {
+  '/':            'index.html',
+  '/services':    'services.html',
+  '/reservation': 'reservation.html',
+  '/estimate':    'estimate.html',
+  '/about':       'about.html',
+  '/contact':     'contact.html',
+  '/privacy':     'privacy.html',
+  '/admin':       'admin.html',
+};
+Object.entries(cleanRoutes).forEach(([route, file]) => {
+  app.get(route, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', file));
+  });
+});
+
+// =============================================
 // Fallback → index.html
 // =============================================
 app.get('*', (req, res) => {
