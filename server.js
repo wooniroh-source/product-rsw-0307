@@ -9,6 +9,16 @@ const app = express();
 const JWT_SECRET = process.env.JWT_SECRET || 'cleanpartners_secret';
 
 app.use(express.json());
+
+// www → non-www 리디렉션
+app.use((req, res, next) => {
+  if (req.headers.host && req.headers.host.startsWith('www.')) {
+    const nonWww = req.headers.host.slice(4);
+    return res.redirect(301, `https://${nonWww}${req.url}`);
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // =============================================

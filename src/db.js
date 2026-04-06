@@ -10,6 +10,7 @@ const dbConfig = {
   waitForConnections: true,
   connectionLimit: 10,
   ssl: (process.env.MYSQLHOST || process.env.DB_SSL === 'true') ? { rejectUnauthorized: false } : undefined
+  // Railway 내부 MySQL 사용 시 MYSQLHOST 환경변수 존재만으로 SSL 활성화됨
 };
 
 const pool = mysql.createPool(
