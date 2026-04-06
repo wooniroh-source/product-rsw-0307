@@ -19,10 +19,26 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
-
 // favicon.ico 파일 없을 때 204로 응답 (크롤러 4xx 방지)
 app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+// .html URL → 클린 URL 301 리디렉션 (express.static보다 먼저 처리해야 함)
+const htmlRedirects = {
+  '/index.html':       '/',
+  '/services.html':    '/services',
+  '/reservation.html': '/reservation',
+  '/estimate.html':    '/estimate',
+  '/about.html':       '/about',
+  '/contact.html':     '/contact',
+  '/privacy.html':     '/privacy',
+};
+app.use((req, res, next) => {
+  const target = htmlRedirects[req.path];
+  if (target) return res.redirect(301, target);
+  next();
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 // =============================================
 // DB 자동 초기화 (테이블 없으면 생성 + 기본 데이터)
@@ -355,24 +371,6 @@ app.get('/robots.txt', (req, res) => {
 app.get('/sitemap.xml', (req, res) => {
   res.setHeader('Content-Type', 'application/xml');
   res.sendFile(path.join(__dirname, 'public', 'sitemap.xml'));
-});
-
-// =============================================
-// .html URL → 클린 URL 301 리디렉션 (SEO)
-// =============================================
-const htmlRedirects = {
-  '/index.html':       '/',
-  '/services.html':    '/services',
-  '/reservation.html': '/reservation',
-  '/estimate.html':    '/estimate',
-  '/about.html':       '/about',
-  '/contact.html':     '/contact',
-  '/privacy.html':     '/privacy',
-};
-app.use((req, res, next) => {
-  const target = htmlRedirects[req.path];
-  if (target) return res.redirect(301, target);
-  next();
 });
 
 // =============================================
