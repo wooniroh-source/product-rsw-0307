@@ -21,6 +21,9 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// favicon.ico 파일 없을 때 204로 응답 (크롤러 4xx 방지)
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // =============================================
 // DB 자동 초기화 (테이블 없으면 생성 + 기본 데이터)
 // =============================================
