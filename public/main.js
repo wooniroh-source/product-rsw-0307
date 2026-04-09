@@ -402,7 +402,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
         <div class="mid-slide-content">
           <div class="mid-slide-number">${num}</div>
           <div class="mid-slide-info">
-            ${item.company_name ? `<div class="mid-slide-company">${item.company_name}</div>` : ''}
+            ${item.company_name ? `<div class="mid-slide-company"><i class="fas fa-building"></i>${item.company_name}</div>` : ''}
             <h2 class="mid-slide-title">${item.title}</h2>
             ${item.description ? `<p class="mid-slide-desc">${item.description}</p>` : ''}
             ${statsHtml ? `<div class="mid-slide-stats">${statsHtml}</div>` : ''}
