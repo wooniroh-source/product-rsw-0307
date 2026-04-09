@@ -226,21 +226,42 @@ section { padding: 6rem 5%; max-width: 1400px; margin: 0 auto; width: 100%; }
     line-height: 1.2;
 }
 @media (max-width: 768px) {
-    .mid-slide-number  { font-size: 2.2rem; }
-    .mid-slide-title   { font-size: 1.8rem; }
-    .mid-slide-desc    { margin-bottom: 1.4rem; }
+    .mid-slide-content { padding: 2rem 6% 6rem; align-items: flex-start; }
+    .mid-slide-number  { font-size: 2rem; margin-bottom: 1rem; }
+    .mid-slide-company { margin-bottom: 1.2rem; }
+    .mid-slide-title   { font-size: 1.7rem; margin-bottom: 1.2rem; }
+    .mid-slide-desc    { margin-bottom: 1.8rem; font-size: 0.95rem; }
     .mid-slide-stats   { gap: 0.55rem; }
     .mid-stat-item     { padding: 0.55rem 0.85rem; min-width: 78px; }
     .mid-stat-value    { font-size: 0.95rem; }
+    /* 화살표를 하단으로 이동해 텍스트와 겹침 방지 */
+    #mid-slider .slider-arrow {
+        top: auto;
+        bottom: 18px;
+        transform: none;
+        width: 38px;
+        height: 38px;
+        font-size: 0.95rem;
+    }
+    #mid-slider .slider-dots { bottom: 68px; }
 }
 @media (max-width: 480px) {
-    .mid-slide-content { padding: 0 5%; }
-    .mid-slide-number  { font-size: 1.8rem; margin-bottom: 0.4rem; }
-    .mid-slide-title   { font-size: 1.35rem; margin-bottom: 0.7rem; }
+    .mid-slide-content { padding: 1.8rem 5% 5.5rem; }
+    .mid-slide-number  { font-size: 1.6rem; margin-bottom: 0.8rem; }
+    .mid-slide-company { font-size: 0.82rem; margin-bottom: 0.9rem; }
+    .mid-slide-title   { font-size: 1.25rem; margin-bottom: 0.9rem; }
     .mid-slide-desc    { display: none; }
-    .mid-stat-item     { padding: 0.4rem 0.65rem; min-width: 68px; }
+    .mid-slide-stats   { gap: 0.4rem; }
+    .mid-stat-item     { padding: 0.4rem 0.6rem; min-width: 65px; }
     .mid-stat-label    { font-size: 0.6rem; }
-    .mid-stat-value    { font-size: 0.85rem; }
+    .mid-stat-value    { font-size: 0.82rem; }
+    #mid-slider .slider-arrow {
+        width: 34px;
+        height: 34px;
+        font-size: 0.8rem;
+        bottom: 14px;
+    }
+    #mid-slider .slider-dots { bottom: 58px; }
 }
 
 /* =============================================
