@@ -223,22 +223,44 @@
                 </header>
 
                 <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
-                    <h3>새 중간 배너 추가</h3>
+                    <h3>새 중간 배너 추가 / 수정</h3>
                     <form id="midBannerForm" class="admin-form" onsubmit="handleMidBannerSubmit(event)">
                         <input type="hidden" id="midBannerEditId" value="">
                         <div class="form-grid">
                             <div class="input-group">
-                                <label>배너 제목</label>
-                                <input type="text" id="midBannerTitle" required>
+                                <label>업체명</label>
+                                <input type="text" id="midBannerCompany" placeholder="예: 클린앤파트너즈">
                             </div>
                             <div class="input-group">
-                                <label>배너 이미지 URL</label>
-                                <input type="url" id="midBannerUrl" required>
+                                <label>이미지 제목 <small style="color:#e00;">*</small></label>
+                                <input type="text" id="midBannerTitle" placeholder="예: 시스템 에어컨 분해세척" required>
                             </div>
                         </div>
                         <div class="input-group">
+                            <label>배너 이미지 URL <small style="color:#e00;">*</small></label>
+                            <input type="url" id="midBannerUrl" placeholder="https://..." required>
+                        </div>
+                        <div class="input-group">
                             <label>배너 설명</label>
-                            <input type="text" id="midBannerDesc" required>
+                            <input type="text" id="midBannerDesc" placeholder="간단한 설명을 입력하세요">
+                        </div>
+                        <div class="form-grid" style="grid-template-columns: repeat(4, 1fr);">
+                            <div class="input-group">
+                                <label>총대수</label>
+                                <input type="text" id="midBannerTotalUnits" placeholder="예: 12대">
+                            </div>
+                            <div class="input-group">
+                                <label>소요시간</label>
+                                <input type="text" id="midBannerTimeRequired" placeholder="예: 6시간">
+                            </div>
+                            <div class="input-group">
+                                <label>투입인원</label>
+                                <input type="text" id="midBannerManpower" placeholder="예: 3명">
+                            </div>
+                            <div class="input-group">
+                                <label>소요일자</label>
+                                <input type="text" id="midBannerWorkDate" placeholder="예: 2024-03-15">
+                            </div>
                         </div>
                         <div style="display:flex;gap:1rem;align-items:center;">
                             <button type="submit" id="midBannerSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">중간 배너 등록하기</button>
@@ -253,9 +275,10 @@
                         <table class="admin-table">
                             <thead>
                                 <tr>
-                                    <th>미리보기</th>
+                                    <th style="width:50px;">번호</th>
+                                    <th style="width:100px;">미리보기</th>
                                     <th>내용</th>
-                                    <th>관리</th>
+                                    <th style="width:80px;">관리</th>
                                 </tr>
                             </thead>
                             <tbody id="midBannerTableBody">

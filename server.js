@@ -114,18 +114,37 @@ async function initDB() {
 
     await runQuery('banners', `
       CREATE TABLE IF NOT EXISTS banners (
-        id          INT AUTO_INCREMENT PRIMARY KEY,
-        banner_type VARCHAR(10)  NOT NULL,
-        badge       VARCHAR(50),
-        title       VARCHAR(200) NOT NULL,
-        description TEXT,
-        image_url   VARCHAR(500),
-        btn_text    VARCHAR(50),
-        btn_link    VARCHAR(300),
-        sort_order  INT DEFAULT 0,
-        created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+        id            INT AUTO_INCREMENT PRIMARY KEY,
+        banner_type   VARCHAR(10)  NOT NULL,
+        badge         VARCHAR(50),
+        title         VARCHAR(200) NOT NULL,
+        description   TEXT,
+        image_url     VARCHAR(500),
+        btn_text      VARCHAR(50),
+        btn_link      VARCHAR(300),
+        sort_order    INT DEFAULT 0,
+        company_name  VARCHAR(100),
+        total_units   VARCHAR(50),
+        time_required VARCHAR(50),
+        manpower      VARCHAR(50),
+        work_date     VARCHAR(50),
+        created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // 기존 배너 테이블에 새 컬럼이 없을 경우 추가 (기존 배포 호환)
+    const midCols = [
+      ["company_name",  "VARCHAR(100)"],
+      ["total_units",   "VARCHAR(50)"],
+      ["time_required", "VARCHAR(50)"],
+      ["manpower",      "VARCHAR(50)"],
+      ["work_date",     "VARCHAR(50)"]
+    ];
+    for (const [col, type] of midCols) {
+      try {
+        await pool.query(`ALTER TABLE banners ADD COLUMN IF NOT EXISTS ${col} ${type}`);
+      } catch(e) { /* ignore */ }
+    }
 
     await runQuery('process_steps', `
       CREATE TABLE IF NOT EXISTS process_steps (
@@ -306,14 +325,16 @@ app.get('/api/banners/:type', async (req, res) => {
 
 app.post('/api/banners/:type', auth, async (req, res) => {
   try {
-    const { badge, title, description, image_url, btn_text, btn_link } = req.body;
+    const { badge, title, description, image_url, btn_text, btn_link,
+            company_name, total_units, time_required, manpower, work_date } = req.body;
     const [max] = await pool.query(
       'SELECT COALESCE(MAX(sort_order),0)+1 AS next FROM banners WHERE banner_type = ?',
       [req.params.type]
     );
     const [result] = await pool.query(
-      'INSERT INTO banners (banner_type, badge, title, description, image_url, btn_text, btn_link, sort_order) VALUES (?,?,?,?,?,?,?,?)',
-      [req.params.type, badge||null, title, description||null, image_url||null, btn_text||null, btn_link||null, max[0].next]
+      'INSERT INTO banners (banner_type, badge, title, description, image_url, btn_text, btn_link, sort_order, company_name, total_units, time_required, manpower, work_date) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      [req.params.type, badge||null, title, description||null, image_url||null, btn_text||null, btn_link||null, max[0].next,
+       company_name||null, total_units||null, time_required||null, manpower||null, work_date||null]
     );
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -321,10 +342,13 @@ app.post('/api/banners/:type', auth, async (req, res) => {
 
 app.put('/api/banners/:type/:id', auth, async (req, res) => {
   try {
-    const { badge, title, description, image_url, btn_text, btn_link } = req.body;
+    const { badge, title, description, image_url, btn_text, btn_link,
+            company_name, total_units, time_required, manpower, work_date } = req.body;
     await pool.query(
-      'UPDATE banners SET badge=?, title=?, description=?, image_url=?, btn_text=?, btn_link=? WHERE id=? AND banner_type=?',
-      [badge||null, title, description||null, image_url||null, btn_text||null, btn_link||null, req.params.id, req.params.type]
+      'UPDATE banners SET badge=?, title=?, description=?, image_url=?, btn_text=?, btn_link=?, company_name=?, total_units=?, time_required=?, manpower=?, work_date=? WHERE id=? AND banner_type=?',
+      [badge||null, title, description||null, image_url||null, btn_text||null, btn_link||null,
+       company_name||null, total_units||null, time_required||null, manpower||null, work_date||null,
+       req.params.id, req.params.type]
     );
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }

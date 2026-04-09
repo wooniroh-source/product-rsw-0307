@@ -164,24 +164,49 @@ window.renderBannerTable = async (type, bodyId) => {
   const body = document.getElementById(bodyId);
   if (!body) return;
   const items = await api('GET', `/banners/${type}`) || [];
-  body.innerHTML = items.length === 0 ? '<tr><td colspan="3" class="no-data">등록된 배너가 없습니다.</td></tr>' : '';
-  items.forEach(item => {
+  const cols = type === 'mid' ? 4 : 3;
+  body.innerHTML = items.length === 0 ? `<tr><td colspan="${cols}" class="no-data">등록된 배너가 없습니다.</td></tr>` : '';
+  items.forEach((item, index) => {
     const tr = document.createElement('tr');
-    const badgeHtml = item.badge ? `<span style="display:inline-block;background:var(--primary);color:#fff;font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:4px;margin-bottom:4px;">${item.badge}</span>` : '';
-    tr.innerHTML = `
-      <td class="banner-thumb-cell"><img src="${item.image_url||''}" class="banner-thumb-img" onerror="this.alt='이미지 없음';"></td>
-      <td class="banner-info-cell">${badgeHtml}<strong style="display:block;">${item.title}</strong><small>${item.description||''}</small></td>
-      <td><div class="btn-group">
-        <button class="btn-action btn-approve" onclick="editBanner('${type}',${item.id})" title="수정"><i class="fas fa-edit"></i></button>
-        <button class="btn-action btn-delete"  onclick="deleteBanner('${type}',${item.id})" title="삭제"><i class="fas fa-trash"></i></button>
-      </div></td>`;
+    if (type === 'mid') {
+      const num = String(index + 1).padStart(2, '0');
+      const statTags = [
+        item.total_units   ? `<span style="font-size:0.72rem;background:#e8f0fe;color:#004499;padding:2px 7px;border-radius:4px;">총대수: ${item.total_units}</span>`   : '',
+        item.time_required ? `<span style="font-size:0.72rem;background:#e8f0fe;color:#004499;padding:2px 7px;border-radius:4px;">소요시간: ${item.time_required}</span>` : '',
+        item.manpower      ? `<span style="font-size:0.72rem;background:#e8f0fe;color:#004499;padding:2px 7px;border-radius:4px;">투입인원: ${item.manpower}</span>`      : '',
+        item.work_date     ? `<span style="font-size:0.72rem;background:#e8f0fe;color:#004499;padding:2px 7px;border-radius:4px;">소요일자: ${item.work_date}</span>`     : ''
+      ].filter(Boolean).join(' ');
+      tr.innerHTML = `
+        <td style="text-align:center;font-size:1.4rem;font-weight:900;color:var(--primary);letter-spacing:-0.02em;">${num}</td>
+        <td class="banner-thumb-cell"><img src="${item.image_url||''}" class="banner-thumb-img" onerror="this.alt='이미지 없음';"></td>
+        <td class="banner-info-cell">
+          ${item.company_name ? `<span style="font-size:0.78rem;color:#888;display:block;margin-bottom:2px;">업체명: ${item.company_name}</span>` : ''}
+          <strong style="display:block;">${item.title}</strong>
+          <small style="display:block;margin-bottom:4px;">${item.description||''}</small>
+          <div style="display:flex;gap:0.35rem;flex-wrap:wrap;">${statTags}</div>
+        </td>
+        <td><div class="btn-group">
+          <button class="btn-action btn-approve" onclick="editBanner('${type}',${item.id})" title="수정"><i class="fas fa-edit"></i></button>
+          <button class="btn-action btn-delete"  onclick="deleteBanner('${type}',${item.id})" title="삭제"><i class="fas fa-trash"></i></button>
+        </div></td>`;
+    } else {
+      const badgeHtml = item.badge ? `<span style="display:inline-block;background:var(--primary);color:#fff;font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:4px;margin-bottom:4px;">${item.badge}</span>` : '';
+      tr.innerHTML = `
+        <td class="banner-thumb-cell"><img src="${item.image_url||''}" class="banner-thumb-img" onerror="this.alt='이미지 없음';"></td>
+        <td class="banner-info-cell">${badgeHtml}<strong style="display:block;">${item.title}</strong><small>${item.description||''}</small></td>
+        <td><div class="btn-group">
+          <button class="btn-action btn-approve" onclick="editBanner('${type}',${item.id})" title="수정"><i class="fas fa-edit"></i></button>
+          <button class="btn-action btn-delete"  onclick="deleteBanner('${type}',${item.id})" title="삭제"><i class="fas fa-trash"></i></button>
+        </div></td>`;
+    }
     body.appendChild(tr);
   });
 };
 
 const bannerFormMap = {
   hero:  { form:'bannerForm',      editId:'bannerEditId',       badge:'',                title:'bannerTitle',       desc:'bannerDesc',       url:'bannerUrl',       btnText:'bannerBtnText',   btnLink:'bannerBtnLink',   submitBtn:'bannerSubmitBtn',       cancelBtn:'bannerCancelBtn',       tableBody:'bannerTableBody' },
-  mid:   { form:'midBannerForm',   editId:'midBannerEditId',    badge:'',                title:'midBannerTitle',    desc:'midBannerDesc',    url:'midBannerUrl',    btnText:'',                btnLink:'',                submitBtn:'midBannerSubmitBtn',    cancelBtn:'midBannerCancelBtn',    tableBody:'midBannerTableBody' },
+  mid:   { form:'midBannerForm',   editId:'midBannerEditId',    badge:'',                title:'midBannerTitle',    desc:'midBannerDesc',    url:'midBannerUrl',    btnText:'',                btnLink:'',                submitBtn:'midBannerSubmitBtn',    cancelBtn:'midBannerCancelBtn',    tableBody:'midBannerTableBody',
+           companyName:'midBannerCompany', totalUnits:'midBannerTotalUnits', timeRequired:'midBannerTimeRequired', manpower:'midBannerManpower', workDate:'midBannerWorkDate' },
   res:   { form:'resBannerForm',   editId:'resBannerEditId',    badge:'resBannerBadge',  title:'resBannerTitle',    desc:'resBannerDesc',    url:'resBannerUrl',    btnText:'',                btnLink:'',                submitBtn:'resBannerSubmitBtn',    cancelBtn:'resBannerCancelBtn',    tableBody:'resBannerTableBody' },
   svc:   { form:'svcBannerForm',   editId:'svcBannerEditId',    badge:'svcBannerBadge',  title:'svcBannerTitle',    desc:'svcBannerDesc',    url:'svcBannerUrl',    btnText:'',                btnLink:'',                submitBtn:'svcBannerSubmitBtn',    cancelBtn:'svcBannerCancelBtn',    tableBody:'svcBannerTableBody' },
   about: { form:'aboutBannerForm', editId:'aboutBannerEditId',  badge:'aboutBannerBadge',title:'aboutBannerTitle',  desc:'aboutBannerDesc',  url:'aboutBannerUrl',  btnText:'',                btnLink:'',                submitBtn:'aboutBannerSubmitBtn',  cancelBtn:'aboutBannerCancelBtn',  tableBody:'aboutBannerTableBody' }
@@ -195,6 +220,13 @@ window.handleBannerSubmit = async (e, type) => {
   const m = bannerFormMap[type];
   const editId = getVal(m.editId);
   const payload = { badge: getVal(m.badge), title: getVal(m.title), description: getVal(m.desc), image_url: getVal(m.url), btn_text: getVal(m.btnText), btn_link: getVal(m.btnLink) };
+  if (type === 'mid') {
+    payload.company_name  = getVal(m.companyName);
+    payload.total_units   = getVal(m.totalUnits);
+    payload.time_required = getVal(m.timeRequired);
+    payload.manpower      = getVal(m.manpower);
+    payload.work_date     = getVal(m.workDate);
+  }
   if (editId) { await api('PUT', `/banners/${type}/${editId}`, payload); alert('수정되었습니다.'); }
   else        { await api('POST', `/banners/${type}`, payload);          alert('등록되었습니다.'); }
   cancelBannerEdit(type);
@@ -211,6 +243,13 @@ window.editBanner = async (type, id) => {
   setVal(m.title, item.title); setVal(m.desc, item.description); setVal(m.url, item.image_url);
   if (m.btnText) setVal(m.btnText, item.btn_text);
   if (m.btnLink) setVal(m.btnLink, item.btn_link);
+  if (type === 'mid') {
+    setVal(m.companyName,  item.company_name);
+    setVal(m.totalUnits,   item.total_units);
+    setVal(m.timeRequired, item.time_required);
+    setVal(m.manpower,     item.manpower);
+    setVal(m.workDate,     item.work_date);
+  }
   const btn = document.getElementById(m.submitBtn); if (btn) btn.textContent = '배너 수정 저장';
   const cancel = document.getElementById(m.cancelBtn); if (cancel) cancel.style.display = 'inline-block';
   document.getElementById(m.form)?.scrollIntoView({ behavior: 'smooth' });
@@ -339,14 +378,36 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
   container.innerHTML = '';
   if (dotsContainer) dotsContainer.innerHTML = '';
   const isHero = containerId === 'hero-slider-container';
+  const isMid  = containerId === 'mid-slider-container';
 
   items.forEach((item, index) => {
     const slide = document.createElement('div');
-    slide.classList.add(isHero ? 'slide' : 'res-banner-slide');
+    slide.classList.add((isHero || isMid) ? 'slide' : 'res-banner-slide');
     if (index === 0) slide.classList.add('active');
     if (isHero) {
       slide.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('${item.image_url||''}')`;
       slide.innerHTML = `<div class="hero-content"><h2>${item.title}</h2><p>${item.description||''}</p>${item.btn_text?`<div class="hero-btns"><a href="${item.btn_link||'#'}" class="btn">${item.btn_text}</a></div>`:''}</div>`;
+    } else if (isMid) {
+      const num = String(index + 1).padStart(2, '0');
+      slide.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.58),rgba(0,0,0,0.58)),url('${item.image_url||''}')`;
+      slide.style.backgroundSize = 'cover';
+      slide.style.backgroundPosition = 'center';
+      const statsHtml = [
+        item.total_units   ? `<div class="mid-stat-item"><span class="mid-stat-label">총대수</span><span class="mid-stat-value">${item.total_units}</span></div>`   : '',
+        item.time_required ? `<div class="mid-stat-item"><span class="mid-stat-label">소요시간</span><span class="mid-stat-value">${item.time_required}</span></div>` : '',
+        item.manpower      ? `<div class="mid-stat-item"><span class="mid-stat-label">투입인원</span><span class="mid-stat-value">${item.manpower}</span></div>`      : '',
+        item.work_date     ? `<div class="mid-stat-item"><span class="mid-stat-label">소요일자</span><span class="mid-stat-value">${item.work_date}</span></div>`     : ''
+      ].join('');
+      slide.innerHTML = `
+        <div class="mid-slide-content">
+          <div class="mid-slide-number">${num}</div>
+          <div class="mid-slide-info">
+            ${item.company_name ? `<div class="mid-slide-company">${item.company_name}</div>` : ''}
+            <h2 class="mid-slide-title">${item.title}</h2>
+            ${item.description ? `<p class="mid-slide-desc">${item.description}</p>` : ''}
+            ${statsHtml ? `<div class="mid-slide-stats">${statsHtml}</div>` : ''}
+          </div>
+        </div>`;
     } else {
       slide.style.backgroundImage = `linear-gradient(to right,rgba(0,0,0,0.65) 40%,rgba(0,0,0,0.25)),url('${item.image_url||''}')`;
       slide.innerHTML = `<div class="res-banner-content">${item.badge?`<span class="res-banner-badge">${item.badge}</span>`:''}<h4>${item.title}</h4><p>${item.description||''}</p></div>`;
@@ -362,7 +423,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
     }
   });
 
-  const slides = container.querySelectorAll(isHero ? '.slide' : '.res-banner-slide');
+  const slides = container.querySelectorAll((isHero || isMid) ? '.slide' : '.res-banner-slide');
   const dots   = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
   let current  = 0, timer;
 

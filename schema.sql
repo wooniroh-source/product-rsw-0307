@@ -26,16 +26,21 @@ CREATE TABLE IF NOT EXISTS contacts (
 
 -- 배너 (hero/mid/res/svc/about 통합)
 CREATE TABLE IF NOT EXISTS banners (
-  id          INT AUTO_INCREMENT PRIMARY KEY,
-  banner_type VARCHAR(10)  NOT NULL,
-  badge       VARCHAR(50),
-  title       VARCHAR(200) NOT NULL,
-  description TEXT,
-  image_url   VARCHAR(500),
-  btn_text    VARCHAR(50),
-  btn_link    VARCHAR(300),
-  sort_order  INT DEFAULT 0,
-  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  banner_type   VARCHAR(10)  NOT NULL,
+  badge         VARCHAR(50),
+  title         VARCHAR(200) NOT NULL,
+  description   TEXT,
+  image_url     VARCHAR(500),
+  btn_text      VARCHAR(50),
+  btn_link      VARCHAR(300),
+  sort_order    INT DEFAULT 0,
+  company_name  VARCHAR(100),
+  total_units   VARCHAR(50),
+  time_required VARCHAR(50),
+  manpower      VARCHAR(50),
+  work_date     VARCHAR(50),
+  created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 6단계 공정
