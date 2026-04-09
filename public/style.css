@@ -231,7 +231,7 @@ section { padding: 6rem 5%; max-width: 1400px; margin: 0 auto; width: 100%; }
     line-height: 1.2;
 }
 @media (max-width: 768px) {
-    .mid-slide-content { padding: 2rem 6% 6rem; align-items: flex-start; }
+    .mid-slide-content { padding: 2rem 6% 6rem; align-items: flex-end; justify-content: flex-start; }
     .mid-slide-number  { font-size: 2rem; margin-bottom: 1rem; }
     .mid-slide-company { margin-bottom: 1.2rem; }
     .mid-slide-title   { font-size: 1.7rem; margin-bottom: 1.2rem; }
@@ -251,7 +251,7 @@ section { padding: 6rem 5%; max-width: 1400px; margin: 0 auto; width: 100%; }
     #mid-slider .slider-dots { bottom: 68px; }
 }
 @media (max-width: 480px) {
-    .mid-slide-content { padding: 1.8rem 5% 5.5rem; }
+    .mid-slide-content { padding: 1.8rem 5% 5.5rem; align-items: flex-end; }
     .mid-slide-number  { font-size: 1.6rem; margin-bottom: 0.8rem; }
     .mid-slide-company { font-size: 0.82rem; margin-bottom: 0.9rem; }
     .mid-slide-title   { font-size: 1.25rem; margin-bottom: 0.9rem; }
