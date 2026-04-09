@@ -133,6 +133,7 @@ async function initDB() {
     `);
 
     // 기존 배너 테이블에 새 컬럼이 없을 경우 추가 (기존 배포 호환)
+    // errno 1060 = Duplicate column (이미 존재) → 무시, 그 외 오류는 무시
     const midCols = [
       ["company_name",  "VARCHAR(100)"],
       ["total_units",   "VARCHAR(50)"],
@@ -140,10 +141,17 @@ async function initDB() {
       ["manpower",      "VARCHAR(50)"],
       ["work_date",     "VARCHAR(50)"]
     ];
-    for (const [col, type] of midCols) {
+    for (const [col, colType] of midCols) {
       try {
-        await pool.query(`ALTER TABLE banners ADD COLUMN IF NOT EXISTS ${col} ${type}`);
-      } catch(e) { /* ignore */ }
+        await pool.query(`ALTER TABLE banners ADD COLUMN ${col} ${colType}`);
+        console.log(`✅ 컬럼 추가됨: banners.${col}`);
+      } catch(e) {
+        if (e.errno === 1060) {
+          // 이미 존재하는 컬럼 - 정상
+        } else {
+          console.warn(`⚠️ 컬럼 추가 스킵 (${col}):`, e.message);
+        }
+      }
     }
 
     await runQuery('process_steps', `
@@ -323,6 +331,21 @@ app.get('/api/banners/:type', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// 배너 테이블에 mid 전용 컬럼이 존재하는지 캐싱
+let _midColsExist = null;
+async function midColsExist() {
+  if (_midColsExist !== null) return _midColsExist;
+  try {
+    const [rows] = await pool.query(
+      "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'banners' AND COLUMN_NAME = 'company_name'"
+    );
+    _midColsExist = rows[0].cnt > 0;
+  } catch(e) {
+    _midColsExist = false;
+  }
+  return _midColsExist;
+}
+
 app.post('/api/banners/:type', auth, async (req, res) => {
   try {
     const { badge, title, description, image_url, btn_text, btn_link,
@@ -331,11 +354,17 @@ app.post('/api/banners/:type', auth, async (req, res) => {
       'SELECT COALESCE(MAX(sort_order),0)+1 AS next FROM banners WHERE banner_type = ?',
       [req.params.type]
     );
-    const [result] = await pool.query(
-      'INSERT INTO banners (banner_type, badge, title, description, image_url, btn_text, btn_link, sort_order, company_name, total_units, time_required, manpower, work_date) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-      [req.params.type, badge||null, title, description||null, image_url||null, btn_text||null, btn_link||null, max[0].next,
-       company_name||null, total_units||null, time_required||null, manpower||null, work_date||null]
-    );
+    const hasMidCols = await midColsExist();
+    let sql, params;
+    if (hasMidCols) {
+      sql = 'INSERT INTO banners (banner_type, badge, title, description, image_url, btn_text, btn_link, sort_order, company_name, total_units, time_required, manpower, work_date) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)';
+      params = [req.params.type, badge||null, title, description||null, image_url||null, btn_text||null, btn_link||null, max[0].next,
+                company_name||null, total_units||null, time_required||null, manpower||null, work_date||null];
+    } else {
+      sql = 'INSERT INTO banners (banner_type, badge, title, description, image_url, btn_text, btn_link, sort_order) VALUES (?,?,?,?,?,?,?,?)';
+      params = [req.params.type, badge||null, title, description||null, image_url||null, btn_text||null, btn_link||null, max[0].next];
+    }
+    const [result] = await pool.query(sql, params);
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -344,12 +373,19 @@ app.put('/api/banners/:type/:id', auth, async (req, res) => {
   try {
     const { badge, title, description, image_url, btn_text, btn_link,
             company_name, total_units, time_required, manpower, work_date } = req.body;
-    await pool.query(
-      'UPDATE banners SET badge=?, title=?, description=?, image_url=?, btn_text=?, btn_link=?, company_name=?, total_units=?, time_required=?, manpower=?, work_date=? WHERE id=? AND banner_type=?',
-      [badge||null, title, description||null, image_url||null, btn_text||null, btn_link||null,
-       company_name||null, total_units||null, time_required||null, manpower||null, work_date||null,
-       req.params.id, req.params.type]
-    );
+    const hasMidCols = await midColsExist();
+    let sql, params;
+    if (hasMidCols) {
+      sql = 'UPDATE banners SET badge=?, title=?, description=?, image_url=?, btn_text=?, btn_link=?, company_name=?, total_units=?, time_required=?, manpower=?, work_date=? WHERE id=? AND banner_type=?';
+      params = [badge||null, title, description||null, image_url||null, btn_text||null, btn_link||null,
+                company_name||null, total_units||null, time_required||null, manpower||null, work_date||null,
+                req.params.id, req.params.type];
+    } else {
+      sql = 'UPDATE banners SET badge=?, title=?, description=?, image_url=?, btn_text=?, btn_link=? WHERE id=? AND banner_type=?';
+      params = [badge||null, title, description||null, image_url||null, btn_text||null, btn_link||null,
+                req.params.id, req.params.type];
+    }
+    await pool.query(sql, params);
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
