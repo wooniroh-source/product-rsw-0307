@@ -107,16 +107,16 @@ section { padding: 6rem 5%; max-width: 1400px; margin: 0 auto; width: 100%; }
 .hero-btns .btn {
     display: inline-block;
     padding: 1.2rem 3rem;
-    background: var(--primary);
+    background: #ff6b00;
     color: #fff;
     text-decoration: none;
     border-radius: 50px;
     font-weight: 700;
     font-size: 1.2rem;
     transition: all 0.3s ease;
-    box-shadow: 0 10px 20px rgba(0,102,204,0.3);
+    box-shadow: 0 10px 20px rgba(255,107,0,0.35);
 }
-.hero-btns .btn:hover { background: var(--secondary); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,168,232,0.4); }
+.hero-btns .btn:hover { background: #e55f00; transform: translateY(-5px); box-shadow: 0 15px 30px rgba(255,107,0,0.45); }
 
 /* Slider Controls */
 .slider-arrow {
