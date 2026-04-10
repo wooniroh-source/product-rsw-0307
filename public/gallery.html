@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시공 갤러리 - 클린앤파트너즈</title>
+    <meta name="description" content="클린앤파트너즈의 실제 에어컨 청소 시공 사례를 확인하세요. 벽걸이, 스탠드, 시스템 에어컨 청소 전후 비교 사진을 제공합니다.">
+    <meta name="keywords" content="에어컨청소 전후, 에어컨세척 사진, 에어컨청소 시공사례, 에어컨청소 갤러리">
+    <meta name="robots" content="index, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="시공 갤러리 - 클린앤파트너즈">
+    <meta property="og:description" content="실제 에어컨 청소 시공 사례 사진을 확인하세요.">
+    <meta property="og:locale" content="ko_KR">
+    <meta property="og:url" content="https://cleannpartners.com/gallery">
+    <meta property="og:site_name" content="클린앤파트너즈">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1590402444816-05d848218571?auto=format&fit=crop&w=1200&q=80">
+    <meta name="naver-site-verification" content="3258843bff58fb18d298a19e5b44bfaf86d43c14">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>❄️</text></svg>">
+    <link rel="canonical" href="https://cleannpartners.com/gallery">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ===== 갤러리 페이지 전용 ===== */
+        #gallery-section {
+            padding: 3rem 5% 6rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .gallery-hero h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.6rem;
+        }
+        .gallery-hero p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* ===== 필터 탭 ===== */
+        .gallery-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        .filter-btn {
+            padding: 0.5rem 1.2rem;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            background: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        /* ===== 갤러리 그리드 ===== */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .gallery-item {
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            cursor: pointer;
+            background: #f0f0f0;
+            aspect-ratio: 4/3;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .gallery-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        .gallery-item .item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: flex-end;
+            padding: 1rem;
+        }
+        .gallery-item:hover .item-overlay {
+            opacity: 1;
+        }
+        .item-overlay .item-info {
+            color: #fff;
+        }
+        .item-info .item-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            display: block;
+        }
+        .item-info .item-tag {
+            font-size: 0.78rem;
+            opacity: 0.85;
+        }
+        .item-overlay .zoom-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        /* before/after 배지 */
+        .ba-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 0.25rem 0.65rem;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            z-index: 1;
+        }
+        .ba-badge.before {
+            background: rgba(239,68,68,0.88);
+            color: #fff;
+        }
+        .ba-badge.after {
+            background: rgba(16,185,129,0.88);
+            color: #fff;
+        }
+
+        /* 카테고리 배지 */
+        .cat-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 0.25rem 0.65rem;
+            background: rgba(0,102,204,0.82);
+            color: #fff;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            z-index: 1;
+        }
+
+        /* 숨김 처리 */
+        .gallery-item.hidden {
+            display: none;
+        }
+
+        /* ===== 라이트박스 ===== */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        #lightbox.open {
+            display: flex;
+        }
+        .lightbox-inner {
+            position: relative;
+            max-width: 900px;
+            width: 100%;
+        }
+        .lightbox-inner img {
+            width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 12px;
+            display: block;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: -44px;
+            right: 0;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.8rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .lightbox-close:hover { opacity: 1; }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .lightbox-nav:hover { background: rgba(255,255,255,0.3); }
+        .lightbox-nav.prev { left: -56px; }
+        .lightbox-nav.next { right: -56px; }
+        .lightbox-caption {
+            text-align: center;
+            color: #ddd;
+            font-size: 0.9rem;
+            margin-top: 0.8rem;
+        }
+        .lightbox-counter {
+            text-align: center;
+            color: #aaa;
+            font-size: 0.82rem;
+            margin-top: 0.3rem;
+        }
+
+        /* ===== CTA ===== */
+        .gallery-cta {
+            margin-top: 3rem;
+            background: linear-gradient(135deg, #0066cc, #00a8e8);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            color: #fff;
+        }
+        .gallery-cta h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        .gallery-cta p {
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        .gallery-cta-btns {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .gallery-cta-btns a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .cta-kakao { background: #fee500; color: #3c1e1e; }
+        .cta-kakao:hover { background: #f5da00; transform: translateY(-2px); }
+        .cta-estimate { background: rgba(255,255,255,0.2); color: #fff; border: 2px solid rgba(255,255,255,0.5); }
+        .cta-estimate:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+
+        /* ===== 반응형 ===== */
+        @media (max-width: 768px) {
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .lightbox-nav.prev { left: -10px; }
+            .lightbox-nav.next { right: -10px; }
+            .gallery-hero h1 { font-size: 1.7rem; }
+        }
+        @media (max-width: 480px) {
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">클린앤파트너즈</a>
+            <ul class="nav-menu">
+                <li><a href="/">홈</a></li>
+                <li><a href="/services">서비스 안내</a></li>
+                <li><a href="/reservation">실시간 예약</a></li>
+                <li><a href="/estimate">간편 견적</a></li>
+                <li><a href="/gallery" class="active">시공 갤러리</a></li>
+                <li><a href="/about">브랜드 소개</a></li>
+                <li><a href="/contact">고객센터</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="tel:15888776" class="nav-phone-btn">
+                    <i class="fas fa-phone"></i>
+                    <span class="phone-label">1588-8776</span>
+                </a>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="gallery-section">
+
+            <div class="gallery-hero">
+                <h1><i class="fas fa-images" style="color:#00a8e8; font-size:1.8rem; margin-right:0.4rem;"></i>시공 갤러리</h1>
+                <p>실제 에어컨 청소 시공 사례를 확인하세요. 전문 엔지니어가 직접 작업한 결과물입니다.</p>
+            </div>
+
+            <!-- 필터 -->
+            <div class="gallery-filters">
+                <button class="filter-btn active" data-filter="all">전체</button>
+                <button class="filter-btn" data-filter="벽걸이">벽걸이</button>
+                <button class="filter-btn" data-filter="스탠드">스탠드</button>
+                <button class="filter-btn" data-filter="시스템">시스템</button>
+                <button class="filter-btn" data-filter="상업용">상업용</button>
+            </div>
+
+            <!-- 갤러리 그리드 -->
+            <div class="gallery-grid" id="gallery-grid">
+                <div style="grid-column:1/-1;text-align:center;padding:3rem;color:#aaa;" id="gallery-loading">
+                    <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i>
+                </div>
+            </div>
+            <div id="gallery-empty" style="display:none;text-align:center;padding:4rem;color:#aaa;">
+                <i class="fas fa-images" style="font-size:2.5rem;margin-bottom:1rem;display:block;"></i>
+                등록된 시공 사진이 없습니다.
+            </div>
+
+            <!-- CTA -->
+            <div class="gallery-cta">
+                <h3>내 에어컨도 이렇게 깨끗하게!</h3>
+                <p>지금 바로 상담하시면 방문 일정을 잡아드립니다.</p>
+                <div class="gallery-cta-btns">
+                    <a href="https://open.kakao.com/o/sgJdxooi" target="_blank" rel="noopener" class="cta-kakao">
+                        <i class="fas fa-comment"></i> 카카오톡 상담
+                    </a>
+                    <a href="/estimate" class="cta-estimate">
+                        <i class="fas fa-calculator"></i> 간편 견적 보기
+                    </a>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- 라이트박스 -->
+    <div id="lightbox">
+        <div class="lightbox-inner">
+            <button class="lightbox-close" id="lb-close"><i class="fas fa-times"></i></button>
+            <button class="lightbox-nav prev" id="lb-prev"><i class="fas fa-chevron-left"></i></button>
+            <button class="lightbox-nav next" id="lb-next"><i class="fas fa-chevron-right"></i></button>
+            <img src="" alt="" id="lb-img">
+            <div class="lightbox-caption" id="lb-caption"></div>
+            <div class="lightbox-counter" id="lb-counter"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p><strong>클린앤파트너즈</strong> | 프리미엄 에어컨 토탈 케어 전문</p>
+            <p>상담전화: <a href="tel:15888776" style="color:#ccc;">1588-8776</a> | 운영시간: 평일 09:00 ~ 18:00 (주말·공휴일 휴무)</p>
+            <p style="margin-top:0.4rem; font-size:0.85rem; opacity:0.7;">대표: 김미영 | 사업자등록번호: 739-81-03458 | 서울시 영등포로28길 5, 지층 29호</p>
+            <div style="margin-top:1.2rem; display:flex; justify-content:center; gap:2rem; font-size:0.85rem; flex-wrap:wrap;">
+                <a href="/privacy" style="color:#bbb; text-decoration:none;">개인정보처리방침</a>
+                <a href="/contact" style="color:#bbb; text-decoration:none;">고객센터</a>
+                <a href="/services" style="color:#bbb; text-decoration:none;">서비스 안내</a>
+            </div>
+            <p style="margin-top:1rem;">&copy; 2026 클린앤파트너즈. All rights reserved.</p>
+            <p style="margin-top:5px; font-size:0.75rem;"><a href="/admin" style="color:#333; text-decoration:none;">Admin</a></p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+    (function () {
+        let allItems = [];
+        let visibleItems = [];
+        let currentIdx = 0;
+        let currentFilter = 'all';
+
+        const grid = document.getElementById('gallery-grid');
+        const emptyEl = document.getElementById('gallery-empty');
+
+        // ── API에서 갤러리 로드 ──
+        async function loadGallery() {
+            const res = await fetch('/api/gallery');
+            allItems = res.ok ? await res.json() : [];
+            renderGrid(currentFilter);
+        }
+
+        function createItem(item) {
+            const el = document.createElement('div');
+            el.className = 'gallery-item';
+            el.dataset.category = item.category;
+            el.dataset.title = item.title;
+            el.dataset.src = item.image_url;
+
+            const baBadge = item.ba_type && item.ba_type !== 'none'
+                ? `<span class="ba-badge ${item.ba_type}">${item.ba_type === 'before' ? '청소 전' : '청소 후'}</span>` : '';
+            const desc = item.description || item.category;
+
+            el.innerHTML = `
+                ${baBadge}
+                <span class="cat-badge">${item.category}</span>
+                <img src="${item.image_url}" alt="${item.title}" loading="lazy">
+                <div class="item-overlay">
+                    <div class="zoom-icon"><i class="fas fa-search-plus"></i></div>
+                    <div class="item-info">
+                        <span class="item-title">${item.title}</span>
+                        <span class="item-tag">${desc}</span>
+                    </div>
+                </div>`;
+
+            el.addEventListener('click', () => {
+                const idx = visibleItems.findIndex(v => v === el);
+                if (idx !== -1) openLightbox(idx);
+            });
+            return el;
+        }
+
+        function renderGrid(filter) {
+            currentFilter = filter;
+            grid.innerHTML = '';
+            const filtered = filter === 'all' ? allItems : allItems.filter(i => i.category === filter);
+
+            if (filtered.length === 0) {
+                emptyEl.style.display = 'block';
+                visibleItems = [];
+                return;
+            }
+            emptyEl.style.display = 'none';
+            visibleItems = filtered.map(item => {
+                const el = createItem(item);
+                grid.appendChild(el);
+                return el;
+            });
+        }
+
+        // ── 필터 버튼 ──
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderGrid(btn.dataset.filter);
+            });
+        });
+
+        // ── 라이트박스 ──
+        function openLightbox(idx) {
+            currentIdx = idx;
+            const el = visibleItems[currentIdx];
+            document.getElementById('lb-img').src = el.dataset.src;
+            document.getElementById('lb-img').alt = el.dataset.title;
+            document.getElementById('lb-caption').textContent = el.dataset.title;
+            document.getElementById('lb-counter').textContent = `${currentIdx + 1} / ${visibleItems.length}`;
+            document.getElementById('lightbox').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('lb-close').addEventListener('click', closeLightbox);
+        document.getElementById('lb-prev').addEventListener('click', () => {
+            currentIdx = (currentIdx - 1 + visibleItems.length) % visibleItems.length;
+            openLightbox(currentIdx);
+        });
+        document.getElementById('lb-next').addEventListener('click', () => {
+            currentIdx = (currentIdx + 1) % visibleItems.length;
+            openLightbox(currentIdx);
+        });
+        document.getElementById('lightbox').addEventListener('click', e => {
+            if (e.target === document.getElementById('lightbox')) closeLightbox();
+        });
+        document.addEventListener('keydown', e => {
+            if (!document.getElementById('lightbox').classList.contains('open')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') document.getElementById('lb-prev').click();
+            if (e.key === 'ArrowRight') document.getElementById('lb-next').click();
+        });
+
+        loadGallery();
+    })();
+    </script>
+</body>
+</html>

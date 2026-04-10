@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','process','contacts','security'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','security'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -103,6 +103,7 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'res-banners')   renderBannerTable('res',   'resBannerTableBody');
   else if (sectionId === 'svc-banners')   renderBannerTable('svc',   'svcBannerTableBody');
   else if (sectionId === 'about-banners') renderBannerTable('about', 'aboutBannerTableBody');
+  else if (sectionId === 'gallery')       renderGalleryTable();
   else if (sectionId === 'process')       renderProcessEditForm();
   else if (sectionId === 'contacts')      renderContactTable();
 };
@@ -324,6 +325,87 @@ window.renderContactTable = async () => {
 
 window.markContactRead = async (id) => { await api('PUT', `/contacts/${id}/read`); renderContactTable(); };
 window.deleteContact   = async (id) => { if (!confirm('정말 삭제하시겠습니까?')) return; await api('DELETE', `/contacts/${id}`); renderContactTable(); };
+
+// =============================================
+// 5-G. 갤러리 관리
+// =============================================
+window.renderGalleryTable = async () => {
+  const body = document.getElementById('galleryTableBody');
+  const noMsg = document.getElementById('noGalleryMessage');
+  if (!body) return;
+  const items = await api('GET', '/gallery') || [];
+  if (noMsg) noMsg.style.display = items.length === 0 ? 'block' : 'none';
+  const baLabel = { before:'청소 전', after:'청소 후', none:'' };
+  const baColor = { before:'#ef4444', after:'#10b981', none:'#999' };
+  body.innerHTML = items.length === 0 ? '' : '';
+  items.forEach(item => {
+    const tr = document.createElement('tr');
+    const baBadge = item.ba_type && item.ba_type !== 'none'
+      ? `<span style="display:inline-block;background:${baColor[item.ba_type]};color:#fff;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:4px;margin-right:4px;">${baLabel[item.ba_type]}</span>`
+      : '';
+    const catBadge = `<span style="display:inline-block;background:#0066cc;color:#fff;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:4px;">${item.category}</span>`;
+    tr.innerHTML = `
+      <td class="banner-thumb-cell"><img src="${item.image_url||''}" class="banner-thumb-img" onerror="this.alt='이미지 없음';"></td>
+      <td class="banner-info-cell">
+        <div style="margin-bottom:4px;">${baBadge}${catBadge}</div>
+        <strong style="display:block;">${item.title}</strong>
+        <small>${item.description||''}</small>
+      </td>
+      <td><div class="btn-group">
+        <button class="btn-action btn-approve" onclick="editGallery(${item.id})" title="수정"><i class="fas fa-edit"></i></button>
+        <button class="btn-action btn-delete"  onclick="deleteGallery(${item.id})" title="삭제"><i class="fas fa-trash"></i></button>
+      </div></td>`;
+    body.appendChild(tr);
+  });
+};
+
+window.handleGallerySubmit = async (e) => {
+  e.preventDefault();
+  const editId = document.getElementById('galleryEditId').value;
+  const payload = {
+    title:       document.getElementById('galleryTitle').value,
+    category:    document.getElementById('galleryCategory').value,
+    ba_type:     document.getElementById('galleryBaType').value,
+    image_url:   document.getElementById('galleryImageUrl').value,
+    description: document.getElementById('galleryDescription').value,
+  };
+  if (editId) { await api('PUT', `/gallery/${editId}`, payload); alert('수정되었습니다.'); }
+  else        { await api('POST', '/gallery', payload);           alert('등록되었습니다.'); }
+  cancelGalleryEdit();
+  renderGalleryTable();
+};
+
+window.editGallery = async (id) => {
+  const items = await api('GET', '/gallery') || [];
+  const item  = items.find(i => i.id === id);
+  if (!item) return;
+  document.getElementById('galleryEditId').value      = item.id;
+  document.getElementById('galleryTitle').value       = item.title;
+  document.getElementById('galleryCategory').value    = item.category;
+  document.getElementById('galleryBaType').value      = item.ba_type || 'none';
+  document.getElementById('galleryImageUrl').value    = item.image_url;
+  document.getElementById('galleryDescription').value = item.description || '';
+  document.getElementById('gallerySubmitBtn').textContent = '수정 저장하기';
+  document.getElementById('galleryCancelBtn').style.display = 'inline-block';
+  document.getElementById('galleryForm').scrollIntoView({ behavior: 'smooth' });
+};
+
+window.cancelGalleryEdit = () => {
+  document.getElementById('galleryEditId').value   = '';
+  document.getElementById('galleryTitle').value    = '';
+  document.getElementById('galleryCategory').value = '';
+  document.getElementById('galleryBaType').value   = 'none';
+  document.getElementById('galleryImageUrl').value = '';
+  document.getElementById('galleryDescription').value = '';
+  document.getElementById('gallerySubmitBtn').textContent = '갤러리 등록하기';
+  document.getElementById('galleryCancelBtn').style.display = 'none';
+};
+
+window.deleteGallery = async (id) => {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  await api('DELETE', `/gallery/${id}`);
+  renderGalleryTable();
+};
 
 // =============================================
 // 5. 공정 관리

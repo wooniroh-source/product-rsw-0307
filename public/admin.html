@@ -75,6 +75,11 @@
                         <i class="fas fa-star"></i> <span>브랜드 소개 배너</span>
                     </a>
                 </li>
+                <li id="menu-gallery">
+                    <a href="javascript:void(0)" onclick="showSection('gallery')">
+                        <i class="fas fa-photo-video"></i> <span>시공 갤러리</span>
+                    </a>
+                </li>
                 <li id="menu-process">
                     <a href="javascript:void(0)" onclick="showSection('process')">
                         <i class="fas fa-tasks"></i> <span>공정 관리</span>
@@ -500,6 +505,75 @@
                         </table>
                     </div>
                     <div id="noContactMessage" class="no-data" style="display:none;">접수된 문의가 없습니다.</div>
+                </div>
+            </div>
+
+            <!-- 갤러리 관리 섹션 -->
+            <div id="section-gallery" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1>시공 갤러리 관리</h1>
+                </header>
+
+                <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+                    <h3>새 갤러리 사진 추가 / 수정</h3>
+                    <form id="galleryForm" class="admin-form" onsubmit="handleGallerySubmit(event)">
+                        <input type="hidden" id="galleryEditId" value="">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>제목 <small style="color:#e00;">*</small></label>
+                                <input type="text" id="galleryTitle" placeholder="예: 벽걸이 에어컨 완전 분해 세척" required>
+                            </div>
+                            <div class="input-group">
+                                <label>이미지 URL <small style="color:#e00;">*</small></label>
+                                <input type="url" id="galleryImageUrl" placeholder="https://..." required>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>에어컨 종류 <small style="color:#e00;">*</small></label>
+                                <select id="galleryCategory" required style="padding:0.75rem;border:1px solid var(--border);border-radius:8px;font-size:1rem;font-family:inherit;outline:none;">
+                                    <option value="">선택하세요</option>
+                                    <option value="벽걸이">벽걸이</option>
+                                    <option value="스탠드">스탠드</option>
+                                    <option value="시스템">시스템</option>
+                                    <option value="상업용">상업용</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>청소 전/후</label>
+                                <select id="galleryBaType" style="padding:0.75rem;border:1px solid var(--border);border-radius:8px;font-size:1rem;font-family:inherit;outline:none;">
+                                    <option value="none">표시 안함</option>
+                                    <option value="before">청소 전</option>
+                                    <option value="after">청소 후</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>설명 <small style="color:#888;">(선택)</small></label>
+                            <input type="text" id="galleryDescription" placeholder="예: 고압 스팀 세척 후 항균 코팅 처리">
+                        </div>
+                        <div style="display:flex;gap:1rem;align-items:center;">
+                            <button type="submit" id="gallerySubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">갤러리 등록하기</button>
+                            <button type="button" id="galleryCancelBtn" onclick="cancelGalleryEdit()" style="display:none;padding:0.8rem 1.5rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">취소</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="admin-table-wrapper">
+                    <h3>등록된 갤러리 목록</h3>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:90px;">미리보기</th>
+                                    <th>내용</th>
+                                    <th style="width:80px;">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="galleryTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="noGalleryMessage" class="no-data" style="display:none;">등록된 사진이 없습니다.</div>
                 </div>
             </div>
 

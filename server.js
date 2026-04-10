@@ -28,6 +28,7 @@ const htmlRedirects = {
   '/services.html':    '/services',
   '/reservation.html': '/reservation',
   '/estimate.html':    '/estimate',
+  '/gallery.html':     '/gallery',
   '/about.html':       '/about',
   '/contact.html':     '/contact',
   '/privacy.html':     '/privacy',
@@ -162,6 +163,19 @@ async function initDB() {
         description VARCHAR(200),
         image_url   VARCHAR(500),
         icon        VARCHAR(50)
+      )
+    `);
+
+    await runQuery('gallery', `
+      CREATE TABLE IF NOT EXISTS gallery (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        title       VARCHAR(200) NOT NULL,
+        category    VARCHAR(50)  NOT NULL,
+        ba_type     ENUM('before','after','none') DEFAULT 'none',
+        image_url   VARCHAR(500) NOT NULL,
+        description VARCHAR(300),
+        sort_order  INT DEFAULT 0,
+        created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
@@ -422,6 +436,54 @@ app.put('/api/process', auth, async (req, res) => {
 
 
 // =============================================
+// GALLERY
+// =============================================
+app.get('/api/gallery', async (req, res) => {
+  try {
+    const { category } = req.query;
+    let sql = 'SELECT * FROM gallery';
+    const params = [];
+    if (category && category !== 'all') {
+      sql += ' WHERE category = ?';
+      params.push(category);
+    }
+    sql += ' ORDER BY sort_order ASC, created_at DESC';
+    const [rows] = await pool.query(sql, params);
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/gallery', auth, async (req, res) => {
+  try {
+    const { title, category, ba_type, image_url, description } = req.body;
+    const [max] = await pool.query('SELECT COALESCE(MAX(sort_order),0)+1 AS next FROM gallery');
+    const [result] = await pool.query(
+      'INSERT INTO gallery (title, category, ba_type, image_url, description, sort_order) VALUES (?,?,?,?,?,?)',
+      [title, category, ba_type||'none', image_url, description||null, max[0].next]
+    );
+    res.json({ id: result.insertId });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/gallery/:id', auth, async (req, res) => {
+  try {
+    const { title, category, ba_type, image_url, description } = req.body;
+    await pool.query(
+      'UPDATE gallery SET title=?, category=?, ba_type=?, image_url=?, description=? WHERE id=?',
+      [title, category, ba_type||'none', image_url, description||null, req.params.id]
+    );
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/gallery/:id', auth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM gallery WHERE id = ?', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================
 // 검색엔진 필수 파일 (와일드카드 폴백보다 먼저 처리)
 // =============================================
 app.get('/robots.txt', (req, res) => {
@@ -441,6 +503,7 @@ const cleanRoutes = {
   '/services':    'services.html',
   '/reservation': 'reservation.html',
   '/estimate':    'estimate.html',
+  '/gallery':     'gallery.html',
   '/about':       'about.html',
   '/contact':     'contact.html',
   '/privacy':     'privacy.html',
