@@ -1174,3 +1174,52 @@ td.no-data { padding: 3rem 0; }
     .day-cell .day-status { display: none; }
     .calendar-legend { font-size: 0.7rem; margin-top: 0.5rem; }
 }
+
+/* =============================================
+   ✨ 버튼 빛 애니메이션 (shine effect)
+   ============================================= */
+@keyframes btn-shine {
+    0%   { left: -75%; }
+    100% { left: 125%; }
+}
+
+.nav-phone-btn,
+.hero-btns .btn,
+.submit-booking-btn,
+.cta-btn,
+.cta-btn-kakao,
+.cta-btn-naver,
+.cta-btn-phone,
+#sticky-cta,
+.filter-btn.active,
+.gallery-cta-btns a {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-phone-btn::after,
+.hero-btns .btn::after,
+.submit-booking-btn::after,
+.cta-btn::after,
+.cta-btn-kakao::after,
+.cta-btn-naver::after,
+.cta-btn-phone::after,
+#sticky-cta::after,
+.filter-btn.active::after,
+.gallery-cta-btns a::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0)   0%,
+        rgba(255,255,255,0.35) 50%,
+        rgba(255,255,255,0)   100%
+    );
+    transform: skewX(-20deg);
+    animation: btn-shine 3s ease-in-out infinite;
+    pointer-events: none;
+}
