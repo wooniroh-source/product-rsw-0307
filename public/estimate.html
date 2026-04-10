@@ -95,87 +95,100 @@
             flex-shrink: 0;
         }
 
-        /* ===== 에어컨 종류 선택 ===== */
+        /* ===== 에어컨 종류 선택 (수량 인라인) ===== */
         .ac-type-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 0.75rem;
         }
-        .ac-type-btn {
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 1rem 0.5rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: #fafafa;
+        .ac-type-item {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .ac-type-btn:hover {
-            border-color: var(--primary);
-            background: #f0f6ff;
-        }
-        .ac-type-btn.selected {
-            border-color: var(--primary);
-            background: #e8f0ff;
-        }
-        .ac-type-btn .ac-icon {
-            font-size: 1.6rem;
-            color: var(--gray);
-            transition: color 0.2s;
-        }
-        .ac-type-btn.selected .ac-icon { color: var(--primary); }
-        .ac-type-btn:hover .ac-icon { color: var(--secondary); }
-        .ac-type-btn .ac-name {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--dark);
-        }
-        .ac-type-btn .ac-price {
-            font-size: 0.76rem;
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        /* ===== 수량 입력 ===== */
-        .qty-control {
-            display: flex;
-            align-items: center;
-            gap: 0;
             border: 2px solid var(--border);
             border-radius: 12px;
             overflow: hidden;
-            width: fit-content;
+            background: #fafafa;
+            transition: border-color 0.2s, background 0.2s;
         }
-        .qty-btn {
-            width: 48px; height: 48px;
-            border: none; background: #f4f7f9;
-            font-size: 1.3rem; cursor: pointer;
-            font-weight: 700; color: var(--primary);
-            transition: background 0.15s;
-            display: flex; align-items: center; justify-content: center;
+        .ac-type-item.active {
+            border-color: var(--primary);
+            background: #e8f0ff;
         }
-        .qty-btn:hover { background: #dde8f5; }
-        #ac-count {
-            width: 72px; height: 48px;
-            border: none; border-left: 2px solid var(--border); border-right: 2px solid var(--border);
+        .ac-type-top {
+            padding: 0.9rem 0.5rem 0.6rem;
             text-align: center;
-            font-size: 1.3rem; font-weight: 700; color: var(--dark);
-            font-family: inherit;
-            outline: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
+            flex: 1;
+            transition: background 0.15s;
         }
-        #ac-count::-webkit-inner-spin-button,
-        #ac-count::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .ac-type-top:hover { background: rgba(0,102,204,0.06); }
+        .ac-type-item .ac-icon {
+            font-size: 1.5rem;
+            color: var(--gray);
+            transition: color 0.2s;
+        }
+        .ac-type-item.active .ac-icon { color: var(--primary); }
+        .ac-type-item .ac-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        .ac-type-item .ac-price {
+            font-size: 0.74rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .ac-qty-row {
+            display: flex;
+            align-items: center;
+            border-top: 1px solid var(--border);
+        }
+        .ac-qty-btn {
+            flex: 1;
+            height: 30px;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+            transition: background 0.15s;
+            line-height: 1;
+        }
+        .ac-qty-btn:hover:not(:disabled) { background: rgba(0,102,204,0.1); }
+        .ac-qty-btn:disabled { color: #ccc; cursor: default; }
+        .ac-qty-val {
+            min-width: 28px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--dark);
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            height: 30px;
+            line-height: 30px;
+        }
+        .ac-type-item.active .ac-qty-row { border-top-color: rgba(0,102,204,0.25); }
+        .ac-type-item.active .ac-qty-val { border-color: rgba(0,102,204,0.25); }
 
-        .qty-hint {
-            margin-left: 1rem;
-            font-size: 0.82rem;
-            color: #888;
-            line-height: 1.4;
+        /* 총 수량 표시 바 */
+        .total-qty-bar {
+            margin-top: 1.1rem;
+            padding: 0.7rem 1rem;
+            background: #f4f7f9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
+        .total-qty-bar .tqb-label { font-size: 0.88rem; color: #555; }
+        .total-qty-bar .tqb-count { font-size: 1rem; font-weight: 800; color: var(--primary); }
+        .total-qty-bar .tqb-hint { font-size: 0.78rem; color: #888; margin-left: auto; line-height: 1.5; text-align: right; }
 
         /* ===== 옵션 체크박스 ===== */
         .option-list {
@@ -445,81 +458,133 @@
                 <p>에어컨 종류와 수량을 선택하시면 예상 비용을 바로 확인하실 수 있습니다.</p>
             </div>
 
-            <!-- STEP 1: 에어컨 종류 -->
+            <!-- STEP 1: 에어컨 종류별 수량 -->
             <div class="estimate-card">
                 <h3>
                     <span class="step-badge">1</span>
-                    에어컨 종류를 선택해 주세요
+                    에어컨 종류별 수량을 선택해 주세요
                 </h3>
                 <div class="ac-type-grid" id="ac-type-grid">
-                    <button class="ac-type-btn selected" data-price="60000" data-name="벽걸이">
-                        <span class="ac-icon"><i class="fas fa-wind"></i></span>
-                        <span class="ac-name">벽걸이</span>
-                        <span class="ac-price">60,000원~</span>
-                    </button>
-                    <button class="ac-type-btn" data-price="110000" data-name="스탠드">
-                        <span class="ac-icon"><i class="fas fa-server"></i></span>
-                        <span class="ac-name">스탠드</span>
-                        <span class="ac-price">110,000원~</span>
-                    </button>
-                    <button class="ac-type-btn" data-price="130000" data-name="무풍/고급">
-                        <span class="ac-icon"><i class="fas fa-snowflake"></i></span>
-                        <span class="ac-name">무풍/고급</span>
-                        <span class="ac-price">130,000원~</span>
-                    </button>
-                    <button class="ac-type-btn" data-price="80000" data-name="시스템 1way">
-                        <span class="ac-icon"><i class="fas fa-th-large"></i></span>
-                        <span class="ac-name">시스템 1way</span>
-                        <span class="ac-price">80,000원~</span>
-                    </button>
-                    <button class="ac-type-btn" data-price="130000" data-name="시스템 4way">
-                        <span class="ac-icon"><i class="fas fa-border-all"></i></span>
-                        <span class="ac-name">시스템 4way</span>
-                        <span class="ac-price">130,000원~</span>
-                    </button>
-                    <button class="ac-type-btn" data-price="170000" data-name="2in1">
-                        <span class="ac-icon"><i class="fas fa-layer-group"></i></span>
-                        <span class="ac-name">2in1</span>
-                        <span class="ac-price">170,000원~</span>
-                    </button>
-                    <button class="ac-type-btn" data-price="140000" data-name="상업용 스탠드">
-                        <span class="ac-icon"><i class="fas fa-building"></i></span>
-                        <span class="ac-name">상업용 스탠드</span>
-                        <span class="ac-price">140,000원~</span>
-                    </button>
-                    <button class="ac-type-btn" data-price="90000" data-name="FCU 팬코일유닛">
-                        <span class="ac-icon"><i class="fas fa-fan"></i></span>
-                        <span class="ac-name">FCU 팬코일유닛</span>
-                        <span class="ac-price">90,000원~</span>
-                    </button>
-                    <button class="ac-type-btn" data-price="150000" data-name="시스템원형 360">
-                        <span class="ac-icon"><i class="fas fa-circle-notch"></i></span>
-                        <span class="ac-name">시스템원형 360</span>
-                        <span class="ac-price">150,000원~</span>
-                    </button>
+                    <div class="ac-type-item" data-price="60000" data-name="벽걸이">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-wind"></i></span>
+                            <span class="ac-name">벽걸이</span>
+                            <span class="ac-price">60,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
+                    <div class="ac-type-item" data-price="110000" data-name="스탠드">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-server"></i></span>
+                            <span class="ac-name">스탠드</span>
+                            <span class="ac-price">110,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
+                    <div class="ac-type-item" data-price="130000" data-name="무풍/고급">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-snowflake"></i></span>
+                            <span class="ac-name">무풍/고급</span>
+                            <span class="ac-price">130,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
+                    <div class="ac-type-item" data-price="80000" data-name="시스템 1way">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-th-large"></i></span>
+                            <span class="ac-name">시스템 1way</span>
+                            <span class="ac-price">80,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
+                    <div class="ac-type-item" data-price="130000" data-name="시스템 4way">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-border-all"></i></span>
+                            <span class="ac-name">시스템 4way</span>
+                            <span class="ac-price">130,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
+                    <div class="ac-type-item" data-price="170000" data-name="2in1">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-layer-group"></i></span>
+                            <span class="ac-name">2in1</span>
+                            <span class="ac-price">170,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
+                    <div class="ac-type-item" data-price="140000" data-name="상업용 스탠드">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-building"></i></span>
+                            <span class="ac-name">상업용 스탠드</span>
+                            <span class="ac-price">140,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
+                    <div class="ac-type-item" data-price="90000" data-name="FCU 팬코일유닛">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-fan"></i></span>
+                            <span class="ac-name">FCU 팬코일유닛</span>
+                            <span class="ac-price">90,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
+                    <div class="ac-type-item" data-price="150000" data-name="시스템원형 360">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-circle-notch"></i></span>
+                            <span class="ac-name">시스템원형 360</span>
+                            <span class="ac-price">150,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="total-qty-bar" id="total-qty-bar">
+                    <span class="tqb-label">총 선택 수량</span>
+                    <span class="tqb-count" id="total-qty-display">0대</span>
+                    <span class="tqb-hint">3대↑ <strong style="color:var(--primary)">5%</strong> · 10대↑ <strong style="color:var(--primary)">10%</strong> · 15대↑ <strong style="color:var(--primary)">15%</strong> · 20대↑ <strong style="color:var(--primary)">20%</strong> 할인</span>
                 </div>
             </div>
 
-            <!-- STEP 2: 수량 -->
+            <!-- STEP 2: 추가 옵션 -->
             <div class="estimate-card">
                 <h3>
                     <span class="step-badge">2</span>
-                    수량을 선택해 주세요
-                </h3>
-                <div style="display:flex; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-                    <div class="qty-control">
-                        <button class="qty-btn" id="qty-minus" aria-label="수량 감소">−</button>
-                        <input type="number" id="ac-count" value="1" min="1" max="99" readonly aria-label="수량">
-                        <button class="qty-btn" id="qty-plus" aria-label="수량 증가">+</button>
-                    </div>
-                    <span class="qty-hint" id="qty-hint">3대 이상 <strong style="color:var(--primary)">5%</strong> · 10대 이상 <strong style="color:var(--primary)">10%</strong><br>15대 이상 <strong style="color:var(--primary)">15%</strong> · 20대 이상 <strong style="color:var(--primary)">20% 할인</strong></span>
-                </div>
-            </div>
-
-            <!-- STEP 3: 추가 옵션 -->
-            <div class="estimate-card">
-                <h3>
-                    <span class="step-badge">3</span>
                     추가 옵션 (복수 선택 가능)
                 </h3>
                 <div class="option-list">
@@ -561,7 +626,7 @@
             <!-- 결과 -->
             <div class="result-card">
                 <div class="result-label">총 예상 견적 금액</div>
-                <div class="result-amount" id="total-price">60,000원</div>
+                <div class="result-amount" id="total-price">0원</div>
                 <div id="discount-badge" class="discount-badge" style="display:none;">
                     <i class="fas fa-tag"></i>
                     <span id="discount-text"></span>
@@ -598,7 +663,7 @@
     <div id="sticky-bar">
         <div class="sticky-price">
             예상 금액
-            <strong id="sticky-amount">60,000원</strong>
+            <strong id="sticky-amount">0원</strong>
         </div>
         <a id="sticky-cta" href="#" target="_blank" rel="noopener">
             <i class="fas fa-comment"></i> 지금 바로 상담하기
@@ -623,33 +688,43 @@
     <script src="main.js"></script>
     <script>
     (function () {
-        // 설정값 (URL은 실제 채널 ID로 교체)
         const KAKAO_URL = 'https://open.kakao.com/o/sgJdxooi';
         const NAVER_URL = 'https://talk.naver.com/ct/W5W574';
 
-        let selectedPrice = 60000;
-        let selectedName = '벽걸이';
+        // ── 에어컨 종류별 수량 제어 ──
+        document.querySelectorAll('.ac-type-item').forEach(item => {
+            const valEl = item.querySelector('.ac-qty-val');
+            const minusBtn = item.querySelector('.ac-qty-btn.minus');
+            const plusBtn = item.querySelector('.ac-qty-btn.plus');
 
-        // ── 에어컨 종류 선택 ──
-        document.querySelectorAll('.ac-type-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.ac-type-btn').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                selectedPrice = parseInt(btn.dataset.price);
-                selectedName = btn.dataset.name;
-                calculate();
+            // 상단 클릭 → 수량 1 증가 (빠른 선택)
+            item.querySelector('.ac-type-top').addEventListener('click', () => {
+                const cur = parseInt(valEl.textContent) || 0;
+                if (cur < 99) {
+                    valEl.textContent = cur + 1;
+                    item.classList.add('active');
+                    calculate();
+                }
             });
-        });
 
-        // ── 수량 버튼 ──
-        const countEl = document.getElementById('ac-count');
-        document.getElementById('qty-minus').addEventListener('click', () => {
-            const v = parseInt(countEl.value);
-            if (v > 1) { countEl.value = v - 1; calculate(); }
-        });
-        document.getElementById('qty-plus').addEventListener('click', () => {
-            const v = parseInt(countEl.value);
-            if (v < 99) { countEl.value = v + 1; calculate(); }
+            minusBtn.addEventListener('click', () => {
+                const cur = parseInt(valEl.textContent) || 0;
+                if (cur > 0) {
+                    const next = cur - 1;
+                    valEl.textContent = next;
+                    item.classList.toggle('active', next > 0);
+                    calculate();
+                }
+            });
+
+            plusBtn.addEventListener('click', () => {
+                const cur = parseInt(valEl.textContent) || 0;
+                if (cur < 99) {
+                    valEl.textContent = cur + 1;
+                    item.classList.add('active');
+                    calculate();
+                }
+            });
         });
 
         // ── 옵션 체크박스 ──
@@ -662,24 +737,44 @@
 
         // ── 계산 함수 ──
         function calculate() {
-            const count = Math.max(1, parseInt(countEl.value) || 1);
+            // 종류별 수량 수집
+            const acLines = [];
+            let totalQty = 0;
+            let baseSubtotal = 0;
 
-            let optionTotal = 0;
+            document.querySelectorAll('.ac-type-item').forEach(item => {
+                const qty = parseInt(item.querySelector('.ac-qty-val').textContent) || 0;
+                if (qty > 0) {
+                    const price = parseInt(item.dataset.price);
+                    const name = item.dataset.name;
+                    acLines.push({ name, price, qty });
+                    totalQty += qty;
+                    baseSubtotal += price * qty;
+                }
+            });
+
+            // 옵션 수집
+            let optionUnitTotal = 0;
             const optionLines = [];
             document.querySelectorAll('.option').forEach(opt => {
                 if (opt.checked) {
                     const val = parseInt(opt.value);
-                    optionTotal += val;
+                    optionUnitTotal += val;
                     const name = opt.closest('.option-item').querySelector('.opt-name').textContent;
                     optionLines.push({ name, val });
                 }
             });
 
-            const unitPrice = selectedPrice + optionTotal;
-            const subtotal = unitPrice * count;
-            const discountRate = count >= 20 ? 0.20 : count >= 15 ? 0.15 : count >= 10 ? 0.10 : count >= 3 ? 0.05 : 0;
+            const optionSubtotal = optionUnitTotal * totalQty;
+            const subtotal = baseSubtotal + optionSubtotal;
+
+            // 총 수량 기준 할인율
+            const discountRate = totalQty >= 20 ? 0.20 : totalQty >= 15 ? 0.15 : totalQty >= 10 ? 0.10 : totalQty >= 3 ? 0.05 : 0;
             const discountAmt = Math.floor(subtotal * discountRate);
             const final = subtotal - discountAmt;
+
+            // 총 수량 표시 업데이트
+            document.getElementById('total-qty-display').textContent = totalQty + '대';
 
             // 결과 금액 표시 (bump 애니메이션)
             const amountEl = document.getElementById('total-price');
@@ -694,7 +789,7 @@
             const discountText = document.getElementById('discount-text');
             if (discountRate > 0) {
                 badge.style.display = 'inline-flex';
-                const label = count >= 20 ? '20대 이상 20% 할인' : count >= 15 ? '15대 이상 15% 할인' : count >= 10 ? '10대 이상 10% 할인' : '3대 이상 5% 할인';
+                const label = totalQty >= 20 ? '20대 이상 20% 할인' : totalQty >= 15 ? '15대 이상 15% 할인' : totalQty >= 10 ? '10대 이상 10% 할인' : '3대 이상 5% 할인';
                 discountText.textContent = `${label} — ${discountAmt.toLocaleString()}원 절약`;
             } else {
                 badge.style.display = 'none';
@@ -702,13 +797,21 @@
 
             // 가격 상세
             const bp = document.getElementById('price-breakdown');
-            let rows = `<div class="pb-row"><span>${selectedName} × ${count}대</span><span>${(selectedPrice * count).toLocaleString()}원</span></div>`;
+            let rows = '';
+
+            if (acLines.length === 0) {
+                rows += `<div class="pb-row"><span>선택된 에어컨 없음</span><span>0원</span></div>`;
+            } else {
+                acLines.forEach(a => {
+                    rows += `<div class="pb-row"><span>${a.name} × ${a.qty}대</span><span>${(a.price * a.qty).toLocaleString()}원</span></div>`;
+                });
+            }
             optionLines.forEach(o => {
-                rows += `<div class="pb-row"><span>${o.name} × ${count}대</span><span>${(o.val * count).toLocaleString()}원</span></div>`;
+                rows += `<div class="pb-row"><span>${o.name} × ${totalQty}대</span><span>${(o.val * totalQty).toLocaleString()}원</span></div>`;
             });
             if (discountRate > 0) {
-                const label = count >= 20 ? '20% 할인' : count >= 15 ? '15% 할인' : count >= 10 ? '10% 할인' : '5% 할인';
-                rows += `<div class="pb-row"><span class="discount-row">${label}</span><span class="discount-row">−${discountAmt.toLocaleString()}원</span></div>`;
+                const label = totalQty >= 20 ? '20% 할인' : totalQty >= 15 ? '15% 할인' : totalQty >= 10 ? '10% 할인' : '5% 할인';
+                rows += `<div class="pb-row"><span class="discount-row">${label} (총 ${totalQty}대)</span><span class="discount-row">−${discountAmt.toLocaleString()}원</span></div>`;
             }
             rows += `<div class="pb-row total"><span>합계</span><span>${final.toLocaleString()}원</span></div>`;
             bp.innerHTML = rows;
@@ -717,8 +820,11 @@
             document.getElementById('sticky-amount').textContent = final.toLocaleString() + '원';
 
             // 상담 링크 생성
+            const acSummary = acLines.length > 0
+                ? acLines.map(a => `${a.name} ${a.qty}대`).join(', ')
+                : '미선택';
             const optNames = optionLines.map(o => o.name).join(', ') || '없음';
-            const msg = `[에어컨 청소 견적 문의]\n종류: ${selectedName}\n수량: ${count}대\n옵션: ${optNames}\n예상금액: ${final.toLocaleString()}원`;
+            const msg = `[에어컨 청소 견적 문의]\n종류/수량: ${acSummary}\n총 수량: ${totalQty}대\n옵션: ${optNames}\n예상금액: ${final.toLocaleString()}원`;
             const encoded = encodeURIComponent(msg);
 
             document.getElementById('kakao-btn').href = `${KAKAO_URL}?text=${encoded}`;
