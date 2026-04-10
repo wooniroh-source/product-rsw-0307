@@ -162,19 +162,19 @@
             <p>단순한 청소를 넘어, 가족의 건강한 실내 환경을 만드는 것이 저희의 사명입니다.<br>10년의 현장 경험과 기술이 신뢰를 만들어 왔습니다.</p>
             <div class="stat-row">
                 <div class="stat-item">
-                    <div class="stat-num">10년+</div>
+                    <div class="stat-num" data-count="10" data-suffix="년+">0년+</div>
                     <div class="stat-label">전문 서비스 경력</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-num">5,000+</div>
+                    <div class="stat-num" data-count="5000" data-suffix="+" data-comma="true">0+</div>
                     <div class="stat-label">누적 서비스 건수</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-num">98%</div>
+                    <div class="stat-num" data-count="98" data-suffix="%">0%</div>
                     <div class="stat-label">고객 만족도</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-num">3개월</div>
+                    <div class="stat-num" data-count="3" data-suffix="개월">0개월</div>
                     <div class="stat-label">무상 A/S 보장</div>
                 </div>
             </div>
@@ -311,5 +311,42 @@
         </div>
     </footer>
     <script src="main.js"></script>
+    <script>
+    (function () {
+        const counters = document.querySelectorAll('.stat-num[data-count]');
+        const duration = 1800;
+
+        function animateCounter(el) {
+            const target = parseInt(el.dataset.count);
+            const suffix = el.dataset.suffix || '';
+            const useComma = el.dataset.comma === 'true';
+            const start = performance.now();
+
+            function step(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                // easeOutQuart
+                const ease = 1 - Math.pow(1 - progress, 4);
+                const current = Math.floor(ease * target);
+                const display = useComma ? current.toLocaleString() : current;
+                el.textContent = display + suffix;
+                if (progress < 1) requestAnimationFrame(step);
+                else el.textContent = (useComma ? target.toLocaleString() : target) + suffix;
+            }
+            requestAnimationFrame(step);
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.4 });
+
+        counters.forEach(el => observer.observe(el));
+    })();
+    </script>
 </body>
 </html>
