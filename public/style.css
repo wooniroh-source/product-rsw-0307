@@ -1236,52 +1236,55 @@ td.no-data { padding: 3rem 0; }
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 8px;
     z-index: 9000;
 }
 .side-talk-btn {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 14px 16px;
+    gap: 0;
+    padding: 0;
     text-decoration: none;
-    font-size: 0.85rem;
     font-weight: 700;
-    color: #3c1e1e;
-    border-radius: 12px 0 0 12px;
-    box-shadow: -3px 3px 12px rgba(0,0,0,0.18);
-    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 14px 0 0 14px;
+    box-shadow: -4px 4px 16px rgba(0,0,0,0.22);
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s;
     white-space: nowrap;
-    margin-bottom: 6px;
-    min-width: 52px;
+    overflow: hidden;
 }
-.side-talk-btn:last-child { margin-bottom: 0; }
 .side-talk-btn:hover {
-    transform: translateX(-6px);
-    box-shadow: -6px 4px 18px rgba(0,0,0,0.22);
+    transform: translateX(-8px);
+    box-shadow: -8px 6px 24px rgba(0,0,0,0.28);
 }
 .side-talk-btn .st-icon {
-    width: 28px;
-    height: 28px;
+    width: 48px;
+    height: 60px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.15rem;
+    font-size: 1.4rem;
 }
 .side-talk-btn .st-label {
     writing-mode: vertical-rl;
     text-orientation: mixed;
-    font-size: 0.78rem;
-    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    padding: 10px 8px 10px 0;
 }
 .side-talk-kakao {
-    background: #fee500;
+    background: linear-gradient(160deg, #ffe033 0%, #ffc200 100%);
     color: #3c1e1e;
 }
+.side-talk-kakao .st-icon {
+    background: rgba(0,0,0,0.07);
+}
 .side-talk-talktalk {
-    background: #03C75A;
+    background: linear-gradient(160deg, #06e065 0%, #00a84b 100%);
     color: #fff;
+}
+.side-talk-talktalk .st-icon {
+    background: rgba(0,0,0,0.1);
 }
 
 /* --- Mobile 퀵메뉴 --- */
@@ -1293,8 +1296,10 @@ td.no-data { padding: 3rem 0; }
     right: 0;
     z-index: 9000;
     flex-direction: row;
-    height: 56px;
-    box-shadow: 0 -2px 12px rgba(0,0,0,0.15);
+    height: 70px;
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.18);
 }
 .quick-menu-btn {
     flex: 1;
@@ -1302,25 +1307,52 @@ td.no-data { padding: 3rem 0; }
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 5px;
     text-decoration: none;
-    font-size: 0.68rem;
-    font-weight: 700;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
     border: none;
     cursor: pointer;
-    transition: filter 0.15s;
+    position: relative;
+    transition: filter 0.15s, transform 0.15s;
 }
-.quick-menu-btn:active { filter: brightness(0.88); }
-.quick-menu-btn i { font-size: 1.15rem; }
-.quick-menu-kakao  { background: #fee500; color: #3c1e1e; }
-.quick-menu-sms    { background: #4a90d9; color: #fff; }
-.quick-menu-talktalk { background: #03C75A; color: #fff; }
+.quick-menu-btn:active {
+    filter: brightness(0.85);
+    transform: scale(0.96);
+}
+.quick-menu-btn + .quick-menu-btn::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 16%;
+    height: 68%;
+    width: 1px;
+    background: rgba(255,255,255,0.35);
+}
+.quick-menu-btn .qm-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    transition: background 0.15s;
+}
+.quick-menu-btn:active .qm-icon-wrap {
+    background: rgba(255,255,255,0.38);
+}
+.quick-menu-kakao   { background: linear-gradient(160deg, #ffe033 0%, #ffc200 100%); color: #3c1e1e; }
+.quick-menu-sms     { background: linear-gradient(160deg, #5ba3f5 0%, #2176d2 100%); color: #fff; }
+.quick-menu-talktalk{ background: linear-gradient(160deg, #06e065 0%, #00a84b 100%); color: #fff; }
 
 /* 퀵메뉴 공간 확보 (모바일에서 body 하단 패딩) */
 @media (max-width: 991px) {
     .side-talk { display: none; }
     .quick-menu { display: flex; }
-    body { padding-bottom: 56px; }
+    body { padding-bottom: 70px; }
 }
 @media (min-width: 992px) {
     .side-talk { display: flex; }
