@@ -1223,3 +1223,106 @@ td.no-data { padding: 3rem 0; }
     animation: btn-shine 3s ease-in-out infinite;
     pointer-events: none;
 }
+
+/* =============================================
+   사이드톡 (PC) & 퀵메뉴 (Mobile)
+   ============================================= */
+
+/* --- PC 사이드톡 --- */
+.side-talk {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    z-index: 9000;
+}
+.side-talk-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #3c1e1e;
+    border-radius: 12px 0 0 12px;
+    box-shadow: -3px 3px 12px rgba(0,0,0,0.18);
+    transition: transform 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+    margin-bottom: 6px;
+    min-width: 52px;
+}
+.side-talk-btn:last-child { margin-bottom: 0; }
+.side-talk-btn:hover {
+    transform: translateX(-6px);
+    box-shadow: -6px 4px 18px rgba(0,0,0,0.22);
+}
+.side-talk-btn .st-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+}
+.side-talk-btn .st-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+}
+.side-talk-kakao {
+    background: #fee500;
+    color: #3c1e1e;
+}
+.side-talk-talktalk {
+    background: #03C75A;
+    color: #fff;
+}
+
+/* --- Mobile 퀵메뉴 --- */
+.quick-menu {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9000;
+    flex-direction: row;
+    height: 56px;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.15);
+}
+.quick-menu-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-decoration: none;
+    font-size: 0.68rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+.quick-menu-btn:active { filter: brightness(0.88); }
+.quick-menu-btn i { font-size: 1.15rem; }
+.quick-menu-kakao  { background: #fee500; color: #3c1e1e; }
+.quick-menu-sms    { background: #4a90d9; color: #fff; }
+.quick-menu-talktalk { background: #03C75A; color: #fff; }
+
+/* 퀵메뉴 공간 확보 (모바일에서 body 하단 패딩) */
+@media (max-width: 991px) {
+    .side-talk { display: none; }
+    .quick-menu { display: flex; }
+    body { padding-bottom: 56px; }
+}
+@media (min-width: 992px) {
+    .side-talk { display: flex; }
+    .quick-menu { display: none; }
+}
