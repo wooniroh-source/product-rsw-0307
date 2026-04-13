@@ -910,3 +910,107 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 });
+
+// =============================================
+// PWA: Service Worker 등록 + 홈화면 추가 배너
+// =============================================
+(function () {
+  if (document.body.classList.contains('admin-body')) return;
+
+  // Service Worker 등록
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+
+  let deferredPrompt = null;
+
+  // 배너 HTML 주입
+  const banner = document.createElement('div');
+  banner.id = 'pwa-banner';
+  banner.innerHTML = `
+    <div id="pwa-banner-inner">
+      <img src="/icon.svg" alt="아이콘" width="40" height="40">
+      <div id="pwa-banner-text">
+        <strong>클린앤파트너즈</strong>
+        <span>홈 화면에 추가하고 빠르게 접속하세요</span>
+      </div>
+      <button id="pwa-install-btn">추가</button>
+      <button id="pwa-close-btn" aria-label="닫기">✕</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+
+  const style = document.createElement('style');
+  style.textContent = `
+    #pwa-banner {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-top: 1px solid #e2e8f0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+      z-index: 9999;
+      padding: 12px 16px;
+      animation: pwa-slide-up 0.3s ease;
+    }
+    @keyframes pwa-slide-up {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+    #pwa-banner-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    #pwa-banner-inner img { border-radius: 10px; flex-shrink: 0; }
+    #pwa-banner-text { flex: 1; display: flex; flex-direction: column; }
+    #pwa-banner-text strong { font-size: 0.95rem; color: #1e293b; }
+    #pwa-banner-text span { font-size: 0.8rem; color: #64748b; }
+    #pwa-install-btn {
+      background: #0066cc; color: #fff;
+      border: none; border-radius: 8px;
+      padding: 8px 18px; font-size: 0.9rem;
+      font-weight: 600; cursor: pointer;
+      flex-shrink: 0;
+    }
+    #pwa-install-btn:hover { background: #0052a3; }
+    #pwa-close-btn {
+      background: none; border: none;
+      color: #94a3b8; font-size: 1.1rem;
+      cursor: pointer; padding: 4px 6px;
+      flex-shrink: 0;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Chrome/Edge/Android: beforeinstallprompt 이벤트
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!sessionStorage.getItem('pwa-banner-dismissed')) {
+      banner.style.display = 'block';
+    }
+  });
+
+  document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+    banner.style.display = 'none';
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+    }
+  });
+
+  document.getElementById('pwa-close-btn').addEventListener('click', () => {
+    banner.style.display = 'none';
+    sessionStorage.setItem('pwa-banner-dismissed', '1');
+  });
+
+  // 이미 설치된 경우 배너 숨김
+  window.addEventListener('appinstalled', () => {
+    banner.style.display = 'none';
+    deferredPrompt = null;
+  });
+})();

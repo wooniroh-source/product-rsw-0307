@@ -1,0 +1,43 @@
+{
+  "name": "클린앤파트너즈",
+  "short_name": "클린앤파트너즈",
+  "description": "프리미엄 에어컨 청소 전문 업체 · 서울·경기·인천 당일 출장",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#0066cc",
+  "lang": "ko",
+  "categories": ["business", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "예약하기",
+      "short_name": "예약",
+      "description": "에어컨 청소 예약",
+      "url": "/reservation",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "간편견적",
+      "short_name": "견적",
+      "description": "빠른 견적 확인",
+      "url": "/estimate",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    }
+  ]
+}

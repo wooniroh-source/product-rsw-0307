@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background rounded square -->
+  <rect width="512" height="512" rx="90" fill="#0066cc"/>
+  <!-- Snowflake: vertical arm -->
+  <rect x="244" y="80" width="24" height="352" rx="12" fill="white"/>
+  <!-- Snowflake: horizontal arm -->
+  <rect x="80" y="244" width="352" height="24" rx="12" fill="white"/>
+  <!-- Snowflake: diagonal arm 1 (60deg) -->
+  <rect x="244" y="80" width="24" height="352" rx="12" fill="white" transform="rotate(60 256 256)"/>
+  <!-- Snowflake: diagonal arm 2 (-60deg) -->
+  <rect x="244" y="80" width="24" height="352" rx="12" fill="white" transform="rotate(-60 256 256)"/>
+  <!-- Branch tips: top vertical -->
+  <rect x="231" y="112" width="14" height="52" rx="7" fill="white" transform="rotate(-45 238 138)"/>
+  <rect x="267" y="112" width="14" height="52" rx="7" fill="white" transform="rotate(45 274 138)"/>
+  <!-- Branch tips: bottom vertical -->
+  <rect x="231" y="348" width="14" height="52" rx="7" fill="white" transform="rotate(45 238 374)"/>
+  <rect x="267" y="348" width="14" height="52" rx="7" fill="white" transform="rotate(-45 274 374)"/>
+  <!-- Branch tips: left horizontal -->
+  <rect x="112" y="231" width="52" height="14" rx="7" fill="white" transform="rotate(45 138 238)"/>
+  <rect x="112" y="267" width="52" height="14" rx="7" fill="white" transform="rotate(-45 138 274)"/>
+  <!-- Branch tips: right horizontal -->
+  <rect x="348" y="231" width="52" height="14" rx="7" fill="white" transform="rotate(-45 374 238)"/>
+  <rect x="348" y="267" width="52" height="14" rx="7" fill="white" transform="rotate(45 374 274)"/>
+  <!-- Center circle -->
+  <circle cx="256" cy="256" r="26" fill="white"/>
+  <circle cx="256" cy="256" r="14" fill="#0066cc"/>
+</svg>
