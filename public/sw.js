@@ -1,5 +1,5 @@
 // 클린앤파트너즈 Service Worker
-const CACHE_NAME = 'cleannpartners-v1';
+const CACHE_NAME = 'cleannpartners-v2';
 const PRECACHE = ['/', '/style.css', '/main.js', '/icon.svg', '/manifest.json'];
 
 self.addEventListener('install', e => {
