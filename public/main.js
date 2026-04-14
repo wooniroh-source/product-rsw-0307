@@ -923,6 +923,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   let deferredPrompt = null;
+  let autoDismissTimer = null;
+
+  function showBanner() {
+    banner.style.display = 'block';
+    autoDismissTimer = setTimeout(() => {
+      banner.style.display = 'none';
+      sessionStorage.setItem('pwa-banner-dismissed', '1');
+    }, 20000);
+  }
+
+  function hideBanner() {
+    banner.style.display = 'none';
+    if (autoDismissTimer) {
+      clearTimeout(autoDismissTimer);
+      autoDismissTimer = null;
+    }
+  }
 
   // 배너 HTML 주입
   const banner = document.createElement('div');
@@ -990,12 +1007,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
     deferredPrompt = e;
     if (!sessionStorage.getItem('pwa-banner-dismissed')) {
-      banner.style.display = 'block';
+      showBanner();
     }
   });
 
   document.getElementById('pwa-install-btn').addEventListener('click', async () => {
-    banner.style.display = 'none';
+    hideBanner();
     if (deferredPrompt) {
       deferredPrompt.prompt();
       await deferredPrompt.userChoice;
@@ -1004,13 +1021,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.getElementById('pwa-close-btn').addEventListener('click', () => {
-    banner.style.display = 'none';
+    hideBanner();
     sessionStorage.setItem('pwa-banner-dismissed', '1');
   });
 
   // 이미 설치된 경우 배너 숨김
   window.addEventListener('appinstalled', () => {
-    banner.style.display = 'none';
+    hideBanner();
     deferredPrompt = null;
   });
 })();
