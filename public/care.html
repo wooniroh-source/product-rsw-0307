@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고객 관리 안내 - 클린앤파트너즈</title>
+    <meta name="description" content="에어컨 관리요령, 이상 증상 점검 가이드, 단종 에어컨 수리불가 확약서 - 클린앤파트너즈">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0066cc">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── 페이지 전용 ── */
+        .care-hero {
+            background: linear-gradient(135deg, #0066cc 0%, #00a8e8 100%);
+            color: #fff;
+            text-align: center;
+            padding: 3.5rem 5% 3rem;
+        }
+        .care-hero h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+        .care-hero p {
+            font-size: 1rem;
+            opacity: 0.88;
+        }
+
+        /* ── 섹션 공통 ── */
+        .care-section {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 3rem 5%;
+        }
+        .care-section + .care-section {
+            border-top: 1px solid #e8eef4;
+        }
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: #e8f4ff;
+            color: #0066cc;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.35rem 0.85rem;
+            border-radius: 50px;
+            margin-bottom: 1rem;
+            letter-spacing: 0.3px;
+        }
+        .section-badge.warn { background: #fff3e0; color: #e67e00; }
+        .section-badge.red  { background: #fdecea; color: #c0392b; }
+        .care-section h2 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #1a2540;
+            margin-bottom: 1.6rem;
+            line-height: 1.35;
+        }
+
+        /* ── 관리요령 카드 ── */
+        .tip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .tip-card {
+            display: flex;
+            gap: 1rem;
+            background: #f7fafd;
+            border: 1px solid #dce8f5;
+            border-radius: 14px;
+            padding: 1.2rem 1.3rem;
+            align-items: flex-start;
+        }
+        .tip-icon {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0066cc, #00a8e8);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .tip-body h3 {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #1a2540;
+            margin-bottom: 0.3rem;
+        }
+        .tip-body p {
+            font-size: 0.88rem;
+            color: #4a5568;
+            line-height: 1.65;
+        }
+
+        /* ── 이상증상 점검 ── */
+        .check-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+        .check-item {
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-start;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem 1.15rem;
+        }
+        .check-item.highlight {
+            border-color: #ffd580;
+            background: #fffbf0;
+        }
+        .check-num {
+            min-width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #0066cc;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+        .check-item.highlight .check-num { background: #e67e00; }
+        .check-text {
+            font-size: 0.88rem;
+            color: #2d3748;
+            line-height: 1.65;
+        }
+        .check-text strong {
+            display: block;
+            font-size: 0.93rem;
+            color: #1a2540;
+            margin-bottom: 0.2rem;
+        }
+
+        /* ── 확약서 ── */
+        .agreement-box {
+            background: #fff;
+            border: 2px solid #e53e3e;
+            border-radius: 16px;
+            padding: 1.6rem;
+        }
+        .agreement-title {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #c0392b;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed #f5c6c6;
+        }
+        .agreement-body {
+            font-size: 0.9rem;
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            word-break: keep-all;
+        }
+        .agreement-body strong {
+            color: #c0392b;
+        }
+
+        /* ── 서명 캔버스 ── */
+        .signature-wrap {
+            border: 1.5px dashed #0066cc;
+            border-radius: 12px;
+            background: #f9fbff;
+            padding: 0.6rem;
+            margin-bottom: 0.7rem;
+        }
+        .signature-label {
+            font-size: 0.78rem;
+            color: #0066cc;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+        #sig-canvas {
+            display: block;
+            width: 100%;
+            height: 140px;
+            cursor: crosshair;
+            touch-action: none;
+            border-radius: 8px;
+            background: #fff;
+        }
+        .sig-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.7rem;
+            flex-wrap: wrap;
+        }
+        .btn-sig-clear {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-sig-clear:hover { background: #e2e8f0; }
+        .btn-sig-save {
+            flex: 2;
+            padding: 0.6rem 1rem;
+            background: #0066cc;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-sig-save:hover { background: #0052a3; }
+        .sig-saved-msg {
+            display: none;
+            text-align: center;
+            color: #10b981;
+            font-size: 0.83rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+        }
+        .sig-saved-msg.show { display: block; }
+
+        /* ── 연락처 카드 ── */
+        .contact-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            background: #f7fafd;
+            border: 1px solid #dce8f5;
+            border-radius: 14px;
+            padding: 1.3rem 1.4rem;
+        }
+        .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-size: 0.9rem;
+            color: #2d3748;
+        }
+        .contact-row i {
+            width: 32px;
+            height: 32px;
+            background: #0066cc;
+            color: #fff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .contact-row a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* ── 인쇄 버튼 ── */
+        .btn-print {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.85rem;
+            background: #1a2540;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1.2rem;
+            transition: background 0.2s;
+        }
+        .btn-print:hover { background: #0f1a30; }
+
+        /* ── 인쇄 스타일 ── */
+        @media print {
+            header, footer, .quick-menu, .side-talk, .sig-actions, .btn-print, .care-hero { display: none !important; }
+            .care-section { padding: 1rem 0; }
+            .agreement-box { border: 2px solid #000; }
+            body { font-size: 12pt; }
+        }
+
+        /* ── 모바일 ── */
+        @media (max-width: 600px) {
+            .care-hero h1 { font-size: 1.6rem; }
+            .tip-icon { width: 38px; height: 38px; min-width: 38px; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">클린앤파트너즈</a>
+            <ul class="nav-menu">
+                <li><a href="/">홈</a></li>
+                <li><a href="/services">서비스 안내</a></li>
+                <li><a href="/reservation">실시간 예약</a></li>
+                <li><a href="/estimate">간편 견적</a></li>
+                <li><a href="/gallery">시공 갤러리</a></li>
+                <li><a href="/about">브랜드 소개</a></li>
+                <li><a href="/contact">고객센터</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="tel:15888776" class="nav-phone-btn">
+                    <i class="fas fa-phone"></i>
+                    <span class="phone-label">1588-8776</span>
+                </a>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="care-hero">
+            <h1><i class="fas fa-heart" style="margin-right:0.4rem;"></i>고객 관리 안내</h1>
+            <p>에어컨을 오래, 건강하게 사용하기 위한 관리 가이드</p>
+        </div>
+
+        <!-- ① 에어컨 관리요령 -->
+        <section class="care-section">
+            <span class="section-badge"><i class="fas fa-snowflake"></i> 에어컨 관리요령</span>
+            <h2>올바른 에어컨 관리로<br>건강한 실내 환경을 만드세요</h2>
+            <div class="tip-list">
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-wind"></i></div>
+                    <div class="tip-body">
+                        <h3>사용 후 송풍 모드로 1시간 가동</h3>
+                        <p>사용하신 후에는 송풍으로 1시간 정도 가동해 주세요. 에어컨 내부에 생긴 습기를 바짝 말려주지 않으면 곰팡이와 세균이 번식하기 쉽습니다.</p>
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-filter"></i></div>
+                    <div class="tip-body">
+                        <h3>에어컨 필터는 수시로 청소</h3>
+                        <p>필터에 보이는 먼지가 많다면 자주자주 청소 할수록 좋습니다. 필터 청소는 냉난방 효율을 높여줍니다.</p>
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-box-open"></i></div>
+                    <div class="tip-body">
+                        <h3>실외기 주변 물건 치우기</h3>
+                        <p>실외기 바로 뒤편의 물건을 치워주세요. 실외기실 공간이 협소하다면 물건을 쌓아두지 말아 주세요. 원활한 공기 순환이 이루어지지 않으면 에어컨 성능이 저하됩니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ② 에어컨 이상시 확인 사항 -->
+        <section class="care-section">
+            <span class="section-badge warn"><i class="fas fa-exclamation-triangle"></i> 이상 증상 점검</span>
+            <h2>에어컨 이상 시<br>먼저 확인해 보세요</h2>
+            <div class="check-list">
+                <div class="check-item highlight">
+                    <div class="check-num">1</div>
+                    <div class="check-text">
+                        <strong>기본 확인</strong>
+                        전원은 잘 꽂았는지, 차단기는 올렸는지 먼저 확인해 주세요.
+                    </div>
+                </div>
+                <div class="check-item">
+                    <div class="check-num">2</div>
+                    <div class="check-text">
+                        <strong>5분 후에도 시원한 바람이 없다면 → 실외기 확인</strong>
+                        에어컨을 작동시켰는데 5분이 지나도 시원한 바람이 나오지 않는다면 실외기실로 가셔서 실외기가 제대로 작동하는지 확인해 보세요. 정상 냉방 운전 중에는 압축기(콤프레샤)와 송풍팬(펜모터)이 둘 다 돌아야 합니다.
+                    </div>
+                </div>
+                <div class="check-item">
+                    <div class="check-num">3</div>
+                    <div class="check-text">
+                        <strong>웅웅 소리는 나는데 실외기 팬이 안 돌 경우</strong>
+                        팬모터 구속·단선, 기동 콘덴서, 또는 인버터 보드 문제일 수 있습니다.
+                    </div>
+                </div>
+                <div class="check-item">
+                    <div class="check-num">4</div>
+                    <div class="check-text">
+                        <strong>팬은 도는데 기계음(웅웅)이 없을 경우</strong>
+                        압축기(콤프레샤) 구속·단선, 기동 콘덴서, 또는 인버터 보드 문제일 수 있습니다.
+                    </div>
+                </div>
+                <div class="check-item">
+                    <div class="check-num">5</div>
+                    <div class="check-text">
+                        <strong>실외기 배관에 물기가 맺히는 경우</strong>
+                        정상 가동 중입니다. 다만 용량 부족이나 날씨가 너무 더워 시원하지 않게 느껴질 수 있습니다.
+                    </div>
+                </div>
+                <div class="check-item highlight">
+                    <div class="check-num">6</div>
+                    <div class="check-text">
+                        <strong>실외기 배관에 성에(얼음)가 끼는 경우</strong>
+                        배관 내 이물질로 인한 막힘 또는 <strong style="color:#e67e00;">냉매 가스 부족</strong> 가능성이 매우 높습니다. 전문가에게 점검을 의뢰해 주세요.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ③ 단종 에어컨 수리불가 확약서 -->
+        <section class="care-section">
+            <span class="section-badge red"><i class="fas fa-file-signature"></i> 확약서</span>
+            <h2>단종 에어컨 파손 시<br>수리 불가 확약서</h2>
+
+            <div class="agreement-box">
+                <div class="agreement-title">
+                    <i class="fas fa-exclamation-circle" style="margin-right:0.4rem;"></i>수리 불가 확약서
+                </div>
+                <div class="agreement-body">
+                    에어컨이 단종되어 수리가 불가한 기종인 경우, 노후화로 인해 분해 시 파손이 예상됩니다.<br><br>
+                    이에 따라 세척 작업 중 발생하는 <strong>기기의 이상·고장·파손 등에 대하여 세척 기사의 책임이 없음을 동의</strong>합니다.
+                </div>
+
+                <!-- 서명 영역 -->
+                <div class="signature-wrap">
+                    <span class="signature-label"><i class="fas fa-pen-nib" style="margin-right:0.3rem;"></i>서명란 (손가락 또는 마우스로 서명해 주세요)</span>
+                    <canvas id="sig-canvas"></canvas>
+                </div>
+                <div class="sig-actions">
+                    <button class="btn-sig-clear" id="btn-clear"><i class="fas fa-eraser" style="margin-right:0.3rem;"></i>지우기</button>
+                    <button class="btn-sig-save" id="btn-save"><i class="fas fa-check" style="margin-right:0.3rem;"></i>서명 저장 (이미지)</button>
+                </div>
+                <p class="sig-saved-msg" id="sig-saved-msg"><i class="fas fa-check-circle" style="margin-right:0.3rem;"></i>서명이 이미지로 저장되었습니다.</p>
+            </div>
+
+            <button class="btn-print" onclick="window.print()">
+                <i class="fas fa-print"></i> 확약서 인쇄하기
+            </button>
+        </section>
+
+        <!-- ④ 연락처 -->
+        <section class="care-section">
+            <span class="section-badge"><i class="fas fa-phone"></i> 연락처</span>
+            <h2>문의 및 입금 안내</h2>
+            <div class="contact-card">
+                <div class="contact-row">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>문의전화&nbsp; <a href="tel:01091152343">010-9115-2343</a></span>
+                </div>
+                <div class="contact-row">
+                    <i class="fas fa-university"></i>
+                    <span>기업은행&nbsp; <strong>010-9115-2343</strong>&nbsp; (노성운)</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p><strong>클린앤파트너즈</strong> | 프리미엄 에어컨 토탈 케어 전문</p>
+            <p>상담전화: <a href="tel:15888776" style="color:#ccc;">1588-8776</a> | 운영시간: 평일 09:00 ~ 18:00 (주말·공휴일 휴무)</p>
+            <p style="margin-top:0.4rem; font-size:0.85rem; opacity:0.7;">대표: 김미영 | 사업자등록번호: 739-81-03458 | 서울시 영등포로28길 5, 지층 29호</p>
+            <div style="margin-top:1.2rem; display:flex; justify-content:center; gap:2rem; font-size:0.85rem; flex-wrap:wrap;">
+                <a href="/privacy" style="color:#bbb; text-decoration:none;">개인정보처리방침</a>
+                <a href="/contact" style="color:#bbb; text-decoration:none;">고객센터</a>
+                <a href="/estimate" style="color:#bbb; text-decoration:none;">간편 견적</a>
+                <a href="/care" style="color:#bbb; text-decoration:none;">고객관리</a>
+            </div>
+            <p style="margin-top:1rem;">&copy; 2026 클린앤파트너즈. All rights reserved.</p>
+            <p style="margin-top:5px; font-size:0.75rem;"><a href="/admin" style="color:#333; text-decoration:none;">Admin</a></p>
+        </div>
+    </footer>
+
+    <div class="side-talk">
+        <a href="https://open.kakao.com/o/sgJdxooi" target="_blank" rel="noopener" class="side-talk-btn side-talk-kakao">
+            <span class="st-icon"><i class="fas fa-comment-dots"></i></span>
+            <span class="st-label">카카오상담</span>
+        </a>
+        <a href="https://talk.naver.com/ct/w5w574" target="_blank" rel="noopener" class="side-talk-btn side-talk-talktalk">
+            <span class="st-icon"><i class="fas fa-comments"></i></span>
+            <span class="st-label">톡톡상담</span>
+        </a>
+    </div>
+    <nav class="quick-menu">
+        <a href="https://open.kakao.com/o/sgJdxooi" target="_blank" rel="noopener" class="quick-menu-btn quick-menu-kakao">
+            <span class="qm-icon-wrap"><i class="fas fa-comment-dots"></i></span>
+            <span>카카오상담</span>
+        </a>
+        <a href="tel:01091152343" class="quick-menu-btn quick-menu-sms">
+            <span class="qm-icon-wrap"><i class="fas fa-sms"></i></span>
+            <span>문자상담</span>
+        </a>
+        <a href="https://talk.naver.com/ct/w5w574" target="_blank" rel="noopener" class="quick-menu-btn quick-menu-talktalk">
+            <span class="qm-icon-wrap"><i class="fas fa-comments"></i></span>
+            <span>톡톡상담</span>
+        </a>
+    </nav>
+
+    <script src="main.js"></script>
+    <script>
+    // ── 서명 캔버스 ──
+    (function () {
+        const canvas = document.getElementById('sig-canvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        let lastX = 0, lastY = 0;
+
+        function resizeCanvas() {
+            const ratio = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            // 기존 서명 보존
+            const tmpCanvas = document.createElement('canvas');
+            tmpCanvas.width = canvas.width;
+            tmpCanvas.height = canvas.height;
+            tmpCanvas.getContext('2d').drawImage(canvas, 0, 0);
+
+            canvas.width  = Math.floor(rect.width  * ratio);
+            canvas.height = Math.floor(rect.height * ratio);
+            ctx.scale(ratio, ratio);
+            ctx.lineWidth   = 2.5;
+            ctx.lineCap     = 'round';
+            ctx.lineJoin    = 'round';
+            ctx.strokeStyle = '#1a2540';
+            ctx.drawImage(tmpCanvas, 0, 0, rect.width, rect.height);
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            if (e.touches) {
+                return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+            }
+            return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        }
+
+        function startDraw(e) {
+            e.preventDefault();
+            drawing = true;
+            const p = getPos(e);
+            lastX = p.x; lastY = p.y;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 1.2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+            e.preventDefault();
+            const p = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+            lastX = p.x; lastY = p.y;
+        }
+
+        function stopDraw() { drawing = false; }
+
+        // 마우스
+        canvas.addEventListener('mousedown',  startDraw);
+        canvas.addEventListener('mousemove',  draw);
+        canvas.addEventListener('mouseup',    stopDraw);
+        canvas.addEventListener('mouseleave', stopDraw);
+        // 터치
+        canvas.addEventListener('touchstart', startDraw, { passive: false });
+        canvas.addEventListener('touchmove',  draw,      { passive: false });
+        canvas.addEventListener('touchend',   stopDraw);
+
+        // 초기화
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // 지우기
+        document.getElementById('btn-clear').addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('sig-saved-msg').classList.remove('show');
+        });
+
+        // 서명 저장 (이미지 다운로드)
+        document.getElementById('btn-save').addEventListener('click', () => {
+            const dataUrl = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = '확약서_서명.png';
+            a.click();
+            document.getElementById('sig-saved-msg').classList.add('show');
+        });
+    })();
+    </script>
+</body>
+</html>

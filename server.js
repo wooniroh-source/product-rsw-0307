@@ -507,6 +507,7 @@ const cleanRoutes = {
   '/about':       'about.html',
   '/contact':     'contact.html',
   '/privacy':     'privacy.html',
+  '/care':        'care.html',
   '/admin':       'admin.html',
 };
 Object.entries(cleanRoutes).forEach(([route, file]) => {
