@@ -2,603 +2,550 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>고객 관리 안내 - 클린앤파트너즈</title>
-    <meta name="description" content="에어컨 관리요령, 이상 증상 점검 가이드, 단종 에어컨 수리불가 확약서 - 클린앤파트너즈">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.svg">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0066cc">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
     <style>
-        /* ── 페이지 전용 ── */
-        .care-hero {
-            background: linear-gradient(135deg, #0066cc 0%, #00a8e8 100%);
-            color: #fff;
-            text-align: center;
-            padding: 3.5rem 5% 3rem;
-        }
-        .care-hero h1 {
-            font-size: 2rem;
-            font-weight: 900;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
-        }
-        .care-hero p {
-            font-size: 1rem;
-            opacity: 0.88;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            color: #1a2540;
+            min-height: 100vh;
         }
 
-        /* ── 섹션 공통 ── */
-        .care-section {
-            max-width: 780px;
+        /* ── 팝업 래퍼 ── */
+        .popup-wrap {
+            max-width: 480px;
             margin: 0 auto;
-            padding: 3rem 5%;
+            background: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 40px rgba(0,0,0,0.12);
         }
-        .care-section + .care-section {
-            border-top: 1px solid #e8eef4;
+
+        /* ── 헤더 바 ── */
+        .popup-header {
+            background: linear-gradient(135deg, #0055b3 0%, #0099d8 100%);
+            padding: 1.4rem 1.4rem 1.2rem;
+            position: relative;
+            text-align: center;
         }
-        .section-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            background: #e8f4ff;
-            color: #0066cc;
-            font-size: 0.78rem;
+        .popup-header .logo-line {
+            font-size: 0.75rem;
             font-weight: 700;
-            padding: 0.35rem 0.85rem;
-            border-radius: 50px;
-            margin-bottom: 1rem;
-            letter-spacing: 0.3px;
+            color: rgba(255,255,255,0.75);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0.35rem;
         }
-        .section-badge.warn { background: #fff3e0; color: #e67e00; }
-        .section-badge.red  { background: #fdecea; color: #c0392b; }
-        .care-section h2 {
-            font-size: 1.45rem;
+        .popup-header h1 {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+        .popup-header p {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 0.3rem;
+        }
+        .btn-close {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            width: 30px; height: 30px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .btn-close:hover { background: rgba(255,255,255,0.35); }
+
+        /* ── 탭 ── */
+        .tab-bar {
+            display: flex;
+            border-bottom: 2px solid #e8eef4;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem 0.3rem;
+            border: none;
+            background: none;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: color 0.2s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .tab-btn i { font-size: 0.95rem; }
+        .tab-btn.active { color: #0066cc; border-bottom-color: #0066cc; }
+
+        /* ── 콘텐츠 패널 ── */
+        .tab-panel { display: none; padding: 1.3rem 1.2rem; flex: 1; }
+        .tab-panel.active { display: block; }
+
+        /* ── 패널 제목 ── */
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.1rem;
+        }
+        .panel-title-icon {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .panel-title-icon.blue  { background: #e8f4ff; color: #0066cc; }
+        .panel-title-icon.warn  { background: #fff3e0; color: #e67e00; }
+        .panel-title-icon.red   { background: #fdecea; color: #c0392b; }
+        .panel-title-icon.green { background: #e6f9f2; color: #0a8a5c; }
+        .panel-title h2 {
+            font-size: 1rem;
             font-weight: 800;
             color: #1a2540;
-            margin-bottom: 1.6rem;
-            line-height: 1.35;
+            line-height: 1.3;
+        }
+        .panel-title span {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            font-weight: 500;
+            display: block;
         }
 
         /* ── 관리요령 카드 ── */
-        .tip-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+        .tip-list { display: flex; flex-direction: column; gap: 0.75rem; }
         .tip-card {
             display: flex;
-            gap: 1rem;
+            gap: 0.85rem;
+            align-items: flex-start;
             background: #f7fafd;
             border: 1px solid #dce8f5;
-            border-radius: 14px;
-            padding: 1.2rem 1.3rem;
-            align-items: flex-start;
+            border-radius: 12px;
+            padding: 1rem 1.1rem;
         }
         .tip-icon {
-            width: 44px;
-            height: 44px;
-            min-width: 44px;
-            border-radius: 12px;
+            width: 38px; height: 38px; min-width: 38px;
+            border-radius: 10px;
             background: linear-gradient(135deg, #0066cc, #00a8e8);
             color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
         }
-        .tip-body h3 {
-            font-size: 0.98rem;
-            font-weight: 700;
-            color: #1a2540;
-            margin-bottom: 0.3rem;
-        }
-        .tip-body p {
-            font-size: 0.88rem;
-            color: #4a5568;
-            line-height: 1.65;
-        }
+        .tip-body h3 { font-size: 0.88rem; font-weight: 700; color: #1a2540; margin-bottom: 0.25rem; }
+        .tip-body p  { font-size: 0.8rem; color: #4a5568; line-height: 1.6; }
 
-        /* ── 이상증상 점검 ── */
-        .check-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.85rem;
-        }
+        /* ── 이상증상 체크리스트 ── */
+        .check-list { display: flex; flex-direction: column; gap: 0.65rem; }
         .check-item {
             display: flex;
-            gap: 0.8rem;
+            gap: 0.7rem;
             align-items: flex-start;
             background: #fff;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 1rem 1.15rem;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
         }
-        .check-item.highlight {
-            border-color: #ffd580;
-            background: #fffbf0;
-        }
+        .check-item.hl { border-color: #ffd580; background: #fffbf0; }
         .check-num {
-            min-width: 26px;
-            height: 26px;
+            min-width: 24px; height: 24px;
             border-radius: 50%;
             background: #0066cc;
             color: #fff;
-            font-size: 0.75rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 1px;
+            font-size: 0.7rem; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: 1px; flex-shrink: 0;
         }
-        .check-item.highlight .check-num { background: #e67e00; }
-        .check-text {
-            font-size: 0.88rem;
-            color: #2d3748;
-            line-height: 1.65;
-        }
-        .check-text strong {
-            display: block;
-            font-size: 0.93rem;
-            color: #1a2540;
-            margin-bottom: 0.2rem;
-        }
+        .check-item.hl .check-num { background: #e67e00; }
+        .check-text { font-size: 0.8rem; color: #2d3748; line-height: 1.6; }
+        .check-text strong { display: block; font-size: 0.84rem; color: #1a2540; margin-bottom: 0.15rem; }
 
         /* ── 확약서 ── */
         .agreement-box {
-            background: #fff;
             border: 2px solid #e53e3e;
-            border-radius: 16px;
-            padding: 1.6rem;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 1rem;
         }
-        .agreement-title {
+        .agreement-head {
+            background: #fdecea;
+            padding: 0.85rem 1.2rem;
             text-align: center;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             font-weight: 800;
             color: #c0392b;
-            margin-bottom: 1.2rem;
-            padding-bottom: 1rem;
             border-bottom: 1px dashed #f5c6c6;
         }
         .agreement-body {
-            font-size: 0.9rem;
+            padding: 1rem 1.2rem 1.2rem;
+            font-size: 0.82rem;
             color: #2d3748;
             line-height: 1.8;
-            margin-bottom: 1.5rem;
             word-break: keep-all;
         }
-        .agreement-body strong {
-            color: #c0392b;
-        }
+        .agreement-body strong { color: #c0392b; }
 
-        /* ── 서명 캔버스 ── */
-        .signature-wrap {
+        /* 서명 */
+        .sig-wrap {
             border: 1.5px dashed #0066cc;
-            border-radius: 12px;
+            border-radius: 10px;
             background: #f9fbff;
-            padding: 0.6rem;
-            margin-bottom: 0.7rem;
+            padding: 0.5rem;
+            margin: 0 1.2rem 0.6rem;
         }
-        .signature-label {
-            font-size: 0.78rem;
-            color: #0066cc;
-            font-weight: 700;
-            margin-bottom: 0.4rem;
-            display: block;
+        .sig-label {
+            font-size: 0.72rem; font-weight: 700; color: #0066cc;
+            margin-bottom: 0.35rem; display: block;
         }
         #sig-canvas {
-            display: block;
-            width: 100%;
-            height: 140px;
-            cursor: crosshair;
-            touch-action: none;
-            border-radius: 8px;
-            background: #fff;
+            display: block; width: 100%; height: 120px;
+            cursor: crosshair; touch-action: none;
+            border-radius: 6px; background: #fff;
         }
-        .sig-actions {
-            display: flex;
-            gap: 0.6rem;
-            margin-top: 0.7rem;
-            flex-wrap: wrap;
+        .sig-btns {
+            display: flex; gap: 0.5rem;
+            margin: 0 1.2rem 1.2rem;
         }
-        .btn-sig-clear {
-            flex: 1;
-            padding: 0.6rem 1rem;
-            background: #f1f5f9;
-            color: #64748b;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
+        .btn-clear {
+            flex: 1; padding: 0.55rem 0.8rem;
+            background: #f1f5f9; color: #64748b;
+            border: 1px solid #cbd5e1; border-radius: 8px;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer;
             transition: background 0.2s;
         }
-        .btn-sig-clear:hover { background: #e2e8f0; }
-        .btn-sig-save {
-            flex: 2;
-            padding: 0.6rem 1rem;
-            background: #0066cc;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            cursor: pointer;
+        .btn-clear:hover { background: #e2e8f0; }
+        .btn-save {
+            flex: 2; padding: 0.55rem 0.8rem;
+            background: #0066cc; color: #fff;
+            border: none; border-radius: 8px;
+            font-size: 0.8rem; font-weight: 700; cursor: pointer;
             transition: background 0.2s;
         }
-        .btn-sig-save:hover { background: #0052a3; }
-        .sig-saved-msg {
-            display: none;
-            text-align: center;
-            color: #10b981;
-            font-size: 0.83rem;
-            font-weight: 700;
-            margin-top: 0.5rem;
+        .btn-save:hover { background: #0052a3; }
+        .sig-ok {
+            display: none; text-align: center;
+            color: #10b981; font-size: 0.78rem; font-weight: 700;
+            padding: 0 1.2rem 0.8rem;
         }
-        .sig-saved-msg.show { display: block; }
+        .sig-ok.show { display: block; }
+        .btn-print-full {
+            display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+            width: 100%; padding: 0.75rem;
+            background: #1a2540; color: #fff;
+            border: none; border-radius: 10px;
+            font-size: 0.85rem; font-weight: 700; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-print-full:hover { background: #0f1a30; }
 
-        /* ── 연락처 카드 ── */
-        .contact-card {
-            display: flex;
-            flex-direction: column;
-            gap: 0.7rem;
-            background: #f7fafd;
-            border: 1px solid #dce8f5;
-            border-radius: 14px;
-            padding: 1.3rem 1.4rem;
+        /* ── 연락처 ── */
+        .contact-list { display: flex; flex-direction: column; gap: 0.65rem; }
+        .contact-item {
+            display: flex; gap: 0.75rem; align-items: center;
+            background: #f7fafd; border: 1px solid #dce8f5;
+            border-radius: 12px; padding: 1rem 1.1rem;
         }
-        .contact-row {
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
+        .contact-icon {
+            width: 38px; height: 38px; min-width: 38px;
+            border-radius: 10px; background: #0066cc; color: #fff;
+            display: flex; align-items: center; justify-content: center;
             font-size: 0.9rem;
-            color: #2d3748;
         }
-        .contact-row i {
-            width: 32px;
-            height: 32px;
-            background: #0066cc;
-            color: #fff;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-        }
-        .contact-row a {
-            color: #0066cc;
-            text-decoration: none;
-            font-weight: 700;
+        .contact-info { line-height: 1.5; }
+        .contact-info .label { font-size: 0.72rem; color: #94a3b8; font-weight: 600; }
+        .contact-info .value { font-size: 0.9rem; font-weight: 700; color: #1a2540; }
+        .contact-info a { color: #0066cc; text-decoration: none; }
+
+        .divider {
+            height: 1px; background: #e8eef4;
+            margin: 1rem 0;
         }
 
-        /* ── 인쇄 버튼 ── */
-        .btn-print {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            width: 100%;
-            padding: 0.85rem;
-            background: #1a2540;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.92rem;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 1.2rem;
-            transition: background 0.2s;
-        }
-        .btn-print:hover { background: #0f1a30; }
-
-        /* ── 인쇄 스타일 ── */
+        /* ── 인쇄 ── */
         @media print {
-            header, footer, .quick-menu, .side-talk, .sig-actions, .btn-print, .care-hero { display: none !important; }
-            .care-section { padding: 1rem 0; }
+            .tab-bar, .btn-close, .sig-btns, .btn-print-full, .popup-header .btn-close { display: none !important; }
+            .tab-panel { display: block !important; padding: 0.5rem 0; }
             .agreement-box { border: 2px solid #000; }
-            body { font-size: 12pt; }
-        }
-
-        /* ── 모바일 ── */
-        @media (max-width: 600px) {
-            .care-hero h1 { font-size: 1.6rem; }
-            .tip-icon { width: 38px; height: 38px; min-width: 38px; font-size: 0.95rem; }
+            body { background: #fff; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="/" class="logo">클린앤파트너즈</a>
-            <ul class="nav-menu">
-                <li><a href="/">홈</a></li>
-                <li><a href="/services">서비스 안내</a></li>
-                <li><a href="/reservation">실시간 예약</a></li>
-                <li><a href="/estimate">간편 견적</a></li>
-                <li><a href="/gallery">시공 갤러리</a></li>
-                <li><a href="/about">브랜드 소개</a></li>
-                <li><a href="/contact">고객센터</a></li>
-            </ul>
-            <div class="nav-actions">
-                <a href="tel:15888776" class="nav-phone-btn">
-                    <i class="fas fa-phone"></i>
-                    <span class="phone-label">1588-8776</span>
-                </a>
-                <div class="menu-toggle" id="mobile-menu">
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                </div>
-            </div>
-        </nav>
-    </header>
+<div class="popup-wrap">
 
-    <main>
-        <div class="care-hero">
-            <h1><i class="fas fa-heart" style="margin-right:0.4rem;"></i>고객 관리 안내</h1>
-            <p>에어컨을 오래, 건강하게 사용하기 위한 관리 가이드</p>
-        </div>
-
-        <!-- ① 에어컨 관리요령 -->
-        <section class="care-section">
-            <span class="section-badge"><i class="fas fa-snowflake"></i> 에어컨 관리요령</span>
-            <h2>올바른 에어컨 관리로<br>건강한 실내 환경을 만드세요</h2>
-            <div class="tip-list">
-                <div class="tip-card">
-                    <div class="tip-icon"><i class="fas fa-wind"></i></div>
-                    <div class="tip-body">
-                        <h3>사용 후 송풍 모드로 1시간 가동</h3>
-                        <p>사용하신 후에는 송풍으로 1시간 정도 가동해 주세요. 에어컨 내부에 생긴 습기를 바짝 말려주지 않으면 곰팡이와 세균이 번식하기 쉽습니다.</p>
-                    </div>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-icon"><i class="fas fa-filter"></i></div>
-                    <div class="tip-body">
-                        <h3>에어컨 필터는 수시로 청소</h3>
-                        <p>필터에 보이는 먼지가 많다면 자주자주 청소 할수록 좋습니다. 필터 청소는 냉난방 효율을 높여줍니다.</p>
-                    </div>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-icon"><i class="fas fa-box-open"></i></div>
-                    <div class="tip-body">
-                        <h3>실외기 주변 물건 치우기</h3>
-                        <p>실외기 바로 뒤편의 물건을 치워주세요. 실외기실 공간이 협소하다면 물건을 쌓아두지 말아 주세요. 원활한 공기 순환이 이루어지지 않으면 에어컨 성능이 저하됩니다.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ② 에어컨 이상시 확인 사항 -->
-        <section class="care-section">
-            <span class="section-badge warn"><i class="fas fa-exclamation-triangle"></i> 이상 증상 점검</span>
-            <h2>에어컨 이상 시<br>먼저 확인해 보세요</h2>
-            <div class="check-list">
-                <div class="check-item highlight">
-                    <div class="check-num">1</div>
-                    <div class="check-text">
-                        <strong>기본 확인</strong>
-                        전원은 잘 꽂았는지, 차단기는 올렸는지 먼저 확인해 주세요.
-                    </div>
-                </div>
-                <div class="check-item">
-                    <div class="check-num">2</div>
-                    <div class="check-text">
-                        <strong>5분 후에도 시원한 바람이 없다면 → 실외기 확인</strong>
-                        에어컨을 작동시켰는데 5분이 지나도 시원한 바람이 나오지 않는다면 실외기실로 가셔서 실외기가 제대로 작동하는지 확인해 보세요. 정상 냉방 운전 중에는 압축기(콤프레샤)와 송풍팬(펜모터)이 둘 다 돌아야 합니다.
-                    </div>
-                </div>
-                <div class="check-item">
-                    <div class="check-num">3</div>
-                    <div class="check-text">
-                        <strong>웅웅 소리는 나는데 실외기 팬이 안 돌 경우</strong>
-                        팬모터 구속·단선, 기동 콘덴서, 또는 인버터 보드 문제일 수 있습니다.
-                    </div>
-                </div>
-                <div class="check-item">
-                    <div class="check-num">4</div>
-                    <div class="check-text">
-                        <strong>팬은 도는데 기계음(웅웅)이 없을 경우</strong>
-                        압축기(콤프레샤) 구속·단선, 기동 콘덴서, 또는 인버터 보드 문제일 수 있습니다.
-                    </div>
-                </div>
-                <div class="check-item">
-                    <div class="check-num">5</div>
-                    <div class="check-text">
-                        <strong>실외기 배관에 물기가 맺히는 경우</strong>
-                        정상 가동 중입니다. 다만 용량 부족이나 날씨가 너무 더워 시원하지 않게 느껴질 수 있습니다.
-                    </div>
-                </div>
-                <div class="check-item highlight">
-                    <div class="check-num">6</div>
-                    <div class="check-text">
-                        <strong>실외기 배관에 성에(얼음)가 끼는 경우</strong>
-                        배관 내 이물질로 인한 막힘 또는 <strong style="color:#e67e00;">냉매 가스 부족</strong> 가능성이 매우 높습니다. 전문가에게 점검을 의뢰해 주세요.
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ③ 단종 에어컨 수리불가 확약서 -->
-        <section class="care-section">
-            <span class="section-badge red"><i class="fas fa-file-signature"></i> 확약서</span>
-            <h2>단종 에어컨 파손 시<br>수리 불가 확약서</h2>
-
-            <div class="agreement-box">
-                <div class="agreement-title">
-                    <i class="fas fa-exclamation-circle" style="margin-right:0.4rem;"></i>수리 불가 확약서
-                </div>
-                <div class="agreement-body">
-                    에어컨이 단종되어 수리가 불가한 기종인 경우, 노후화로 인해 분해 시 파손이 예상됩니다.<br><br>
-                    이에 따라 세척 작업 중 발생하는 <strong>기기의 이상·고장·파손 등에 대하여 세척 기사의 책임이 없음을 동의</strong>합니다.
-                </div>
-
-                <!-- 서명 영역 -->
-                <div class="signature-wrap">
-                    <span class="signature-label"><i class="fas fa-pen-nib" style="margin-right:0.3rem;"></i>서명란 (손가락 또는 마우스로 서명해 주세요)</span>
-                    <canvas id="sig-canvas"></canvas>
-                </div>
-                <div class="sig-actions">
-                    <button class="btn-sig-clear" id="btn-clear"><i class="fas fa-eraser" style="margin-right:0.3rem;"></i>지우기</button>
-                    <button class="btn-sig-save" id="btn-save"><i class="fas fa-check" style="margin-right:0.3rem;"></i>서명 저장 (이미지)</button>
-                </div>
-                <p class="sig-saved-msg" id="sig-saved-msg"><i class="fas fa-check-circle" style="margin-right:0.3rem;"></i>서명이 이미지로 저장되었습니다.</p>
-            </div>
-
-            <button class="btn-print" onclick="window.print()">
-                <i class="fas fa-print"></i> 확약서 인쇄하기
-            </button>
-        </section>
-
-        <!-- ④ 연락처 -->
-        <section class="care-section">
-            <span class="section-badge"><i class="fas fa-phone"></i> 연락처</span>
-            <h2>문의 및 입금 안내</h2>
-            <div class="contact-card">
-                <div class="contact-row">
-                    <i class="fas fa-phone-alt"></i>
-                    <span>문의전화&nbsp; <a href="tel:01091152343">010-9115-2343</a></span>
-                </div>
-                <div class="contact-row">
-                    <i class="fas fa-university"></i>
-                    <span>기업은행&nbsp; <strong>010-9115-2343</strong>&nbsp; (노성운)</span>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-content">
-            <p><strong>클린앤파트너즈</strong> | 프리미엄 에어컨 토탈 케어 전문</p>
-            <p>상담전화: <a href="tel:15888776" style="color:#ccc;">1588-8776</a> | 운영시간: 평일 09:00 ~ 18:00 (주말·공휴일 휴무)</p>
-            <p style="margin-top:0.4rem; font-size:0.85rem; opacity:0.7;">대표: 김미영 | 사업자등록번호: 739-81-03458 | 서울시 영등포로28길 5, 지층 29호</p>
-            <div style="margin-top:1.2rem; display:flex; justify-content:center; gap:2rem; font-size:0.85rem; flex-wrap:wrap;">
-                <a href="/privacy" style="color:#bbb; text-decoration:none;">개인정보처리방침</a>
-                <a href="/contact" style="color:#bbb; text-decoration:none;">고객센터</a>
-                <a href="/estimate" style="color:#bbb; text-decoration:none;">간편 견적</a>
-                <a href="/care" style="color:#bbb; text-decoration:none;">고객관리</a>
-            </div>
-            <p style="margin-top:1rem;">&copy; 2026 클린앤파트너즈. All rights reserved.</p>
-            <p style="margin-top:5px; font-size:0.75rem;"><a href="/admin" style="color:#333; text-decoration:none;">Admin</a></p>
-        </div>
-    </footer>
-
-    <div class="side-talk">
-        <a href="https://open.kakao.com/o/sgJdxooi" target="_blank" rel="noopener" class="side-talk-btn side-talk-kakao">
-            <span class="st-icon"><i class="fas fa-comment-dots"></i></span>
-            <span class="st-label">카카오상담</span>
-        </a>
-        <a href="https://talk.naver.com/ct/w5w574" target="_blank" rel="noopener" class="side-talk-btn side-talk-talktalk">
-            <span class="st-icon"><i class="fas fa-comments"></i></span>
-            <span class="st-label">톡톡상담</span>
-        </a>
+    <!-- 헤더 -->
+    <div class="popup-header">
+        <button class="btn-close" onclick="window.close()" title="닫기"><i class="fas fa-times"></i></button>
+        <div class="logo-line">Clean &amp; Partners</div>
+        <h1><i class="fas fa-clipboard-list" style="margin-right:0.4rem; opacity:0.9;"></i>고객 관리 안내</h1>
+        <p>에어컨을 오래, 건강하게 사용하기 위한 가이드</p>
     </div>
-    <nav class="quick-menu">
-        <a href="https://open.kakao.com/o/sgJdxooi" target="_blank" rel="noopener" class="quick-menu-btn quick-menu-kakao">
-            <span class="qm-icon-wrap"><i class="fas fa-comment-dots"></i></span>
-            <span>카카오상담</span>
-        </a>
-        <a href="tel:01091152343" class="quick-menu-btn quick-menu-sms">
-            <span class="qm-icon-wrap"><i class="fas fa-sms"></i></span>
-            <span>문자상담</span>
-        </a>
-        <a href="https://talk.naver.com/ct/w5w574" target="_blank" rel="noopener" class="quick-menu-btn quick-menu-talktalk">
-            <span class="qm-icon-wrap"><i class="fas fa-comments"></i></span>
-            <span>톡톡상담</span>
-        </a>
-    </nav>
 
-    <script src="main.js"></script>
-    <script>
-    // ── 서명 캔버스 ──
-    (function () {
-        const canvas = document.getElementById('sig-canvas');
-        const ctx = canvas.getContext('2d');
-        let drawing = false;
-        let lastX = 0, lastY = 0;
+    <!-- 탭 바 -->
+    <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tip">
+            <i class="fas fa-snowflake"></i>관리요령
+        </button>
+        <button class="tab-btn" data-tab="check">
+            <i class="fas fa-search"></i>이상점검
+        </button>
+        <button class="tab-btn" data-tab="agree">
+            <i class="fas fa-file-signature"></i>확약서
+        </button>
+        <button class="tab-btn" data-tab="contact">
+            <i class="fas fa-phone"></i>연락처
+        </button>
+    </div>
 
-        function resizeCanvas() {
-            const ratio = window.devicePixelRatio || 1;
-            const rect = canvas.getBoundingClientRect();
-            // 기존 서명 보존
-            const tmpCanvas = document.createElement('canvas');
-            tmpCanvas.width = canvas.width;
-            tmpCanvas.height = canvas.height;
-            tmpCanvas.getContext('2d').drawImage(canvas, 0, 0);
+    <!-- ① 관리요령 -->
+    <div class="tab-panel active" id="tab-tip">
+        <div class="panel-title">
+            <div class="panel-title-icon blue"><i class="fas fa-snowflake"></i></div>
+            <div>
+                <h2>에어컨 관리요령</h2>
+                <span>올바른 관리로 건강한 실내 환경을</span>
+            </div>
+        </div>
+        <div class="tip-list">
+            <div class="tip-card">
+                <div class="tip-icon"><i class="fas fa-wind"></i></div>
+                <div class="tip-body">
+                    <h3>사용 후 송풍 모드로 1시간 가동</h3>
+                    <p>사용 후 송풍으로 1시간 정도 가동해 주세요. 내부 습기를 말리지 않으면 곰팡이·세균이 번식하기 쉽습니다.</p>
+                </div>
+            </div>
+            <div class="tip-card">
+                <div class="tip-icon"><i class="fas fa-filter"></i></div>
+                <div class="tip-body">
+                    <h3>필터는 수시로 청소</h3>
+                    <p>먼지가 많이 보인다면 자주 청소할수록 좋습니다. 필터 청소는 냉난방 효율을 높여줍니다.</p>
+                </div>
+            </div>
+            <div class="tip-card">
+                <div class="tip-icon"><i class="fas fa-box-open"></i></div>
+                <div class="tip-body">
+                    <h3>실외기 주변 물건 치우기</h3>
+                    <p>실외기 뒤편 물건을 치워주세요. 공기 순환이 막히면 에어컨 성능이 크게 저하됩니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            canvas.width  = Math.floor(rect.width  * ratio);
-            canvas.height = Math.floor(rect.height * ratio);
-            ctx.scale(ratio, ratio);
-            ctx.lineWidth   = 2.5;
-            ctx.lineCap     = 'round';
-            ctx.lineJoin    = 'round';
-            ctx.strokeStyle = '#1a2540';
-            ctx.drawImage(tmpCanvas, 0, 0, rect.width, rect.height);
-        }
+    <!-- ② 이상 점검 -->
+    <div class="tab-panel" id="tab-check">
+        <div class="panel-title">
+            <div class="panel-title-icon warn"><i class="fas fa-exclamation-triangle"></i></div>
+            <div>
+                <h2>이상 시 확인 사항</h2>
+                <span>순서대로 확인해 보세요</span>
+            </div>
+        </div>
+        <div class="check-list">
+            <div class="check-item hl">
+                <div class="check-num">1</div>
+                <div class="check-text">
+                    <strong>기본 확인</strong>
+                    전원 플러그가 잘 꽂혔는지, 차단기가 올라가 있는지 먼저 확인해 주세요.
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-num">2</div>
+                <div class="check-text">
+                    <strong>5분 후에도 시원하지 않다면 → 실외기 확인</strong>
+                    정상 냉방 운전 중에는 압축기(콤프레샤)와 송풍팬(펜모터)이 둘 다 돌아야 합니다.
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-num">3</div>
+                <div class="check-text">
+                    <strong>웅웅 소리는 나는데 팬이 안 돌 경우</strong>
+                    팬모터 구속·단선, 기동 콘덴서, 인버터 보드 문제일 수 있습니다.
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-num">4</div>
+                <div class="check-text">
+                    <strong>팬은 도는데 기계음(웅웅)이 없을 경우</strong>
+                    압축기 구속·단선, 기동 콘덴서, 인버터 보드 문제일 수 있습니다.
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-num">5</div>
+                <div class="check-text">
+                    <strong>실외기 배관에 물기가 맺히는 경우</strong>
+                    정상 가동 중입니다. 용량 부족이나 폭염으로 시원하지 않게 느껴질 수 있습니다.
+                </div>
+            </div>
+            <div class="check-item hl">
+                <div class="check-num">6</div>
+                <div class="check-text">
+                    <strong>실외기 배관에 성에(얼음)가 끼는 경우</strong>
+                    배관 막힘 또는 <strong style="color:#e67e00;">냉매 가스 부족</strong> 가능성이 높습니다. 전문가 점검을 받아 주세요.
+                </div>
+            </div>
+        </div>
+    </div>
 
-        function getPos(e) {
-            const rect = canvas.getBoundingClientRect();
-            if (e.touches) {
-                return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
-            }
-            return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-        }
+    <!-- ③ 확약서 -->
+    <div class="tab-panel" id="tab-agree">
+        <div class="panel-title">
+            <div class="panel-title-icon red"><i class="fas fa-file-signature"></i></div>
+            <div>
+                <h2>단종 에어컨 수리불가 확약서</h2>
+                <span>서명 후 저장 또는 인쇄해 주세요</span>
+            </div>
+        </div>
 
-        function startDraw(e) {
-            e.preventDefault();
-            drawing = true;
-            const p = getPos(e);
-            lastX = p.x; lastY = p.y;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 1.2, 0, Math.PI * 2);
-            ctx.fill();
-        }
+        <div class="agreement-box">
+            <div class="agreement-head">
+                <i class="fas fa-exclamation-circle" style="margin-right:0.35rem;"></i>수리 불가 확약서
+            </div>
+            <div class="agreement-body">
+                에어컨이 단종되어 수리가 불가한 기종인 경우, 노후화로 인해 분해 시 파손이 예상됩니다.<br><br>
+                이에 따라 세척 작업 중 발생하는 <strong>기기의 이상·고장·파손 등에 대하여 세척 기사의 책임이 없음을 동의</strong>합니다.
+            </div>
+            <div class="sig-wrap">
+                <span class="sig-label"><i class="fas fa-pen-nib" style="margin-right:0.3rem;"></i>서명란 (손가락 또는 마우스로 서명)</span>
+                <canvas id="sig-canvas"></canvas>
+            </div>
+            <div class="sig-btns">
+                <button class="btn-clear" id="btn-clear"><i class="fas fa-eraser" style="margin-right:0.25rem;"></i>지우기</button>
+                <button class="btn-save" id="btn-save"><i class="fas fa-download" style="margin-right:0.25rem;"></i>서명 저장</button>
+            </div>
+            <p class="sig-ok" id="sig-ok"><i class="fas fa-check-circle" style="margin-right:0.3rem;"></i>서명 이미지가 저장되었습니다.</p>
+        </div>
 
-        function draw(e) {
-            if (!drawing) return;
-            e.preventDefault();
-            const p = getPos(e);
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(p.x, p.y);
-            ctx.stroke();
-            lastX = p.x; lastY = p.y;
-        }
+        <button class="btn-print-full" onclick="window.print()">
+            <i class="fas fa-print"></i> 확약서 인쇄
+        </button>
+    </div>
 
-        function stopDraw() { drawing = false; }
+    <!-- ④ 연락처 -->
+    <div class="tab-panel" id="tab-contact">
+        <div class="panel-title">
+            <div class="panel-title-icon green"><i class="fas fa-phone-alt"></i></div>
+            <div>
+                <h2>문의 및 입금 안내</h2>
+                <span>궁금한 점은 언제든 연락 주세요</span>
+            </div>
+        </div>
+        <div class="contact-list">
+            <div class="contact-item">
+                <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                <div class="contact-info">
+                    <div class="label">문의전화</div>
+                    <div class="value"><a href="tel:01091152343">010-9115-2343</a></div>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon"><i class="fas fa-university"></i></div>
+                <div class="contact-info">
+                    <div class="label">입금 계좌 (기업은행)</div>
+                    <div class="value">010-9115-2343 (노성운)</div>
+                </div>
+            </div>
+        </div>
 
-        // 마우스
-        canvas.addEventListener('mousedown',  startDraw);
-        canvas.addEventListener('mousemove',  draw);
-        canvas.addEventListener('mouseup',    stopDraw);
-        canvas.addEventListener('mouseleave', stopDraw);
-        // 터치
-        canvas.addEventListener('touchstart', startDraw, { passive: false });
-        canvas.addEventListener('touchmove',  draw,      { passive: false });
-        canvas.addEventListener('touchend',   stopDraw);
+        <div class="divider"></div>
 
-        // 초기화
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        <div style="text-align:center; padding: 0.5rem 0 0.2rem;">
+            <img src="/icon.svg" alt="클린앤파트너즈" width="36" height="36" style="opacity:0.6; margin-bottom:0.4rem; display:block; margin-left:auto; margin-right:auto;">
+            <p style="font-size:0.75rem; color:#94a3b8; font-weight:600;">클린앤파트너즈</p>
+            <p style="font-size:0.72rem; color:#b0bec5; margin-top:0.2rem;">프리미엄 에어컨 토탈 케어 전문</p>
+        </div>
+    </div>
 
-        // 지우기
-        document.getElementById('btn-clear').addEventListener('click', () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            document.getElementById('sig-saved-msg').classList.remove('show');
-        });
+</div><!-- /.popup-wrap -->
 
-        // 서명 저장 (이미지 다운로드)
-        document.getElementById('btn-save').addEventListener('click', () => {
-            const dataUrl = canvas.toDataURL('image/png');
-            const a = document.createElement('a');
-            a.href = dataUrl;
-            a.download = '확약서_서명.png';
-            a.click();
-            document.getElementById('sig-saved-msg').classList.add('show');
-        });
-    })();
-    </script>
+<script>
+// ── 탭 전환 ──
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const id = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + id).classList.add('active');
+        // 확약서 탭 열릴 때 캔버스 크기 재조정
+        if (id === 'agree') setTimeout(resizeCanvas, 50);
+    });
+});
+
+// ── 서명 캔버스 ──
+const canvas = document.getElementById('sig-canvas');
+const ctx = canvas.getContext('2d');
+let drawing = false, lastX = 0, lastY = 0;
+
+function resizeCanvas() {
+    const ratio = window.devicePixelRatio || 1;
+    const rect  = canvas.getBoundingClientRect();
+    if (rect.width === 0) return;
+
+    const tmp = document.createElement('canvas');
+    tmp.width  = canvas.width;
+    tmp.height = canvas.height;
+    tmp.getContext('2d').drawImage(canvas, 0, 0);
+
+    canvas.width  = Math.floor(rect.width  * ratio);
+    canvas.height = Math.floor(rect.height * ratio);
+    ctx.scale(ratio, ratio);
+    ctx.lineWidth   = 2.2;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+    ctx.strokeStyle = '#1a2540';
+    ctx.fillStyle   = '#1a2540';
+    ctx.drawImage(tmp, 0, 0, rect.width, rect.height);
+}
+
+function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    return e.touches
+        ? { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top }
+        : { x: e.clientX - r.left,             y: e.clientY - r.top };
+}
+
+canvas.addEventListener('mousedown',  e => { e.preventDefault(); drawing = true; const p = pos(e); lastX = p.x; lastY = p.y; ctx.beginPath(); ctx.arc(p.x, p.y, 1.1, 0, Math.PI*2); ctx.fill(); });
+canvas.addEventListener('mousemove',  e => { if (!drawing) return; e.preventDefault(); const p = pos(e); ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke(); lastX = p.x; lastY = p.y; });
+canvas.addEventListener('mouseup',    () => { drawing = false; });
+canvas.addEventListener('mouseleave', () => { drawing = false; });
+canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; const p = pos(e); lastX = p.x; lastY = p.y; ctx.beginPath(); ctx.arc(p.x, p.y, 1.1, 0, Math.PI*2); ctx.fill(); }, { passive: false });
+canvas.addEventListener('touchmove',  e => { if (!drawing) return; e.preventDefault(); const p = pos(e); ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke(); lastX = p.x; lastY = p.y; }, { passive: false });
+canvas.addEventListener('touchend',   () => { drawing = false; });
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+document.getElementById('btn-clear').addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.getElementById('sig-ok').classList.remove('show');
+});
+
+document.getElementById('btn-save').addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.href     = canvas.toDataURL('image/png');
+    a.download = '확약서_서명.png';
+    a.click();
+    document.getElementById('sig-ok').classList.add('show');
+});
+</script>
 </body>
 </html>
