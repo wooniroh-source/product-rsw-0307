@@ -90,6 +90,11 @@
                         <i class="fas fa-comments"></i> <span>상담 문의</span>
                     </a>
                 </li>
+                <li id="menu-checklists">
+                    <a href="javascript:void(0)" onclick="showSection('checklists')">
+                        <i class="fas fa-clipboard-check"></i> <span>세척 체크리스트</span>
+                    </a>
+                </li>
                 <li id="menu-security">
                     <a href="javascript:void(0)" onclick="showSection('security')">
                         <i class="fas fa-lock"></i> <span>보안 설정</span>
@@ -595,6 +600,117 @@
                     </form>
                 </div>
             </div>
+            <!-- 세척 체크리스트 섹션 -->
+            <div id="section-checklists" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1>세척 체크리스트 관리</h1>
+                    <div class="admin-user">
+                        <button class="btn-sm" onclick="renderChecklistTable()">
+                            <i class="fas fa-sync-alt"></i> 새로고침
+                        </button>
+                    </div>
+                </header>
+
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>전체 체크리스트</h3>
+                        <p id="checklistTotalCount">0건</p>
+                    </div>
+                    <div class="stat-card confirmed">
+                        <h3>고객 서명 완료</h3>
+                        <p id="checklistSignedCount">0건</p>
+                    </div>
+                </div>
+
+                <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+                    <h3>새 체크리스트 작성</h3>
+                    <form id="checklistForm" class="admin-form" onsubmit="handleChecklistSubmit(event)">
+                        <input type="hidden" id="clEditId" value="">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>세척일자 <small style="color:#e00;">*</small></label>
+                                <input type="date" id="clWashDate" required>
+                            </div>
+                            <div class="input-group">
+                                <label>현장명 <small style="color:#e00;">*</small></label>
+                                <input type="text" id="clSiteName" placeholder="예: 홍길동 고객 댁" required>
+                            </div>
+                        </div>
+                        <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                            <div class="input-group">
+                                <label>실외온도</label>
+                                <input type="text" id="clOutdoorTemp" placeholder="예: 32°C">
+                            </div>
+                            <div class="input-group">
+                                <label>토출온도</label>
+                                <input type="text" id="clDischargeTemp" placeholder="예: 12°C">
+                            </div>
+                            <div class="input-group">
+                                <label>작업시간</label>
+                                <input type="text" id="clWorkTime" placeholder="예: 10:00 ~ 12:30">
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>분해정도</label>
+                                <select id="clDisassembly" style="padding:0.75rem;border:1px solid var(--border);border-radius:8px;font-size:1rem;font-family:inherit;outline:none;">
+                                    <option value="">선택</option>
+                                    <option value="완전분해">완전분해</option>
+                                    <option value="부분분해">부분분해</option>
+                                    <option value="외부세척">외부세척</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>오염정도</label>
+                                <select id="clContamination" style="padding:0.75rem;border:1px solid var(--border);border-radius:8px;font-size:1rem;font-family:inherit;outline:none;">
+                                    <option value="">선택</option>
+                                    <option value="심함">심함</option>
+                                    <option value="보통">보통</option>
+                                    <option value="양호">양호</option>
+                                    <option value="청결">청결</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>사용약품</label>
+                            <input type="text" id="clChemicals" placeholder="예: 친환경 에어컨 전용 세제, 항균 코팅제">
+                        </div>
+                        <div class="input-group">
+                            <label>특이사항 / 메모</label>
+                            <input type="text" id="clMemo" placeholder="고객에게 전달할 특이사항을 입력하세요">
+                        </div>
+                        <div style="display:flex;gap:1rem;align-items:center;">
+                            <button type="submit" id="clSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">체크리스트 등록</button>
+                            <button type="button" id="clCancelBtn" onclick="cancelChecklistEdit()" style="display:none;padding:0.8rem 1.5rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">취소</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="admin-table-wrapper">
+                    <h3>등록된 체크리스트 목록</h3>
+                    <p style="font-size:0.85rem;color:#64748b;margin-bottom:1rem;">
+                        <i class="fas fa-info-circle" style="margin-right:0.3rem;"></i>
+                        링크 복사 버튼으로 고객에게 URL을 전달하면, 고객이 직접 확인 후 서명할 수 있습니다.
+                    </p>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>세척일자</th>
+                                    <th>현장명</th>
+                                    <th>작업시간</th>
+                                    <th>서명 상태</th>
+                                    <th>등록일</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="checklistTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="noChecklistMessage" class="no-data" style="display:none;">등록된 체크리스트가 없습니다.</div>
+                </div>
+            </div>
+
             <!-- 보안 설정 섹션 -->
             <div id="section-security" class="admin-section" style="display: none;">
                 <header class="admin-header">

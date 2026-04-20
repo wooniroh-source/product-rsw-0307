@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','security'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','security'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -106,6 +106,7 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'gallery')       renderGalleryTable();
   else if (sectionId === 'process')       renderProcessEditForm();
   else if (sectionId === 'contacts')      renderContactTable();
+  else if (sectionId === 'checklists')    renderChecklistTable();
 };
 
 // =============================================
@@ -325,6 +326,121 @@ window.renderContactTable = async () => {
 
 window.markContactRead = async (id) => { await api('PUT', `/contacts/${id}/read`); renderContactTable(); };
 window.deleteContact   = async (id) => { if (!confirm('정말 삭제하시겠습니까?')) return; await api('DELETE', `/contacts/${id}`); renderContactTable(); };
+
+// =============================================
+// 4-C. 세척 체크리스트 관리
+// =============================================
+window.renderChecklistTable = async () => {
+  const body  = document.getElementById('checklistTableBody');
+  const noMsg = document.getElementById('noChecklistMessage');
+  const total = document.getElementById('checklistTotalCount');
+  const signed= document.getElementById('checklistSignedCount');
+  if (!body) return;
+
+  const items = await api('GET', '/checklists') || [];
+  if (total)  total.textContent  = `${items.length}건`;
+  if (signed) signed.textContent = `${items.filter(i=>i.signed_at).length}건`;
+
+  body.innerHTML = '';
+  if (items.length === 0) { if (noMsg) noMsg.style.display = 'block'; return; }
+  if (noMsg) noMsg.style.display = 'none';
+
+  items.forEach(item => {
+    const tr = document.createElement('tr');
+    const createdAt = item.created_at ? String(item.created_at).replace('T',' ').slice(0,16) : '-';
+    const signedAt  = item.signed_at  ? String(item.signed_at).replace('T',' ').slice(0,16)  : null;
+    const link = `${location.origin}/care?checklist=${item.id}`;
+    tr.innerHTML = `
+      <td style="white-space:nowrap;">${item.wash_date}</td>
+      <td><strong>${item.site_name}</strong></td>
+      <td>${item.work_time||'-'}</td>
+      <td>
+        ${signedAt
+          ? `<span class="badge confirmed"><i class="fas fa-signature" style="margin-right:3px;"></i>서명완료</span><br><small style="color:#64748b;font-size:0.72rem;">${signedAt}</small>`
+          : `<span class="badge pending">미서명</span>`}
+      </td>
+      <td style="white-space:nowrap;font-size:0.8rem;color:#64748b;">${createdAt}</td>
+      <td><div class="btn-group">
+        <button class="btn-action btn-approve" onclick="copyChecklistLink(${item.id})" title="링크 복사"><i class="fas fa-link"></i></button>
+        <button class="btn-action" style="background:#f1f5f9;color:#475569;" onclick="editChecklist(${item.id})" title="수정"><i class="fas fa-edit"></i></button>
+        <button class="btn-action btn-delete" onclick="deleteChecklist(${item.id})" title="삭제"><i class="fas fa-trash"></i></button>
+      </div></td>`;
+    body.appendChild(tr);
+  });
+};
+
+window.handleChecklistSubmit = async (e) => {
+  e.preventDefault();
+  const editId = document.getElementById('clEditId').value;
+  const payload = {
+    wash_date:           document.getElementById('clWashDate').value,
+    site_name:           document.getElementById('clSiteName').value,
+    outdoor_temp:        document.getElementById('clOutdoorTemp').value,
+    discharge_temp:      document.getElementById('clDischargeTemp').value,
+    work_time:           document.getElementById('clWorkTime').value,
+    disassembly_level:   document.getElementById('clDisassembly').value,
+    chemicals:           document.getElementById('clChemicals').value,
+    contamination_level: document.getElementById('clContamination').value,
+    memo:                document.getElementById('clMemo').value,
+  };
+  if (editId) {
+    await api('PUT', `/checklists/${editId}`, payload);
+    alert('수정되었습니다.');
+  } else {
+    const result = await api('POST', '/checklists', payload);
+    if (result?.id) {
+      const link = `${location.origin}/care?checklist=${result.id}`;
+      if (confirm(`체크리스트가 등록되었습니다.\n\n고객 링크:\n${link}\n\n클립보드에 복사하시겠습니까?`)) {
+        navigator.clipboard.writeText(link).catch(() => prompt('아래 링크를 복사하세요:', link));
+      }
+    }
+  }
+  cancelChecklistEdit();
+  renderChecklistTable();
+};
+
+window.editChecklist = async (id) => {
+  const item = await api('GET', `/checklists/${id}`);
+  if (!item) return;
+  document.getElementById('clEditId').value           = item.id;
+  document.getElementById('clWashDate').value         = item.wash_date || '';
+  document.getElementById('clSiteName').value         = item.site_name || '';
+  document.getElementById('clOutdoorTemp').value      = item.outdoor_temp || '';
+  document.getElementById('clDischargeTemp').value    = item.discharge_temp || '';
+  document.getElementById('clWorkTime').value         = item.work_time || '';
+  document.getElementById('clDisassembly').value      = item.disassembly_level || '';
+  document.getElementById('clChemicals').value        = item.chemicals || '';
+  document.getElementById('clContamination').value    = item.contamination_level || '';
+  document.getElementById('clMemo').value             = item.memo || '';
+  document.getElementById('clSubmitBtn').textContent  = '수정 저장하기';
+  document.getElementById('clCancelBtn').style.display = 'inline-block';
+  document.getElementById('checklistForm').scrollIntoView({ behavior: 'smooth' });
+};
+
+window.cancelChecklistEdit = () => {
+  ['clEditId','clWashDate','clSiteName','clOutdoorTemp','clDischargeTemp',
+   'clWorkTime','clDisassembly','clChemicals','clContamination','clMemo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const submitBtn = document.getElementById('clSubmitBtn');
+  const cancelBtn = document.getElementById('clCancelBtn');
+  if (submitBtn) submitBtn.textContent = '체크리스트 등록';
+  if (cancelBtn) cancelBtn.style.display = 'none';
+};
+
+window.deleteChecklist = async (id) => {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  await api('DELETE', `/checklists/${id}`);
+  renderChecklistTable();
+};
+
+window.copyChecklistLink = (id) => {
+  const link = `${location.origin}/care?checklist=${id}`;
+  navigator.clipboard.writeText(link)
+    .then(() => alert('고객 링크가 클립보드에 복사되었습니다.\n\n' + link))
+    .catch(() => prompt('아래 링크를 복사하세요:', link));
+};
 
 // =============================================
 // 5-G. 갤러리 관리

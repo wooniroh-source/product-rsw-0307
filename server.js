@@ -179,6 +179,24 @@ async function initDB() {
       )
     `);
 
+    await runQuery('wash_checklists', `
+      CREATE TABLE IF NOT EXISTS wash_checklists (
+        id                  INT AUTO_INCREMENT PRIMARY KEY,
+        wash_date           VARCHAR(20)  NOT NULL,
+        site_name           VARCHAR(100) NOT NULL,
+        outdoor_temp        VARCHAR(20),
+        discharge_temp      VARCHAR(20),
+        work_time           VARCHAR(50),
+        disassembly_level   VARCHAR(50),
+        chemicals           VARCHAR(200),
+        contamination_level VARCHAR(50),
+        memo                TEXT,
+        customer_signature  MEDIUMTEXT,
+        signed_at           DATETIME,
+        created_at          DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // 3. 기본 데이터 채우기 (생략 가능 시 건너뜀)
     const [processRows] = await pool.query('SELECT id FROM process_steps LIMIT 1');
     if (!processRows.length) {
@@ -479,6 +497,76 @@ app.put('/api/gallery/:id', auth, async (req, res) => {
 app.delete('/api/gallery/:id', auth, async (req, res) => {
   try {
     await pool.query('DELETE FROM gallery WHERE id = ?', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================
+// WASH CHECKLISTS
+// =============================================
+app.get('/api/checklists', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM wash_checklists ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/checklists/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM wash_checklists WHERE id = ?', [req.params.id]);
+    if (!rows.length) return res.status(404).json({ error: '체크리스트를 찾을 수 없습니다.' });
+    res.json(rows[0]);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/checklists', auth, async (req, res) => {
+  try {
+    const { wash_date, site_name, outdoor_temp, discharge_temp, work_time,
+            disassembly_level, chemicals, contamination_level, memo } = req.body;
+    const [result] = await pool.query(
+      `INSERT INTO wash_checklists
+        (wash_date, site_name, outdoor_temp, discharge_temp, work_time,
+         disassembly_level, chemicals, contamination_level, memo)
+       VALUES (?,?,?,?,?,?,?,?,?)`,
+      [wash_date, site_name, outdoor_temp||null, discharge_temp||null, work_time||null,
+       disassembly_level||null, chemicals||null, contamination_level||null, memo||null]
+    );
+    res.json({ id: result.insertId });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/checklists/:id', auth, async (req, res) => {
+  try {
+    const { wash_date, site_name, outdoor_temp, discharge_temp, work_time,
+            disassembly_level, chemicals, contamination_level, memo } = req.body;
+    await pool.query(
+      `UPDATE wash_checklists SET
+        wash_date=?, site_name=?, outdoor_temp=?, discharge_temp=?, work_time=?,
+        disassembly_level=?, chemicals=?, contamination_level=?, memo=?
+       WHERE id=?`,
+      [wash_date, site_name, outdoor_temp||null, discharge_temp||null, work_time||null,
+       disassembly_level||null, chemicals||null, contamination_level||null, memo||null,
+       req.params.id]
+    );
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.patch('/api/checklists/:id/sign', async (req, res) => {
+  try {
+    const { signature } = req.body;
+    if (!signature) return res.status(400).json({ error: '서명 데이터가 없습니다.' });
+    await pool.query(
+      'UPDATE wash_checklists SET customer_signature=?, signed_at=NOW() WHERE id=?',
+      [signature, req.params.id]
+    );
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/checklists/:id', auth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM wash_checklists WHERE id = ?', [req.params.id]);
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

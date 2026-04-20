@@ -280,6 +280,11 @@
             margin: 1rem 0;
         }
 
+        /* ── 체크리스트 필드 ── */
+        .cl-field { display: flex; flex-direction: column; gap: 0.15rem; }
+        .cl-label { font-size: 0.68rem; color: #94a3b8; font-weight: 600; }
+        .cl-value { font-size: 0.88rem; color: #1a2540; font-weight: 600; }
+
         /* ── 인쇄 ── */
         @media print {
             .tab-bar, .btn-close, .sig-btns, .btn-print-full, .popup-header .btn-close { display: none !important; }
@@ -310,6 +315,9 @@
         </button>
         <button class="tab-btn" data-tab="agree">
             <i class="fas fa-file-signature"></i>확약서
+        </button>
+        <button class="tab-btn" data-tab="checklist" id="tab-btn-checklist">
+            <i class="fas fa-clipboard-check"></i>체크리스트
         </button>
         <button class="tab-btn" data-tab="contact">
             <i class="fas fa-phone"></i>연락처
@@ -439,7 +447,89 @@
         </button>
     </div>
 
-    <!-- ④ 연락처 -->
+    <!-- ④ 세척 체크리스트 -->
+    <div class="tab-panel" id="tab-checklist">
+        <div class="panel-title">
+            <div class="panel-title-icon blue"><i class="fas fa-clipboard-check"></i></div>
+            <div>
+                <h2>세척 작업 체크리스트</h2>
+                <span>작업 완료 후 내용을 확인하고 서명해 주세요</span>
+            </div>
+        </div>
+
+        <!-- 로딩 중 -->
+        <div id="cl-loading" style="text-align:center;padding:2.5rem 0;color:#94a3b8;">
+            <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;margin-bottom:0.6rem;display:block;"></i>
+            <span style="font-size:0.85rem;">체크리스트를 불러오는 중...</span>
+        </div>
+
+        <!-- 체크리스트 없음 -->
+        <div id="cl-empty" style="display:none;text-align:center;padding:2.5rem 1rem;">
+            <i class="fas fa-clipboard" style="font-size:2rem;color:#cbd5e1;margin-bottom:0.7rem;display:block;"></i>
+            <p style="font-size:0.88rem;color:#94a3b8;">전달받은 체크리스트 링크를 통해 접근해 주세요.</p>
+        </div>
+
+        <!-- 체크리스트 내용 -->
+        <div id="cl-content" style="display:none;">
+
+            <!-- 작업 정보 -->
+            <div style="background:#f7fafd;border:1px solid #dce8f5;border-radius:12px;padding:1.1rem 1.2rem;margin-bottom:1rem;">
+                <div style="font-size:0.72rem;font-weight:700;color:#0066cc;margin-bottom:0.8rem;letter-spacing:0.5px;">작업 정보</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+                    <div class="cl-field"><span class="cl-label">세척일자</span><span class="cl-value" id="cl-wash-date">-</span></div>
+                    <div class="cl-field"><span class="cl-label">현장명</span><span class="cl-value" id="cl-site-name">-</span></div>
+                    <div class="cl-field"><span class="cl-label">실외온도</span><span class="cl-value" id="cl-outdoor-temp">-</span></div>
+                    <div class="cl-field"><span class="cl-label">토출온도</span><span class="cl-value" id="cl-discharge-temp">-</span></div>
+                    <div class="cl-field" style="grid-column:1/-1;"><span class="cl-label">작업시간</span><span class="cl-value" id="cl-work-time">-</span></div>
+                </div>
+            </div>
+
+            <!-- 세척 정보 -->
+            <div style="background:#f7fafd;border:1px solid #dce8f5;border-radius:12px;padding:1.1rem 1.2rem;margin-bottom:1rem;">
+                <div style="font-size:0.72rem;font-weight:700;color:#0066cc;margin-bottom:0.8rem;letter-spacing:0.5px;">세척 상세</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+                    <div class="cl-field"><span class="cl-label">분해정도</span><span class="cl-value" id="cl-disassembly">-</span></div>
+                    <div class="cl-field"><span class="cl-label">오염정도</span><span class="cl-value" id="cl-contamination">-</span></div>
+                    <div class="cl-field" style="grid-column:1/-1;"><span class="cl-label">사용약품</span><span class="cl-value" id="cl-chemicals">-</span></div>
+                </div>
+            </div>
+
+            <!-- 특이사항 -->
+            <div id="cl-memo-wrap" style="display:none;background:#fffbf0;border:1px solid #ffd580;border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;">
+                <div style="font-size:0.72rem;font-weight:700;color:#e67e00;margin-bottom:0.4rem;">특이사항</div>
+                <p id="cl-memo" style="font-size:0.85rem;color:#2d3748;line-height:1.6;"></p>
+            </div>
+
+            <!-- 이미 서명된 경우 -->
+            <div id="cl-already-signed" style="display:none;background:#e6f9f2;border:1px solid #6ee7b7;border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;text-align:center;">
+                <i class="fas fa-check-circle" style="color:#059669;font-size:1.3rem;margin-bottom:0.4rem;display:block;"></i>
+                <p style="font-size:0.85rem;color:#065f46;font-weight:700;">고객 확인 서명이 완료되었습니다.</p>
+                <p id="cl-signed-at" style="font-size:0.75rem;color:#047857;margin-top:0.2rem;"></p>
+            </div>
+
+            <!-- 고객 서명 영역 -->
+            <div id="cl-sign-area">
+                <div style="font-size:0.78rem;font-weight:700;color:#1a2540;margin-bottom:0.6rem;">
+                    <i class="fas fa-pen-nib" style="margin-right:0.3rem;color:#0066cc;"></i>고객 확인 서명
+                </div>
+                <div class="sig-wrap" style="margin:0 0 0.6rem;">
+                    <span class="sig-label">손가락 또는 마우스로 서명해 주세요</span>
+                    <canvas id="cl-canvas"></canvas>
+                </div>
+                <div class="sig-btns" style="margin:0 0 0.8rem;">
+                    <button class="btn-clear" id="cl-btn-clear"><i class="fas fa-eraser" style="margin-right:0.25rem;"></i>지우기</button>
+                    <button class="btn-save" id="cl-btn-submit" style="background:#059669;">
+                        <i class="fas fa-check" style="margin-right:0.25rem;"></i>서명 완료 및 제출
+                    </button>
+                </div>
+                <p id="cl-submit-ok" style="display:none;text-align:center;color:#059669;font-size:0.82rem;font-weight:700;padding:0.4rem 0;">
+                    <i class="fas fa-check-circle" style="margin-right:0.3rem;"></i>서명이 제출되었습니다. 감사합니다!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑤ 연락처 -->
     <div class="tab-panel" id="tab-contact">
         <div class="panel-title">
             <div class="panel-title-icon green"><i class="fas fa-phone-alt"></i></div>
@@ -485,9 +575,136 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('tab-' + id).classList.add('active');
-        // 확약서 탭 열릴 때 캔버스 크기 재조정
         if (id === 'agree') setTimeout(resizeCanvas, 50);
+        if (id === 'checklist') setTimeout(resizeClCanvas, 50);
     });
+});
+
+// ── URL 파라미터에서 체크리스트 ID 읽기 ──
+const urlParams = new URLSearchParams(location.search);
+const checklistId = urlParams.get('checklist');
+
+if (checklistId) {
+    // 체크리스트 탭에 뱃지 표시 & 자동 활성화
+    const clBtn = document.getElementById('tab-btn-checklist');
+    if (clBtn) {
+        clBtn.style.color = '#059669';
+        clBtn.innerHTML = '<i class="fas fa-clipboard-check"></i>체크리스트<span style="display:inline-block;background:#059669;color:#fff;font-size:0.6rem;padding:1px 5px;border-radius:10px;margin-left:2px;vertical-align:top;margin-top:1px;">NEW</span>';
+    }
+    loadChecklist(checklistId);
+} else {
+    document.getElementById('cl-loading').style.display = 'none';
+    document.getElementById('cl-empty').style.display = 'block';
+}
+
+async function loadChecklist(id) {
+    try {
+        const res = await fetch(`/api/checklists/${id}`);
+        if (!res.ok) throw new Error('not found');
+        const data = await res.json();
+        renderChecklist(data);
+    } catch (e) {
+        document.getElementById('cl-loading').style.display = 'none';
+        document.getElementById('cl-empty').style.display = 'block';
+    }
+}
+
+function renderChecklist(data) {
+    document.getElementById('cl-loading').style.display = 'none';
+    document.getElementById('cl-content').style.display = 'block';
+
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '-'; };
+    set('cl-wash-date',    data.wash_date);
+    set('cl-site-name',    data.site_name);
+    set('cl-outdoor-temp', data.outdoor_temp);
+    set('cl-discharge-temp', data.discharge_temp);
+    set('cl-work-time',    data.work_time);
+    set('cl-disassembly',  data.disassembly_level);
+    set('cl-contamination',data.contamination_level);
+    set('cl-chemicals',    data.chemicals);
+
+    if (data.memo) {
+        document.getElementById('cl-memo-wrap').style.display = 'block';
+        document.getElementById('cl-memo').textContent = data.memo;
+    }
+
+    if (data.signed_at) {
+        document.getElementById('cl-already-signed').style.display = 'block';
+        document.getElementById('cl-sign-area').style.display = 'none';
+        const dt = String(data.signed_at).replace('T',' ').slice(0,16);
+        document.getElementById('cl-signed-at').textContent = `서명일시: ${dt}`;
+    } else {
+        setTimeout(resizeClCanvas, 50);
+    }
+}
+
+// ── 체크리스트 서명 캔버스 ──
+const clCanvas = document.getElementById('cl-canvas');
+const clCtx    = clCanvas.getContext('2d');
+let clDrawing  = false, clLX = 0, clLY = 0;
+
+function resizeClCanvas() {
+    const ratio = window.devicePixelRatio || 1;
+    const rect  = clCanvas.getBoundingClientRect();
+    if (rect.width === 0) return;
+    const tmp = document.createElement('canvas');
+    tmp.width = clCanvas.width; tmp.height = clCanvas.height;
+    tmp.getContext('2d').drawImage(clCanvas, 0, 0);
+    clCanvas.width  = Math.floor(rect.width  * ratio);
+    clCanvas.height = Math.floor(rect.height * ratio);
+    clCtx.scale(ratio, ratio);
+    clCtx.lineWidth = 2.2; clCtx.lineCap = 'round';
+    clCtx.lineJoin  = 'round'; clCtx.strokeStyle = '#1a2540';
+    clCtx.fillStyle = '#1a2540';
+    clCtx.drawImage(tmp, 0, 0, rect.width, rect.height);
+}
+
+function clPos(e) {
+    const r = clCanvas.getBoundingClientRect();
+    return e.touches
+        ? { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top }
+        : { x: e.clientX - r.left,             y: e.clientY - r.top };
+}
+
+clCanvas.addEventListener('mousedown',  e => { e.preventDefault(); clDrawing = true; const p = clPos(e); clLX=p.x; clLY=p.y; clCtx.beginPath(); clCtx.arc(p.x,p.y,1.1,0,Math.PI*2); clCtx.fill(); });
+clCanvas.addEventListener('mousemove',  e => { if (!clDrawing) return; e.preventDefault(); const p = clPos(e); clCtx.beginPath(); clCtx.moveTo(clLX,clLY); clCtx.lineTo(p.x,p.y); clCtx.stroke(); clLX=p.x; clLY=p.y; });
+clCanvas.addEventListener('mouseup',    () => { clDrawing = false; });
+clCanvas.addEventListener('mouseleave', () => { clDrawing = false; });
+clCanvas.addEventListener('touchstart', e => { e.preventDefault(); clDrawing = true; const p = clPos(e); clLX=p.x; clLY=p.y; clCtx.beginPath(); clCtx.arc(p.x,p.y,1.1,0,Math.PI*2); clCtx.fill(); }, { passive:false });
+clCanvas.addEventListener('touchmove',  e => { if (!clDrawing) return; e.preventDefault(); const p = clPos(e); clCtx.beginPath(); clCtx.moveTo(clLX,clLY); clCtx.lineTo(p.x,p.y); clCtx.stroke(); clLX=p.x; clLY=p.y; }, { passive:false });
+clCanvas.addEventListener('touchend',   () => { clDrawing = false; });
+
+document.getElementById('cl-btn-clear').addEventListener('click', () => {
+    clCtx.clearRect(0, 0, clCanvas.width, clCanvas.height);
+});
+
+document.getElementById('cl-btn-submit').addEventListener('click', async () => {
+    if (!checklistId) return;
+    const signature = clCanvas.toDataURL('image/png');
+    const btn = document.getElementById('cl-btn-submit');
+    btn.disabled = true;
+    btn.textContent = '제출 중...';
+    try {
+        const res = await fetch(`/api/checklists/${checklistId}/sign`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ signature })
+        });
+        if (res.ok) {
+            document.getElementById('cl-sign-area').style.display = 'none';
+            document.getElementById('cl-already-signed').style.display = 'block';
+            document.getElementById('cl-signed-at').textContent = `서명일시: ${new Date().toLocaleString('ko-KR')}`;
+            document.getElementById('cl-submit-ok').style.display = 'block';
+        } else {
+            alert('제출에 실패했습니다. 다시 시도해 주세요.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check" style="margin-right:0.25rem;"></i>서명 완료 및 제출';
+        }
+    } catch (e) {
+        alert('네트워크 오류가 발생했습니다.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check" style="margin-right:0.25rem;"></i>서명 완료 및 제출';
+    }
 });
 
 // ── 서명 캔버스 ──
