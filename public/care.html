@@ -6,6 +6,8 @@
     <title>고객 관리 안내 - 클린앤파트너즈</title>
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -248,15 +250,28 @@
             padding: 0 1.2rem 0.8rem;
         }
         .sig-ok.show { display: block; }
+        .agree-actions {
+            display: flex; gap: 0.6rem; margin-top: 1rem;
+        }
         .btn-print-full {
-            display: flex; align-items: center; justify-content: center; gap: 0.45rem;
-            width: 100%; padding: 0.75rem;
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+            padding: 0.75rem;
             background: #1a2540; color: #fff;
             border: none; border-radius: 10px;
-            font-size: 0.85rem; font-weight: 700; cursor: pointer;
+            font-size: 0.82rem; font-weight: 700; cursor: pointer;
             transition: background 0.2s;
         }
         .btn-print-full:hover { background: #0f1a30; }
+        .btn-pdf-download {
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+            padding: 0.75rem;
+            background: #c0392b; color: #fff;
+            border: none; border-radius: 10px;
+            font-size: 0.82rem; font-weight: 700; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-pdf-download:hover { background: #a93226; }
+        .btn-pdf-download:disabled { background: #94a3b8; cursor: not-allowed; }
 
         /* ── 연락처 ── */
         .contact-list { display: flex; flex-direction: column; gap: 0.65rem; }
@@ -443,9 +458,14 @@
             <p class="sig-ok" id="sig-ok"><i class="fas fa-check-circle" style="margin-right:0.3rem;"></i>서명 이미지가 저장되었습니다.</p>
         </div>
 
-        <button class="btn-print-full" onclick="window.print()">
-            <i class="fas fa-print"></i> 확약서 인쇄
-        </button>
+        <div class="agree-actions">
+            <button class="btn-print-full" onclick="window.print()">
+                <i class="fas fa-print"></i> 인쇄
+            </button>
+            <button class="btn-pdf-download" id="btn-pdf" onclick="downloadAgreementPDF()">
+                <i class="fas fa-file-pdf"></i> PDF 저장
+            </button>
+        </div>
     </div>
 
     <!-- ④ 세척 체크리스트 -->
@@ -568,6 +588,127 @@
 </div><!-- /.popup-wrap -->
 
 <script>
+// ── 확약서 PDF 다운로드 ──
+async function downloadAgreementPDF() {
+    const btn = document.getElementById('btn-pdf');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 생성 중...';
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+        const pageW = pdf.internal.pageSize.getWidth();
+        const margin = 20;
+        const contentW = pageW - margin * 2;
+        let y = 20;
+
+        // ── 헤더 ──
+        pdf.setFillColor(0, 85, 179);
+        pdf.rect(0, 0, pageW, 28, 'F');
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Clean & Partners', margin, 11);
+        pdf.setFontSize(13);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('수리 불가 확약서', pageW / 2, 19, { align: 'center' });
+        y = 40;
+
+        // ── 발급일 ──
+        pdf.setTextColor(100, 100, 100);
+        pdf.setFontSize(8.5);
+        pdf.setFont('helvetica', 'normal');
+        const today = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        pdf.text(`발급일: ${today}`, pageW - margin, y, { align: 'right' });
+        y += 10;
+
+        // ── 구분선 ──
+        pdf.setDrawColor(220, 232, 245);
+        pdf.setLineWidth(0.4);
+        pdf.line(margin, y, pageW - margin, y);
+        y += 8;
+
+        // ── 본문 제목 ──
+        pdf.setTextColor(192, 57, 43);
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('! 수리 불가 확약서', margin, y);
+        y += 8;
+
+        // ── 본문 내용 ──
+        pdf.setTextColor(45, 55, 72);
+        pdf.setFontSize(9.5);
+        pdf.setFont('helvetica', 'normal');
+
+        const bodyLines = [
+            '에어컨이 단종되어 수리가 불가한 기종인 경우,',
+            '노후화로 인해 분해 시 파손이 예상됩니다.',
+            '',
+            '이에 따라 세척 작업 중 발생하는',
+            '기기의 이상·고장·파손 등에 대하여',
+            '세척 기사의 책임이 없음을 동의합니다.',
+        ];
+        bodyLines.forEach(line => {
+            pdf.text(line, margin, y);
+            y += 6.5;
+        });
+        y += 6;
+
+        // ── 서명란 박스 ──
+        pdf.setDrawColor(200, 200, 200);
+        pdf.setLineWidth(0.3);
+        pdf.setFillColor(249, 251, 255);
+        pdf.rect(margin, y, contentW, 42, 'FD');
+
+        pdf.setTextColor(0, 102, 204);
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('고객 서명', margin + 3, y + 7);
+
+        // 서명 이미지 삽입
+        const sigCanvas = document.getElementById('sig-canvas');
+        const sigDataUrl = sigCanvas.toDataURL('image/png');
+
+        // 서명이 비어있는지 체크 (빈 캔버스는 투명 or 흰색만)
+        const tempCtx = sigCanvas.getContext('2d');
+        const imgData = tempCtx.getImageData(0, 0, sigCanvas.width, sigCanvas.height);
+        const hasSignature = imgData.data.some((v, i) => i % 4 !== 3 && v < 240);
+
+        if (hasSignature) {
+            pdf.addImage(sigDataUrl, 'PNG', margin + 2, y + 9, contentW - 4, 30);
+        } else {
+            pdf.setTextColor(180, 180, 180);
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text('(서명 없음)', pageW / 2, y + 25, { align: 'center' });
+        }
+        y += 48;
+
+        // ── 하단 구분선 ──
+        pdf.setDrawColor(220, 232, 245);
+        pdf.setLineWidth(0.4);
+        pdf.line(margin, y, pageW - margin, y);
+        y += 7;
+
+        // ── 푸터 ──
+        pdf.setTextColor(150, 150, 150);
+        pdf.setFontSize(7.5);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('클린앤파트너즈 | 문의: 010-9115-2343 | 기업은행 010-9115-2343 (노성운)', pageW / 2, y, { align: 'center' });
+
+        // ── 저장 ──
+        const filename = `확약서_클린앤파트너즈_${today.replace(/\. /g, '-').replace('.', '')}.pdf`;
+        pdf.save(filename);
+
+    } catch (e) {
+        alert('PDF 생성 중 오류가 발생했습니다.\n' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF 저장';
+    }
+}
+
 // ── 탭 전환 ──
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
