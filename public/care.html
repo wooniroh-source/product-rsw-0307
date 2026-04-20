@@ -216,7 +216,8 @@
             font-size: 0.72rem; font-weight: 700; color: #0066cc;
             margin-bottom: 0.35rem; display: block;
         }
-        #sig-canvas {
+        #sig-canvas,
+        #cl-canvas {
             display: block; width: 100%; height: 120px;
             cursor: crosshair; touch-action: none;
             border-radius: 6px; background: #fff;
@@ -661,9 +662,18 @@ function resizeClCanvas() {
 
 function clPos(e) {
     const r = clCanvas.getBoundingClientRect();
-    return e.touches
-        ? { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top }
-        : { x: e.clientX - r.left,             y: e.clientY - r.top };
+    const scaleX = clCanvas.width  / (window.devicePixelRatio || 1) / r.width;
+    const scaleY = clCanvas.height / (window.devicePixelRatio || 1) / r.height;
+    if (e.touches) {
+        return {
+            x: (e.touches[0].clientX - r.left) * scaleX,
+            y: (e.touches[0].clientY - r.top)  * scaleY
+        };
+    }
+    return {
+        x: (e.clientX - r.left) * scaleX,
+        y: (e.clientY - r.top)  * scaleY
+    };
 }
 
 clCanvas.addEventListener('mousedown',  e => { e.preventDefault(); clDrawing = true; const p = clPos(e); clLX=p.x; clLY=p.y; clCtx.beginPath(); clCtx.arc(p.x,p.y,1.1,0,Math.PI*2); clCtx.fill(); });
@@ -735,9 +745,18 @@ function resizeCanvas() {
 
 function pos(e) {
     const r = canvas.getBoundingClientRect();
-    return e.touches
-        ? { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top }
-        : { x: e.clientX - r.left,             y: e.clientY - r.top };
+    const scaleX = canvas.width  / (window.devicePixelRatio || 1) / r.width;
+    const scaleY = canvas.height / (window.devicePixelRatio || 1) / r.height;
+    if (e.touches) {
+        return {
+            x: (e.touches[0].clientX - r.left) * scaleX,
+            y: (e.touches[0].clientY - r.top)  * scaleY
+        };
+    }
+    return {
+        x: (e.clientX - r.left) * scaleX,
+        y: (e.clientY - r.top)  * scaleY
+    };
 }
 
 canvas.addEventListener('mousedown',  e => { e.preventDefault(); drawing = true; const p = pos(e); lastX = p.x; lastY = p.y; ctx.beginPath(); ctx.arc(p.x, p.y, 1.1, 0, Math.PI*2); ctx.fill(); });
