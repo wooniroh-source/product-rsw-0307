@@ -1,5 +1,5 @@
 // 클린앤파트너즈 Service Worker
-const CACHE_NAME = 'cleannpartners-v3';
+const CACHE_NAME = 'cleannpartners-v4';
 const IMAGE_CACHE = 'cleannpartners-images-v1';
 const PRECACHE = ['/', '/style.css', '/main.js', '/icon.svg', '/manifest.json'];
 
