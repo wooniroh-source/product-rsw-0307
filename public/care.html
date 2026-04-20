@@ -588,121 +588,125 @@
 </div><!-- /.popup-wrap -->
 
 <script>
-// ── 확약서 PDF 다운로드 ──
+// ── 확약서 PDF 다운로드 (html2canvas → jsPDF) ──
 async function downloadAgreementPDF() {
     const btn = document.getElementById('btn-pdf');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 생성 중...';
 
     try {
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const today = new Date().toLocaleDateString('ko-KR',
+            { year: 'numeric', month: '2-digit', day: '2-digit' });
+        const todayFile = today.replace(/\. /g, '-').replace('.', '');
 
-        const pageW = pdf.internal.pageSize.getWidth();
-        const margin = 20;
-        const contentW = pageW - margin * 2;
-        let y = 20;
-
-        // ── 헤더 ──
-        pdf.setFillColor(0, 85, 179);
-        pdf.rect(0, 0, pageW, 28, 'F');
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(9);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text('Clean & Partners', margin, 11);
-        pdf.setFontSize(13);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('수리 불가 확약서', pageW / 2, 19, { align: 'center' });
-        y = 40;
-
-        // ── 발급일 ──
-        pdf.setTextColor(100, 100, 100);
-        pdf.setFontSize(8.5);
-        pdf.setFont('helvetica', 'normal');
-        const today = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
-        pdf.text(`발급일: ${today}`, pageW - margin, y, { align: 'right' });
-        y += 10;
-
-        // ── 구분선 ──
-        pdf.setDrawColor(220, 232, 245);
-        pdf.setLineWidth(0.4);
-        pdf.line(margin, y, pageW - margin, y);
-        y += 8;
-
-        // ── 본문 제목 ──
-        pdf.setTextColor(192, 57, 43);
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('! 수리 불가 확약서', margin, y);
-        y += 8;
-
-        // ── 본문 내용 ──
-        pdf.setTextColor(45, 55, 72);
-        pdf.setFontSize(9.5);
-        pdf.setFont('helvetica', 'normal');
-
-        const bodyLines = [
-            '에어컨이 단종되어 수리가 불가한 기종인 경우,',
-            '노후화로 인해 분해 시 파손이 예상됩니다.',
-            '',
-            '이에 따라 세척 작업 중 발생하는',
-            '기기의 이상·고장·파손 등에 대하여',
-            '세척 기사의 책임이 없음을 동의합니다.',
-        ];
-        bodyLines.forEach(line => {
-            pdf.text(line, margin, y);
-            y += 6.5;
-        });
-        y += 6;
-
-        // ── 서명란 박스 ──
-        pdf.setDrawColor(200, 200, 200);
-        pdf.setLineWidth(0.3);
-        pdf.setFillColor(249, 251, 255);
-        pdf.rect(margin, y, contentW, 42, 'FD');
-
-        pdf.setTextColor(0, 102, 204);
-        pdf.setFontSize(8);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('고객 서명', margin + 3, y + 7);
-
-        // 서명 이미지 삽입
+        // ── 서명 이미지 추출 ──
         const sigCanvas = document.getElementById('sig-canvas');
         const sigDataUrl = sigCanvas.toDataURL('image/png');
+        const sigCtxData = sigCanvas.getContext('2d')
+            .getImageData(0, 0, sigCanvas.width, sigCanvas.height).data;
+        const hasSig = sigCtxData.some((v, i) => i % 4 !== 3 && v < 230);
 
-        // 서명이 비어있는지 체크 (빈 캔버스는 투명 or 흰색만)
-        const tempCtx = sigCanvas.getContext('2d');
-        const imgData = tempCtx.getImageData(0, 0, sigCanvas.width, sigCanvas.height);
-        const hasSignature = imgData.data.some((v, i) => i % 4 !== 3 && v < 240);
+        // ── 캡처용 임시 DOM 생성 ──
+        const el = document.createElement('div');
+        el.style.cssText = [
+            'position:fixed', 'top:-9999px', 'left:0',
+            'width:680px', 'padding:40px',
+            'background:#fff', 'font-family:-apple-system,BlinkMacSystemFont,sans-serif',
+            'font-size:15px', 'color:#1a2540', 'line-height:1.7',
+            'box-sizing:border-box'
+        ].join(';');
 
-        if (hasSignature) {
-            pdf.addImage(sigDataUrl, 'PNG', margin + 2, y + 9, contentW - 4, 30);
+        el.innerHTML = `
+          <!-- 헤더 -->
+          <div style="background:linear-gradient(135deg,#0055b3,#0099d8);
+                      color:#fff;padding:22px 28px;border-radius:10px;
+                      margin-bottom:24px;">
+            <div style="font-size:11px;opacity:.75;letter-spacing:1px;margin-bottom:4px;">
+              CLEAN &amp; PARTNERS
+            </div>
+            <div style="font-size:20px;font-weight:900;">수리 불가 확약서</div>
+            <div style="font-size:11px;opacity:.8;margin-top:6px;">발급일: ${today}</div>
+          </div>
+
+          <!-- 확약서 본문 -->
+          <div style="border:2px solid #e53e3e;border-radius:12px;overflow:hidden;
+                      margin-bottom:20px;">
+            <div style="background:#fdecea;padding:14px 20px;
+                        color:#c0392b;font-weight:800;font-size:15px;
+                        border-bottom:1px dashed #f5c6c6;">
+              ⚠ 수리 불가 확약서
+            </div>
+            <div style="padding:18px 20px;color:#2d3748;font-size:14px;line-height:1.9;">
+              에어컨이 단종되어 수리가 불가한 기종인 경우,<br>
+              노후화로 인해 분해 시 파손이 예상됩니다.<br><br>
+              이에 따라 세척 작업 중 발생하는<br>
+              <strong style="color:#c0392b;">기기의 이상·고장·파손 등에 대하여
+              세척 기사의 책임이 없음을 동의</strong>합니다.
+            </div>
+          </div>
+
+          <!-- 서명란 -->
+          <div style="border:1.5px solid #0066cc;border-radius:10px;
+                      padding:14px 16px;background:#f9fbff;margin-bottom:20px;">
+            <div style="font-size:11px;font-weight:700;color:#0066cc;margin-bottom:10px;">
+              ✏ 고객 서명
+            </div>
+            ${hasSig
+              ? `<img src="${sigDataUrl}" style="width:100%;height:110px;
+                   object-fit:contain;background:#fff;border-radius:6px;display:block;">`
+              : `<div style="height:110px;display:flex;align-items:center;
+                    justify-content:center;color:#cbd5e1;font-size:13px;
+                    background:#fff;border-radius:6px;">(서명 없음)</div>`
+            }
+          </div>
+
+          <!-- 푸터 -->
+          <div style="border-top:1px solid #e8eef4;padding-top:14px;
+                      font-size:11px;color:#94a3b8;text-align:center;">
+            클린앤파트너즈 &nbsp;|&nbsp; 문의: 010-9115-2343
+            &nbsp;|&nbsp; 기업은행 010-9115-2343 (노성운)
+          </div>
+        `;
+
+        document.body.appendChild(el);
+
+        // ── html2canvas 캡처 ──
+        const captured = await html2canvas(el, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false
+        });
+
+        document.body.removeChild(el);
+
+        // ── jsPDF에 이미지로 삽입 ──
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pageW  = pdf.internal.pageSize.getWidth();
+        const pageH  = pdf.internal.pageSize.getHeight();
+        const imgW   = pageW;
+        const imgH   = (captured.height / captured.width) * imgW;
+
+        // 이미지가 한 페이지를 넘을 경우 분할
+        if (imgH <= pageH) {
+            pdf.addImage(captured.toDataURL('image/jpeg', 0.95),
+                'JPEG', 0, 0, imgW, imgH);
         } else {
-            pdf.setTextColor(180, 180, 180);
-            pdf.setFontSize(9);
-            pdf.setFont('helvetica', 'normal');
-            pdf.text('(서명 없음)', pageW / 2, y + 25, { align: 'center' });
+            let offsetY = 0;
+            while (offsetY < imgH) {
+                if (offsetY > 0) pdf.addPage();
+                pdf.addImage(captured.toDataURL('image/jpeg', 0.95),
+                    'JPEG', 0, -offsetY, imgW, imgH);
+                offsetY += pageH;
+            }
         }
-        y += 48;
 
-        // ── 하단 구분선 ──
-        pdf.setDrawColor(220, 232, 245);
-        pdf.setLineWidth(0.4);
-        pdf.line(margin, y, pageW - margin, y);
-        y += 7;
-
-        // ── 푸터 ──
-        pdf.setTextColor(150, 150, 150);
-        pdf.setFontSize(7.5);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text('클린앤파트너즈 | 문의: 010-9115-2343 | 기업은행 010-9115-2343 (노성운)', pageW / 2, y, { align: 'center' });
-
-        // ── 저장 ──
-        const filename = `확약서_클린앤파트너즈_${today.replace(/\. /g, '-').replace('.', '')}.pdf`;
-        pdf.save(filename);
+        pdf.save(`확약서_클린앤파트너즈_${todayFile}.pdf`);
 
     } catch (e) {
         alert('PDF 생성 중 오류가 발생했습니다.\n' + e.message);
+        console.error(e);
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF 저장';
