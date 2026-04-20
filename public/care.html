@@ -29,6 +29,16 @@
             box-shadow: 0 0 40px rgba(0,0,0,0.12);
         }
 
+        /* ── 콘텐츠 래퍼 (탭바 + 패널) ── */
+        .content-wrap {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .panels-wrap {
+            flex: 1;
+        }
+
         /* ── 헤더 바 ── */
         .popup-header {
             background: linear-gradient(135deg, #0055b3 0%, #0099d8 100%);
@@ -88,7 +98,7 @@
             font-weight: 700;
             color: #94a3b8;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: color 0.2s, background 0.2s;
             border-bottom: 2px solid transparent;
             margin-bottom: -2px;
             display: flex;
@@ -102,6 +112,108 @@
         /* ── 콘텐츠 패널 ── */
         .tab-panel { display: none; padding: 1.3rem 1.2rem; flex: 1; }
         .tab-panel.active { display: block; }
+
+        /* ── PC 레이아웃 (769px 이상) ── */
+        @media (min-width: 769px) {
+            body { padding: 2rem 1rem; }
+
+            .popup-wrap {
+                max-width: 1040px;
+                margin: 0 auto;
+                min-height: auto;
+                border-radius: 18px;
+                overflow: hidden;
+            }
+
+            .popup-header {
+                padding: 2rem 2.5rem;
+                text-align: left;
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+            }
+            .popup-header-text { flex: 1; }
+            .popup-header .logo-line { font-size: 0.8rem; margin-bottom: 0.4rem; }
+            .popup-header h1 { font-size: 1.6rem; }
+            .popup-header p { font-size: 0.85rem; margin-top: 0.35rem; }
+            .btn-close { top: 1.2rem; right: 1.2rem; width: 34px; height: 34px; }
+
+            .content-wrap {
+                flex-direction: row;
+                align-items: stretch;
+            }
+
+            /* 사이드바 탭 */
+            .tab-bar {
+                flex-direction: column;
+                width: 190px;
+                min-width: 190px;
+                border-bottom: none;
+                border-right: 1px solid #e8eef4;
+                position: sticky;
+                top: 0;
+                align-self: flex-start;
+                max-height: calc(100vh - 4rem);
+                background: #f8fafc;
+                padding: 0.8rem 0;
+            }
+            .tab-btn {
+                flex: none;
+                flex-direction: row;
+                justify-content: flex-start;
+                align-items: center;
+                padding: 0.85rem 1.4rem;
+                font-size: 0.88rem;
+                gap: 0.65rem;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                margin-bottom: 0;
+                border-radius: 0;
+                text-align: left;
+                white-space: nowrap;
+            }
+            .tab-btn i { font-size: 1.05rem; }
+            .tab-btn.active {
+                color: #0066cc;
+                border-left-color: #0066cc;
+                border-bottom-color: transparent;
+                background: #e8f4ff;
+            }
+            .tab-btn:hover:not(.active) { background: #f0f4f8; color: #334155; }
+
+            /* 패널 영역 */
+            .panels-wrap { flex: 1; overflow-y: auto; }
+            .tab-panel { padding: 2rem 2.5rem; }
+
+            /* 콘텐츠 폰트/크기 조정 */
+            .panel-title h2 { font-size: 1.15rem; }
+            .panel-title span { font-size: 0.8rem; }
+            .panel-title-icon { width: 40px; height: 40px; font-size: 1rem; }
+
+            .tip-list { gap: 1rem; }
+            .tip-card { padding: 1.2rem 1.4rem; }
+            .tip-icon { width: 44px; height: 44px; min-width: 44px; font-size: 1.1rem; }
+            .tip-body h3 { font-size: 1rem; }
+            .tip-body p { font-size: 0.88rem; }
+
+            .check-list { gap: 0.8rem; }
+            .check-item { padding: 1rem 1.2rem; }
+            .check-text { font-size: 0.88rem; }
+            .check-text strong { font-size: 0.92rem; }
+
+            .agreement-body { font-size: 0.92rem; padding: 1.2rem 1.5rem 1.5rem; }
+            .agreement-head { font-size: 1rem; padding: 1rem 1.5rem; }
+
+            .sig-wrap { margin: 0 1.5rem 0.8rem; }
+            #sig-canvas, #cl-canvas { height: 150px; }
+            .sig-btns { margin: 0 1.5rem 1.2rem; }
+
+            .contact-item { padding: 1.1rem 1.4rem; }
+            .contact-icon { width: 44px; height: 44px; min-width: 44px; }
+            .contact-info .value { font-size: 1rem; }
+
+            .cl-value { font-size: 0.96rem; }
+        }
 
         /* ── 패널 제목 ── */
         .panel-title {
@@ -316,11 +428,14 @@
     <!-- 헤더 -->
     <div class="popup-header">
         <button class="btn-close" onclick="window.close()" title="닫기"><i class="fas fa-times"></i></button>
-        <div class="logo-line">Clean &amp; Partners</div>
-        <h1><i class="fas fa-clipboard-list" style="margin-right:0.4rem; opacity:0.9;"></i>고객 관리 안내</h1>
-        <p>에어컨을 오래, 건강하게 사용하기 위한 가이드</p>
+        <div class="popup-header-text">
+            <div class="logo-line">Clean &amp; Partners</div>
+            <h1><i class="fas fa-clipboard-list" style="margin-right:0.4rem; opacity:0.9;"></i>고객 관리 안내</h1>
+            <p>에어컨을 오래, 건강하게 사용하기 위한 가이드</p>
+        </div>
     </div>
 
+    <div class="content-wrap">
     <!-- 탭 바 -->
     <div class="tab-bar">
         <button class="tab-btn active" data-tab="tip">
@@ -340,6 +455,7 @@
         </button>
     </div>
 
+    <div class="panels-wrap">
     <!-- ① 관리요령 -->
     <div class="tab-panel active" id="tab-tip">
         <div class="panel-title">
@@ -585,6 +701,8 @@
         </div>
     </div>
 
+    </div><!-- /.panels-wrap -->
+    </div><!-- /.content-wrap -->
 </div><!-- /.popup-wrap -->
 
 <script>
