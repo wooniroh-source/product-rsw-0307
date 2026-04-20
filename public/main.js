@@ -450,6 +450,22 @@ const sendEmailNotification = (subject, html) => {
 // =============================================
 // 7. 공통 배너 슬라이더
 // =============================================
+// Unsplash URL에 최적화 파라미터 추가 (이미 파라미터가 있으면 유지)
+function optimizeImageUrl(url, width) {
+  if (!url) return '';
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('unsplash.com') || u.hostname.includes('images.unsplash.com')) {
+      if (!u.searchParams.has('w')) u.searchParams.set('w', width || 1200);
+      if (!u.searchParams.has('q')) u.searchParams.set('q', '75');
+      if (!u.searchParams.has('auto')) u.searchParams.set('auto', 'format');
+      if (!u.searchParams.has('fit')) u.searchParams.set('fit', 'crop');
+      return u.toString();
+    }
+  } catch (_) {}
+  return url;
+}
+
 const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
   const container     = document.getElementById(containerId);
   const dotsContainer = document.getElementById(dotsId);
@@ -461,17 +477,32 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
   if (dotsContainer) dotsContainer.innerHTML = '';
   const isHero = containerId === 'hero-slider-container';
   const isMid  = containerId === 'mid-slider-container';
+  const imgWidth = isHero ? 1200 : 800;
 
   items.forEach((item, index) => {
     const slide = document.createElement('div');
     slide.classList.add((isHero || isMid) ? 'slide' : 'res-banner-slide');
     if (index === 0) slide.classList.add('active');
+
+    // 첫 슬라이드만 즉시 로드, 나머지는 data-bg에 저장해 전환 시 로드
+    const imgUrl = optimizeImageUrl(item.image_url, imgWidth);
+    const gradient = isHero
+      ? 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5))'
+      : isMid
+        ? 'linear-gradient(rgba(0,0,0,0.58),rgba(0,0,0,0.58))'
+        : 'linear-gradient(to right,rgba(0,0,0,0.65) 40%,rgba(0,0,0,0.25))';
+
+    if (index === 0) {
+      slide.style.backgroundImage = `${gradient},url('${imgUrl}')`;
+    } else {
+      slide.dataset.bgUrl = imgUrl;
+      slide.dataset.bgGradient = gradient;
+    }
+
     if (isHero) {
-      slide.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('${item.image_url||''}')`;
       slide.innerHTML = `<div class="hero-content"><h2>${item.title}</h2><p>${item.description||''}</p>${item.btn_text?`<div class="hero-btns"><a href="${item.btn_link||'#'}" class="btn">${item.btn_text}</a></div>`:''}</div>`;
     } else if (isMid) {
       const num = String(index + 1).padStart(2, '0');
-      slide.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.58),rgba(0,0,0,0.58)),url('${item.image_url||''}')`;
       slide.style.backgroundSize = 'cover';
       slide.style.backgroundPosition = 'center';
       const statsHtml = [
@@ -491,7 +522,6 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
           </div>
         </div>`;
     } else {
-      slide.style.backgroundImage = `linear-gradient(to right,rgba(0,0,0,0.65) 40%,rgba(0,0,0,0.25)),url('${item.image_url||''}')`;
       slide.innerHTML = `<div class="res-banner-content">${item.badge?`<span class="res-banner-badge">${item.badge}</span>`:''}<h4>${item.title}</h4><p>${item.description||''}</p></div>`;
     }
     container.appendChild(slide);
@@ -509,10 +539,26 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
   const dots   = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
   let current  = 0, timer;
 
+  const loadSlideBg = (slide) => {
+    if (slide.dataset.bgUrl && !slide.dataset.bgLoaded) {
+      slide.style.backgroundImage = `${slide.dataset.bgGradient},url('${slide.dataset.bgUrl}')`;
+      slide.dataset.bgLoaded = '1';
+    }
+  };
+  // 다음 슬라이드 미리 로드
+  const preloadNext = (idx) => {
+    const nextIdx = (idx + 1) % slides.length;
+    if (slides[nextIdx]) loadSlideBg(slides[nextIdx]);
+  };
   const showSlide = (idx) => {
     slides.forEach(s => s.classList.remove('active')); dots.forEach(d => d.classList.remove('active'));
-    if (slides[idx]) { slides[idx].classList.add('active'); current = idx; }
-    if (dots[idx])   dots[idx].classList.add('active');
+    if (slides[idx]) {
+      loadSlideBg(slides[idx]);
+      slides[idx].classList.add('active');
+      current = idx;
+      preloadNext(idx);
+    }
+    if (dots[idx]) dots[idx].classList.add('active');
   };
   const next  = () => showSlide((current + 1) % slides.length);
   const prev  = () => showSlide((current - 1 + slides.length) % slides.length);
@@ -572,7 +618,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       box.classList.add('process-step-box');
       box.innerHTML = `
         <div class="step-badge">STEP 0${i+1}</div>
-        <div class="step-img-wrapper"><img src="${step.image_url||''}" alt="${step.title}"></div>
+        <div class="step-img-wrapper"><img src="${optimizeImageUrl(step.image_url, 600)}" alt="${step.title}" loading="lazy"></div>
         <div class="step-icon"><i class="fas ${step.icon||''}"></i></div>
         <h4>${step.title}</h4><p>${step.description||''}</p>`;
       processDisplay.appendChild(box);
