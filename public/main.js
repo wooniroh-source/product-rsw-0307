@@ -1116,13 +1116,10 @@ function renderReviewTable() {
   if (ac) ac.textContent = approved + '건';
   if (pc) pc.textContent = pending + '건';
 
-  if (!filtered.length) {
-    if (table) table.style.display = 'none';
-    if (noMsg) noMsg.style.display = 'block';
-    return;
-  }
-  if (table) table.style.display = 'table';
-  if (noMsg) noMsg.style.display = 'none';
+  const isEmpty = filtered.length === 0;
+  if (table) table.style.display = isEmpty ? 'none' : 'table';
+  if (noMsg) noMsg.style.display = isEmpty ? 'block' : 'none';
+  if (isEmpty) return;
 
   body.innerHTML = filtered.map(r => {
     const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);

@@ -742,27 +742,18 @@
                     <p class="admin-header-sub">고객이 제출한 후기를 승인하거나 삭제할 수 있습니다. 승인된 후기만 홈페이지에 표시됩니다.</p>
                 </header>
 
-                <div class="admin-stats" style="margin-bottom:1.5rem;">
+                <div class="dashboard-stats">
                     <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-star"></i></div>
-                        <div class="stat-info">
-                            <p class="stat-label">전체 후기</p>
-                            <p class="stat-value" id="reviewTotalCount">0건</p>
-                        </div>
+                        <h3>전체 후기</h3>
+                        <p id="reviewTotalCount">0건</p>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:#d1fae5;color:#059669;"><i class="fas fa-check-circle"></i></div>
-                        <div class="stat-info">
-                            <p class="stat-label">승인됨</p>
-                            <p class="stat-value" id="reviewApprovedCount">0건</p>
-                        </div>
+                    <div class="stat-card confirmed">
+                        <h3>승인됨</h3>
+                        <p id="reviewApprovedCount">0건</p>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:#fef9c3;color:#d97706;"><i class="fas fa-clock"></i></div>
-                        <div class="stat-info">
-                            <p class="stat-label">승인 대기</p>
-                            <p class="stat-value" id="reviewPendingCount">0건</p>
-                        </div>
+                    <div class="stat-card pending">
+                        <h3>승인 대기</h3>
+                        <p id="reviewPendingCount">0건</p>
                     </div>
                 </div>
 
@@ -791,7 +782,7 @@
                         </thead>
                         <tbody id="reviewTableBody"></tbody>
                     </table>
-                    <div id="noReviewMessage" class="no-data" style="display:none;">등록된 후기가 없습니다.</div>
+                    <div id="noReviewMessage" class="no-data">등록된 후기가 없습니다.</div>
                 </div>
             </div>
 
