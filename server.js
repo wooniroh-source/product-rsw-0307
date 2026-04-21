@@ -32,6 +32,7 @@ const htmlRedirects = {
   '/about.html':       '/about',
   '/contact.html':     '/contact',
   '/privacy.html':     '/privacy',
+  '/care.html':        '/care',
 };
 app.use((req, res, next) => {
   const target = htmlRedirects[req.path];
@@ -216,13 +217,30 @@ async function initDB() {
     if (!bannerRows.length) {
       await pool.query(`
         INSERT INTO banners (banner_type, title, description, image_url, btn_text, btn_link, sort_order) VALUES
-        ('hero', '당신의 숨결을 디자인합니다', '전문 분해 세척으로 시작하는 깨끗한 실내 공기 솔루션', 'https://images.unsplash.com/photo-1590402444816-05d848218571?auto=format&fit=crop&w=1200&q=80', '온라인 예약하기', 'reservation.html', 1),
-        ('hero', '10년 경력의 베테랑 엔지니어', '까다로운 시스템 에어컨부터 가정용까지 완벽하게 케어합니다', 'https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?auto=format&fit=crop&w=1200&q=80', '서비스 상세 보기', 'services.html', 2),
-        ('hero', '친환경 세제 안심 공법', '우리가족 건강을 생각하는 FDA 승인 친환경 약품 사용', 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=1200&q=80', '브랜드 스토리', 'about.html', 3),
+        ('hero', '당신의 숨결을 디자인합니다', '전문 분해 세척으로 시작하는 깨끗한 실내 공기 솔루션', 'https://images.unsplash.com/photo-1590402444816-05d848218571?auto=format&fit=crop&w=1200&q=80', '온라인 예약하기', '/reservation', 1),
+        ('hero', '10년 경력의 베테랑 엔지니어', '까다로운 시스템 에어컨부터 가정용까지 완벽하게 케어합니다', 'https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?auto=format&fit=crop&w=1200&q=80', '서비스 상세 보기', '/services', 2),
+        ('hero', '친환경 세제 안심 공법', '우리가족 건강을 생각하는 FDA 승인 친환경 약품 사용', 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=1200&q=80', '브랜드 스토리', '/about', 3),
         ('mid', '완벽한 분해, 철저한 살균', '보이지 않는 곳까지 클린앤파트너즈가 책임집니다.', 'https://images.unsplash.com/photo-1558389186-438424b00a32?auto=format&fit=crop&w=1200&q=80', null, null, 1),
         ('mid', '쾌적한 여름의 시작', '지금 예약하고 시원한 바람을 만나보세요.', 'https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=1200&q=80', null, null, 2)
       `);
       console.log('✅ 기본 배너 데이터 생성 완료');
+    }
+
+    // btn_link의 .html 확장자 제거 (SEO: 리디렉션 체인 방지)
+    const linkMigrations = [
+      ['reservation.html', '/reservation'],
+      ['services.html',    '/services'],
+      ['estimate.html',    '/estimate'],
+      ['gallery.html',     '/gallery'],
+      ['about.html',       '/about'],
+      ['contact.html',     '/contact'],
+      ['privacy.html',     '/privacy'],
+    ];
+    for (const [oldLink, newLink] of linkMigrations) {
+      await pool.query(
+        "UPDATE banners SET btn_link = ? WHERE btn_link = ? OR btn_link = ?",
+        [newLink, oldLink, `/${oldLink}`]
+      );
     }
 
     console.log('✅ 모든 DB 초기화 작업 완료');

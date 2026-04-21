@@ -37,6 +37,18 @@
         <priority>0.7</priority>
     </url>
     <url>
+        <loc>https://cleannpartners.com/gallery</loc>
+        <lastmod>2026-04-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://cleannpartners.com/care</loc>
+        <lastmod>2026-04-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
         <loc>https://cleannpartners.com/privacy</loc>
         <lastmod>2026-04-06</lastmod>
         <changefreq>yearly</changefreq>

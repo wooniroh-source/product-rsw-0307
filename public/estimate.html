@@ -50,9 +50,10 @@
     <style>
         /* ===== 견적 페이지 전용 스타일 ===== */
         #estimate-section {
-            padding: 4rem 5% 8rem;
-            max-width: 720px;
+            padding: 6rem 5% 8rem;
+            max-width: 1400px;
             margin: 0 auto;
+            width: 100%;
         }
 
         .estimate-hero {
@@ -424,6 +425,9 @@
         #sticky-cta:hover { background: #f5da00; }
 
         /* ===== 반응형 ===== */
+        @media (max-width: 768px) {
+            .ac-type-grid { grid-template-columns: repeat(2, 1fr); }
+        }
         @media (max-width: 480px) {
             .ac-type-grid { grid-template-columns: repeat(2, 1fr); }
             .estimate-hero h1 { font-size: 1.7rem; }
@@ -521,6 +525,18 @@
                             <button class="ac-qty-btn plus" aria-label="증가">+</button>
                         </div>
                     </div>
+                    <div class="ac-type-item" data-price="90000" data-name="시스템 2way">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-table-cells-large"></i></span>
+                            <span class="ac-name">시스템 2way</span>
+                            <span class="ac-price">90,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
                     <div class="ac-type-item" data-price="130000" data-name="시스템 4way">
                         <div class="ac-type-top">
                             <span class="ac-icon"><i class="fas fa-border-all"></i></span>
@@ -557,6 +573,18 @@
                             <button class="ac-qty-btn plus" aria-label="증가">+</button>
                         </div>
                     </div>
+                    <div class="ac-type-item" data-price="200000" data-name="상업용 스탠드 대형">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-warehouse"></i></span>
+                            <span class="ac-name">상업용 스탠드 대형</span>
+                            <span class="ac-price">200,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
                     <div class="ac-type-item" data-price="90000" data-name="FCU 팬코일유닛">
                         <div class="ac-type-top">
                             <span class="ac-icon"><i class="fas fa-fan"></i></span>
@@ -581,12 +609,23 @@
                             <button class="ac-qty-btn plus" aria-label="증가">+</button>
                         </div>
                     </div>
+                    <div class="ac-type-item" data-price="250000" data-name="매립덕트에어컨">
+                        <div class="ac-type-top">
+                            <span class="ac-icon"><i class="fas fa-grip-lines"></i></span>
+                            <span class="ac-name">매립덕트에어컨</span>
+                            <span class="ac-price">250,000원~</span>
+                        </div>
+                        <div class="ac-qty-row">
+                            <button class="ac-qty-btn minus" aria-label="감소">−</button>
+                            <span class="ac-qty-val">0</span>
+                            <button class="ac-qty-btn plus" aria-label="증가">+</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="total-qty-bar" id="total-qty-bar">
                     <span class="tqb-label">총 선택 수량</span>
                     <span class="tqb-count" id="total-qty-display">0대</span>
                     <span class="tqb-hint">3대↑ <strong style="color:var(--primary)">10%</strong> · 10대↑ <strong style="color:var(--primary)">20%</strong> · 15대↑ <strong style="color:var(--primary)">25%</strong> · 20대↑ <strong style="color:var(--primary)">30%</strong> 할인</span>
-                    <span class="tqb-notice">※ 천장형 매립덕트 에어컨은 별도 문의 하세요.</span>
                 </div>
             </div>
 
