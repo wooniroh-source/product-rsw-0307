@@ -198,6 +198,19 @@ async function initDB() {
       )
     `);
 
+    await runQuery('reviews', `
+      CREATE TABLE IF NOT EXISTS reviews (
+        id           INT AUTO_INCREMENT PRIMARY KEY,
+        checklist_id INT DEFAULT NULL,
+        nickname     VARCHAR(50)  NOT NULL,
+        rating       TINYINT(1)   NOT NULL DEFAULT 5,
+        ac_type      VARCHAR(50),
+        content      TEXT         NOT NULL,
+        is_approved  TINYINT(1)   DEFAULT 0,
+        created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // 3. 기본 데이터 채우기 (생략 가능 시 건너뜀)
     const [processRows] = await pool.query('SELECT id FROM process_steps LIMIT 1');
     if (!processRows.length) {
@@ -585,6 +598,55 @@ app.patch('/api/checklists/:id/sign', async (req, res) => {
 app.delete('/api/checklists/:id', auth, async (req, res) => {
   try {
     await pool.query('DELETE FROM wash_checklists WHERE id = ?', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================
+// REVIEWS
+// =============================================
+app.get('/api/reviews', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT id, nickname, rating, ac_type, content, created_at FROM reviews WHERE is_approved = 1 ORDER BY created_at DESC LIMIT 30'
+    );
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/reviews/all', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM reviews ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/reviews', async (req, res) => {
+  try {
+    const { checklist_id, nickname, rating, ac_type, content } = req.body;
+    if (!nickname || !content) return res.status(400).json({ error: '닉네임과 후기 내용은 필수입니다.' });
+    const r = Math.min(5, Math.max(1, parseInt(rating) || 5));
+    const [result] = await pool.query(
+      'INSERT INTO reviews (checklist_id, nickname, rating, ac_type, content) VALUES (?,?,?,?,?)',
+      [checklist_id || null, nickname.trim(), r, ac_type || null, content.trim()]
+    );
+    res.json({ id: result.insertId });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.patch('/api/reviews/:id/approve', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT is_approved FROM reviews WHERE id = ?', [req.params.id]);
+    if (!rows.length) return res.status(404).json({ error: '후기를 찾을 수 없습니다.' });
+    const next = rows[0].is_approved ? 0 : 1;
+    await pool.query('UPDATE reviews SET is_approved = ? WHERE id = ?', [next, req.params.id]);
+    res.json({ ok: true, is_approved: next });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/reviews/:id', auth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM reviews WHERE id = ?', [req.params.id]);
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

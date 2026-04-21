@@ -51,6 +51,61 @@
       }
     }
     </script>
+    <style>
+        /* ── 청소 서비스 후기 섹션 ── */
+        #reviews-section { background: #fff; }
+
+        .review-slider-wrap {
+            overflow: hidden;
+            position: relative;
+        }
+        .review-track {
+            display: flex;
+            gap: 1.2rem;
+            animation: reviewScroll 30s linear infinite;
+            width: max-content;
+        }
+        .review-track:hover { animation-play-state: paused; }
+
+        @keyframes reviewScroll {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .review-card {
+            flex-shrink: 0;
+            width: 280px;
+            background: #f7fafd;
+            border: 1px solid #dce8f5;
+            border-radius: 16px;
+            padding: 1.4rem 1.3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .review-card .rv-stars { color: #f59e0b; font-size: 0.9rem; letter-spacing: 1px; }
+        .review-card .rv-content {
+            font-size: 0.88rem;
+            color: #374151;
+            line-height: 1.7;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .review-card .rv-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e8eef4;
+            padding-top: 0.6rem;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+        .review-card .rv-nickname { font-weight: 700; color: #475569; }
+        .review-card .rv-ac { background: #e8f4ff; color: #0066cc; border-radius: 20px; padding: 0.15rem 0.6rem; font-size: 0.7rem; font-weight: 600; }
+    </style>
 </head>
 <body>
     <header>
@@ -200,6 +255,22 @@
                 </div>
             </div>
         </section>
+
+        <!-- 청소 서비스 후기 -->
+        <section id="reviews-section">
+            <div class="section-title">
+                <h2>청소 서비스 후기</h2>
+                <p>실제 고객님들의 솔직한 후기를 확인해 보세요.</p>
+            </div>
+            <div class="review-slider-wrap">
+                <div class="review-track" id="review-track">
+                    <!-- JS로 렌더링 -->
+                </div>
+            </div>
+            <div id="review-empty" style="display:none;text-align:center;padding:2.5rem 0;color:#94a3b8;font-size:0.92rem;">
+                아직 등록된 후기가 없습니다.
+            </div>
+        </section>
         </main>
 
 
@@ -244,5 +315,48 @@
         </a>
     </nav>
     <script src="main.js"></script>
+    <script>
+    // ── 청소 서비스 후기 로딩 ──
+    (async function loadReviews() {
+        try {
+            const res = await fetch('/api/reviews');
+            if (!res.ok) return;
+            const reviews = await res.json();
+            const track = document.getElementById('review-track');
+            const empty = document.getElementById('review-empty');
+            if (!reviews.length) {
+                track.parentElement.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            function makeCard(r) {
+                const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+                const date = new Date(r.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                const acBadge = r.ac_type ? `<span class="rv-ac">${r.ac_type}</span>` : '';
+                return `<div class="review-card">
+                    <div class="rv-stars">${stars}</div>
+                    <div class="rv-content">${r.content.replace(/</g,'&lt;')}</div>
+                    <div class="rv-meta">
+                        <span class="rv-nickname">${r.nickname.replace(/</g,'&lt;')}</span>
+                        <span style="display:flex;gap:0.4rem;align-items:center;">${acBadge}<span>${date}</span></span>
+                    </div>
+                </div>`;
+            }
+
+            // 카드 생성 (무한 스크롤을 위해 2배 복제)
+            const html = reviews.map(makeCard).join('');
+            track.innerHTML = html + html;
+
+            // 카드 수가 적으면 애니메이션 비활성화
+            if (reviews.length < 4) {
+                track.style.animation = 'none';
+                track.innerHTML = html;
+            }
+        } catch (e) {
+            console.warn('후기 로딩 실패:', e);
+        }
+    })();
+    </script>
 </body>
 </html>

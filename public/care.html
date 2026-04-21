@@ -414,6 +414,15 @@
         .cl-label { font-size: 0.68rem; color: #94a3b8; font-weight: 600; }
         .cl-value { font-size: 0.88rem; color: #1a2540; font-weight: 600; }
 
+        /* ── 별점 선택 ── */
+        .star-select { display: flex; gap: 0.3rem; margin-bottom: 0.3rem; }
+        .star-select .star {
+            font-size: 1.8rem; color: #d1d5db; cursor: pointer;
+            transition: color 0.15s, transform 0.1s;
+        }
+        .star-select .star.on { color: #f59e0b; }
+        .star-select .star:hover { transform: scale(1.15); }
+
         /* ── 인쇄 ── */
         @media print {
             .tab-bar, .btn-close, .sig-btns, .btn-print-full, .popup-header .btn-close { display: none !important; }
@@ -450,6 +459,9 @@
         </button>
         <button class="tab-btn" data-tab="checklist" id="tab-btn-checklist">
             <i class="fas fa-clipboard-check"></i>체크리스트
+        </button>
+        <button class="tab-btn" data-tab="review">
+            <i class="fas fa-star"></i>후기작성
         </button>
         <button class="tab-btn" data-tab="contact">
             <i class="fas fa-phone"></i>연락처
@@ -667,7 +679,80 @@
         </div>
     </div>
 
-    <!-- ⑤ 연락처 -->
+    <!-- ⑤ 후기 작성 -->
+    <div class="tab-panel" id="tab-review">
+        <div class="panel-title">
+            <div class="panel-title-icon" style="background:#fff8e1;color:#f59e0b;"><i class="fas fa-star"></i></div>
+            <div>
+                <h2>청소 서비스 후기</h2>
+                <span>서비스 이용 후 솔직한 후기를 남겨주세요</span>
+            </div>
+        </div>
+
+        <div id="review-form-wrap">
+            <!-- 별점 -->
+            <div style="margin-bottom:1rem;">
+                <div style="font-size:0.78rem;font-weight:700;color:#1a2540;margin-bottom:0.5rem;">서비스 만족도</div>
+                <div class="star-select" id="star-select">
+                    <span class="star" data-v="1"><i class="fas fa-star"></i></span>
+                    <span class="star" data-v="2"><i class="fas fa-star"></i></span>
+                    <span class="star" data-v="3"><i class="fas fa-star"></i></span>
+                    <span class="star" data-v="4"><i class="fas fa-star"></i></span>
+                    <span class="star" data-v="5"><i class="fas fa-star"></i></span>
+                </div>
+                <input type="hidden" id="rv-rating" value="5">
+            </div>
+
+            <!-- 닉네임 -->
+            <div style="margin-bottom:0.85rem;">
+                <label style="font-size:0.78rem;font-weight:700;color:#1a2540;display:block;margin-bottom:0.35rem;">닉네임 <span style="color:#e53e3e;">*</span></label>
+                <input type="text" id="rv-nickname" maxlength="20" placeholder="예) 강남 고객님" style="width:100%;padding:0.65rem 0.9rem;border:1.5px solid #dce8f5;border-radius:10px;font-size:0.88rem;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='#0066cc'" onblur="this.style.borderColor='#dce8f5'">
+            </div>
+
+            <!-- 에어컨 종류 -->
+            <div style="margin-bottom:0.85rem;">
+                <label style="font-size:0.78rem;font-weight:700;color:#1a2540;display:block;margin-bottom:0.35rem;">에어컨 종류 <span style="color:#94a3b8;font-weight:500;">(선택)</span></label>
+                <select id="rv-ac-type" style="width:100%;padding:0.65rem 0.9rem;border:1.5px solid #dce8f5;border-radius:10px;font-size:0.88rem;outline:none;background:#fff;cursor:pointer;">
+                    <option value="">선택 안함</option>
+                    <option value="벽걸이">벽걸이</option>
+                    <option value="스탠드">스탠드</option>
+                    <option value="무풍/고급">무풍/고급</option>
+                    <option value="시스템 1way">시스템 1way</option>
+                    <option value="시스템 2way">시스템 2way</option>
+                    <option value="시스템 4way">시스템 4way</option>
+                    <option value="2in1">2in1</option>
+                    <option value="상업용 스탠드">상업용 스탠드</option>
+                    <option value="상업용 스탠드 대형">상업용 스탠드 대형</option>
+                    <option value="FCU 팬코일유닛">FCU 팬코일유닛</option>
+                    <option value="시스템원형 360">시스템원형 360</option>
+                    <option value="매립덕트에어컨">매립덕트에어컨</option>
+                </select>
+            </div>
+
+            <!-- 후기 내용 -->
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:0.78rem;font-weight:700;color:#1a2540;display:block;margin-bottom:0.35rem;">후기 내용 <span style="color:#e53e3e;">*</span></label>
+                <textarea id="rv-content" maxlength="300" rows="5" placeholder="서비스 이용 후기를 자유롭게 작성해 주세요. (최대 300자)" style="width:100%;padding:0.7rem 0.9rem;border:1.5px solid #dce8f5;border-radius:10px;font-size:0.88rem;line-height:1.7;resize:vertical;outline:none;font-family:inherit;transition:border-color 0.2s;" onfocus="this.style.borderColor='#0066cc'" onblur="this.style.borderColor='#dce8f5'"></textarea>
+                <div style="text-align:right;font-size:0.72rem;color:#94a3b8;margin-top:0.25rem;"><span id="rv-char-count">0</span>/300</div>
+            </div>
+
+            <p style="font-size:0.72rem;color:#94a3b8;margin-bottom:0.9rem;line-height:1.6;">※ 제출된 후기는 관리자 확인 후 홈페이지에 게재됩니다.</p>
+
+            <button id="rv-submit-btn" style="width:100%;padding:0.85rem;background:#0066cc;color:#fff;border:none;border-radius:10px;font-size:0.92rem;font-weight:700;cursor:pointer;transition:background 0.2s;">
+                <i class="fas fa-paper-plane" style="margin-right:0.4rem;"></i>후기 제출하기
+            </button>
+            <p id="rv-error" style="display:none;margin-top:0.7rem;font-size:0.8rem;color:#e53e3e;text-align:center;"></p>
+        </div>
+
+        <!-- 제출 완료 -->
+        <div id="review-done" style="display:none;text-align:center;padding:2.5rem 1rem;">
+            <div style="font-size:3rem;margin-bottom:0.8rem;">⭐</div>
+            <p style="font-size:1rem;font-weight:800;color:#1a2540;margin-bottom:0.4rem;">후기가 제출되었습니다!</p>
+            <p style="font-size:0.82rem;color:#64748b;">관리자 확인 후 홈페이지에 게재됩니다. 감사합니다.</p>
+        </div>
+    </div>
+
+    <!-- ⑥ 연락처 -->
     <div class="tab-panel" id="tab-contact">
         <div class="panel-title">
             <div class="panel-title-icon green"><i class="fas fa-phone-alt"></i></div>
@@ -707,6 +792,70 @@
 </div><!-- /.popup-wrap -->
 
 <script>
+// ── 별점 선택 ──
+(function () {
+    const stars = document.querySelectorAll('#star-select .star');
+    const ratingInput = document.getElementById('rv-rating');
+    let current = 5;
+
+    function paint(val) {
+        stars.forEach(s => s.classList.toggle('on', parseInt(s.dataset.v) <= val));
+    }
+    paint(current);
+
+    stars.forEach(s => {
+        s.addEventListener('mouseenter', () => paint(parseInt(s.dataset.v)));
+        s.addEventListener('mouseleave', () => paint(current));
+        s.addEventListener('click', () => {
+            current = parseInt(s.dataset.v);
+            ratingInput.value = current;
+            paint(current);
+        });
+    });
+
+    // 글자 수 카운트
+    const textarea = document.getElementById('rv-content');
+    textarea.addEventListener('input', () => {
+        document.getElementById('rv-char-count').textContent = textarea.value.length;
+    });
+
+    // 제출
+    document.getElementById('rv-submit-btn').addEventListener('click', async () => {
+        const nickname = document.getElementById('rv-nickname').value.trim();
+        const content  = document.getElementById('rv-content').value.trim();
+        const rating   = parseInt(ratingInput.value) || 5;
+        const ac_type  = document.getElementById('rv-ac-type').value;
+        const errEl    = document.getElementById('rv-error');
+        const btn      = document.getElementById('rv-submit-btn');
+
+        if (!nickname) { errEl.textContent = '닉네임을 입력해 주세요.'; errEl.style.display = 'block'; return; }
+        if (!content)  { errEl.textContent = '후기 내용을 입력해 주세요.'; errEl.style.display = 'block'; return; }
+        errEl.style.display = 'none';
+
+        const urlParams = new URLSearchParams(location.search);
+        const checklistId = urlParams.get('checklist') || null;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 제출 중...';
+
+        try {
+            const res = await fetch('/api/reviews', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ checklist_id: checklistId, nickname, rating, ac_type: ac_type || null, content })
+            });
+            if (!res.ok) throw new Error((await res.json()).error || '오류');
+            document.getElementById('review-form-wrap').style.display = 'none';
+            document.getElementById('review-done').style.display = 'block';
+        } catch (e) {
+            errEl.textContent = '제출 중 오류가 발생했습니다: ' + e.message;
+            errEl.style.display = 'block';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:0.4rem;"></i>후기 제출하기';
+        }
+    });
+})();
+
 // ── 확약서 PDF 다운로드 (html2canvas → jsPDF) ──
 async function downloadAgreementPDF() {
     const btn = document.getElementById('btn-pdf');
