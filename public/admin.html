@@ -7,6 +7,25 @@
     <title>관리 시스템 - 클린앤파트너즈</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .filter-btn {
+            padding: 0.4rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .filter-btn:hover { background: #e8f4ff; color: #0066cc; border-color: #0066cc; }
+        .filter-btn-active { background: #0066cc !important; color: #fff !important; border-color: #0066cc !important; }
+        .btn-confirm { color: #059669; border-color: #059669; }
+        .btn-confirm:hover { background: #059669; color: #fff; }
+        .btn-delete  { color: #dc2626; border-color: #dc2626; }
+        .btn-delete:hover  { background: #dc2626; color: #fff; }
+    </style>
 </head>
 <body class="admin-body">
 
@@ -93,6 +112,11 @@
                 <li id="menu-checklists">
                     <a href="javascript:void(0)" onclick="showSection('checklists')">
                         <i class="fas fa-clipboard-check"></i> <span>세척 체크리스트</span>
+                    </a>
+                </li>
+                <li id="menu-reviews">
+                    <a href="javascript:void(0)" onclick="showSection('reviews')">
+                        <i class="fas fa-star"></i> <span>후기 관리</span>
                     </a>
                 </li>
                 <li id="menu-security">
@@ -708,6 +732,66 @@
                         </table>
                     </div>
                     <div id="noChecklistMessage" class="no-data" style="display:none;">등록된 체크리스트가 없습니다.</div>
+                </div>
+            </div>
+
+            <!-- 후기 관리 섹션 -->
+            <div id="section-reviews" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1>후기 관리</h1>
+                    <p class="admin-header-sub">고객이 제출한 후기를 승인하거나 삭제할 수 있습니다. 승인된 후기만 홈페이지에 표시됩니다.</p>
+                </header>
+
+                <div class="admin-stats" style="margin-bottom:1.5rem;">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-star"></i></div>
+                        <div class="stat-info">
+                            <p class="stat-label">전체 후기</p>
+                            <p class="stat-value" id="reviewTotalCount">0건</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#d1fae5;color:#059669;"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <p class="stat-label">승인됨</p>
+                            <p class="stat-value" id="reviewApprovedCount">0건</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#fef9c3;color:#d97706;"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <p class="stat-label">승인 대기</p>
+                            <p class="stat-value" id="reviewPendingCount">0건</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-table-wrapper">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+                        <div style="display:flex;gap:0.5rem;">
+                            <button onclick="filterReviews('all')" id="rv-filter-all" class="filter-btn filter-btn-active">전체</button>
+                            <button onclick="filterReviews('pending')" id="rv-filter-pending" class="filter-btn">대기중</button>
+                            <button onclick="filterReviews('approved')" id="rv-filter-approved" class="filter-btn">승인됨</button>
+                        </div>
+                        <button onclick="loadReviewsAdmin()" style="padding:0.5rem 1rem;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-size:0.85rem;">
+                            <i class="fas fa-sync-alt"></i> 새로고침
+                        </button>
+                    </div>
+                    <table class="admin-table" id="reviewTable" style="display:table;">
+                        <thead>
+                            <tr>
+                                <th>별점</th>
+                                <th>닉네임</th>
+                                <th>에어컨 종류</th>
+                                <th>후기 내용</th>
+                                <th>제출일</th>
+                                <th>상태</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewTableBody"></tbody>
+                    </table>
+                    <div id="noReviewMessage" class="no-data" style="display:none;">등록된 후기가 없습니다.</div>
                 </div>
             </div>
 

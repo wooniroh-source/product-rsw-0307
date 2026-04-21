@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','security'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','security'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -107,6 +107,7 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'process')       renderProcessEditForm();
   else if (sectionId === 'contacts')      renderContactTable();
   else if (sectionId === 'checklists')    renderChecklistTable();
+  else if (sectionId === 'reviews')       loadReviewsAdmin();
 };
 
 // =============================================
@@ -1072,6 +1073,91 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 });
+
+// =============================================
+// 후기 관리
+// =============================================
+let _allReviews = [];
+let _rvFilter   = 'all';
+
+window.loadReviewsAdmin = async () => {
+  _allReviews = await api('GET', '/reviews/all') || [];
+  renderReviewTable();
+};
+
+window.filterReviews = (filter) => {
+  _rvFilter = filter;
+  ['all','pending','approved'].forEach(f => {
+    const btn = document.getElementById(`rv-filter-${f}`);
+    if (btn) btn.classList.toggle('filter-btn-active', f === filter);
+  });
+  renderReviewTable();
+};
+
+function renderReviewTable() {
+  const body   = document.getElementById('reviewTableBody');
+  const noMsg  = document.getElementById('noReviewMessage');
+  const table  = document.getElementById('reviewTable');
+  if (!body) return;
+
+  const filtered = _rvFilter === 'pending'
+    ? _allReviews.filter(r => !r.is_approved)
+    : _rvFilter === 'approved'
+    ? _allReviews.filter(r => r.is_approved)
+    : _allReviews;
+
+  const total    = _allReviews.length;
+  const approved = _allReviews.filter(r => r.is_approved).length;
+  const pending  = total - approved;
+  const tc = document.getElementById('reviewTotalCount');
+  const ac = document.getElementById('reviewApprovedCount');
+  const pc = document.getElementById('reviewPendingCount');
+  if (tc) tc.textContent = total + '건';
+  if (ac) ac.textContent = approved + '건';
+  if (pc) pc.textContent = pending + '건';
+
+  if (!filtered.length) {
+    if (table) table.style.display = 'none';
+    if (noMsg) noMsg.style.display = 'block';
+    return;
+  }
+  if (table) table.style.display = 'table';
+  if (noMsg) noMsg.style.display = 'none';
+
+  body.innerHTML = filtered.map(r => {
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    const date  = new Date(r.created_at).toLocaleDateString('ko-KR');
+    const statusBadge = r.is_approved
+      ? '<span style="background:#d1fae5;color:#065f46;padding:2px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;">승인됨</span>'
+      : '<span style="background:#fef9c3;color:#92400e;padding:2px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;">대기중</span>';
+    const approveLabel = r.is_approved ? '승인 취소' : '승인';
+    const approveCls   = r.is_approved ? 'btn-action btn-cancel' : 'btn-action btn-confirm';
+    const content = r.content.replace(/</g,'&lt;').replace(/\n/g,'<br>');
+    return `<tr>
+      <td style="color:#f59e0b;letter-spacing:1px;font-size:0.9rem;">${stars}</td>
+      <td><strong>${r.nickname.replace(/</g,'&lt;')}</strong></td>
+      <td>${r.ac_type ? `<span style="background:#e8f4ff;color:#0066cc;padding:2px 8px;border-radius:12px;font-size:0.75rem;">${r.ac_type}</span>` : '-'}</td>
+      <td style="max-width:240px;white-space:normal;font-size:0.85rem;line-height:1.6;">${content}</td>
+      <td>${date}</td>
+      <td>${statusBadge}</td>
+      <td>
+        <button class="${approveCls}" onclick="approveReview(${r.id})">${approveLabel}</button>
+        <button class="btn-action btn-delete" onclick="deleteReview(${r.id})">삭제</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+window.approveReview = async (id) => {
+  await api('PATCH', `/reviews/${id}/approve`);
+  loadReviewsAdmin();
+};
+
+window.deleteReview = async (id) => {
+  if (!confirm('이 후기를 삭제하시겠습니까?')) return;
+  await api('DELETE', `/reviews/${id}`);
+  loadReviewsAdmin();
+};
 
 // =============================================
 // PWA: Service Worker 등록 + 홈화면 추가 배너
