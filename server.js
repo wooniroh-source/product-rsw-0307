@@ -1,11 +1,33 @@
 require('dotenv').config();
-const express = require('express');
-const jwt     = require('jsonwebtoken');
-const path    = require('path');
-const pool    = require('./src/db');
-const auth    = require('./src/middleware/auth');
+const express    = require('express');
+const jwt        = require('jsonwebtoken');
+const path       = require('path');
+const nodemailer = require('nodemailer');
+const pool       = require('./src/db');
+const auth       = require('./src/middleware/auth');
 
 const app = express();
+
+// 이메일 발송 설정
+const mailTransporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS }
+});
+
+const NOTIFY_EMAILS = [
+  process.env.NOTIFY_EMAIL,
+  'myzerobiz.co@gmail.com'
+].filter(Boolean);
+
+const sendMail = (subject, text) => {
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS || NOTIFY_EMAILS.length === 0) return;
+  mailTransporter.sendMail({
+    from: `"클린앤파트너즈 알림" <${process.env.GMAIL_USER}>`,
+    to: NOTIFY_EMAILS.join(', '),
+    subject,
+    text
+  }).catch(err => console.error('[Mail]', err.message));
+};
 const JWT_SECRET = process.env.JWT_SECRET || 'cleanpartners_secret';
 
 app.use(express.json());
@@ -326,10 +348,24 @@ app.get('/api/reservations', auth, async (req, res) => {
 
 app.post('/api/reservations', async (req, res) => {
   try {
-    const { name, phone, service, date, time } = req.body;
+    const { name, phone, service, date, time, district } = req.body;
     const [result] = await pool.query(
       'INSERT INTO reservations (name, phone, service, date, time) VALUES (?, ?, ?, ?, ?)',
       [name, phone, service, date, time]
+    );
+    const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
+    const districtLine = district ? `\n서비스 지역 : ${district}` : '';
+    sendMail(
+      `[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`,
+      `📋 새 예약이 접수되었습니다\n` +
+      `──────────────────────\n` +
+      `고객명   : ${name}\n` +
+      `연락처   : ${phone}` +
+      `${districtLine}\n` +
+      `서비스   : ${svcNames[service] || service}\n` +
+      `예약 날짜 : ${date}\n` +
+      `희망 시간 : ${time}\n` +
+      `──────────────────────`
     );
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -365,6 +401,16 @@ app.post('/api/contacts', async (req, res) => {
     const [result] = await pool.query(
       'INSERT INTO contacts (name, phone, message) VALUES (?, ?, ?)',
       [name, phone, message]
+    );
+    sendMail(
+      `[클린앤파트너즈] 새 문의 접수 - ${name}`,
+      `💬 새 문의가 접수되었습니다\n` +
+      `──────────────────────\n` +
+      `고객명   : ${name}\n` +
+      `연락처   : ${phone}\n` +
+      `──────────────────────\n` +
+      `문의 내용 :\n${message}\n` +
+      `──────────────────────`
     );
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
