@@ -23,7 +23,8 @@ const sendMail = (subject, text) => {
   if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS || NOTIFY_EMAILS.length === 0) return;
   mailTransporter.sendMail({
     from: `"클린앤파트너즈 알림" <${process.env.GMAIL_USER}>`,
-    to: NOTIFY_EMAILS.join(', '),
+    to: NOTIFY_EMAILS[0],
+    cc: NOTIFY_EMAILS.slice(1).join(', '),
     subject,
     text
   }).catch(err => console.error('[Mail]', err.message));
