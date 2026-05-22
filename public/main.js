@@ -1061,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           // 두 번째 탭 → 예약 페이지 이동
           mapTooltip.style.opacity = '0';
           activeTooltipBubble = null;
-          window.location.href = 'reservation.html?district=' + encodeURIComponent(d.name);
+          window.location.href = '/reservation?district=' + encodeURIComponent(d.name);
         } else {
           // 첫 번째 탭 → 툴팁 표시
           mapTooltip.innerHTML = d.name + '<span>탭하여 예약하기</span>';
@@ -1074,7 +1074,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // 클릭 → 실시간 예약 페이지 (지역명 파라미터 포함)
       g.addEventListener('click', () => {
-        window.location.href = 'reservation.html?district=' + encodeURIComponent(d.name);
+        window.location.href = '/reservation?district=' + encodeURIComponent(d.name);
       });
     });
   }

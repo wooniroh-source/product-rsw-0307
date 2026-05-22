@@ -36,7 +36,10 @@ const htmlRedirects = {
 };
 app.use((req, res, next) => {
   const target = htmlRedirects[req.path];
-  if (target) return res.redirect(301, target);
+  if (target) {
+    const qs = req.originalUrl.indexOf('?') !== -1 ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
+    return res.redirect(301, target + qs);
+  }
   next();
 });
 
