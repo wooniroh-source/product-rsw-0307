@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','security','hanyoung'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','security','hanyoung','hanyoung-banners','hanyoung-svc-banners'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -102,7 +102,9 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'mid-banners')   renderBannerTable('mid',   'midBannerTableBody');
   else if (sectionId === 'res-banners')   renderBannerTable('res',   'resBannerTableBody');
   else if (sectionId === 'svc-banners')   renderBannerTable('svc',   'svcBannerTableBody');
-  else if (sectionId === 'about-banners') renderBannerTable('about', 'aboutBannerTableBody');
+  else if (sectionId === 'about-banners')        renderBannerTable('about',        'aboutBannerTableBody');
+  else if (sectionId === 'hanyoung-banners')     renderBannerTable('hanyoung',     'hyBannerTableBody');
+  else if (sectionId === 'hanyoung-svc-banners') renderBannerTable('hanyoung-svc', 'hySvcBannerTableBody');
   else if (sectionId === 'gallery')       renderGalleryTable();
   else if (sectionId === 'process')       renderProcessEditForm();
   else if (sectionId === 'contacts')      renderContactTable();
@@ -258,12 +260,14 @@ window.renderBannerTable = async (type, bodyId) => {
 };
 
 const bannerFormMap = {
-  hero:  { form:'bannerForm',      editId:'bannerEditId',       badge:'',                title:'bannerTitle',       desc:'bannerDesc',       url:'bannerUrl',       btnText:'bannerBtnText',   btnLink:'bannerBtnLink',   submitBtn:'bannerSubmitBtn',       cancelBtn:'bannerCancelBtn',       tableBody:'bannerTableBody' },
-  mid:   { form:'midBannerForm',   editId:'midBannerEditId',    badge:'',                title:'midBannerTitle',    desc:'midBannerDesc',    url:'midBannerUrl',    btnText:'',                btnLink:'',                submitBtn:'midBannerSubmitBtn',    cancelBtn:'midBannerCancelBtn',    tableBody:'midBannerTableBody',
-           companyName:'midBannerCompany', totalUnits:'midBannerTotalUnits', timeRequired:'midBannerTimeRequired', manpower:'midBannerManpower', workDate:'midBannerWorkDate' },
-  res:   { form:'resBannerForm',   editId:'resBannerEditId',    badge:'resBannerBadge',  title:'resBannerTitle',    desc:'resBannerDesc',    url:'resBannerUrl',    btnText:'',                btnLink:'',                submitBtn:'resBannerSubmitBtn',    cancelBtn:'resBannerCancelBtn',    tableBody:'resBannerTableBody' },
-  svc:   { form:'svcBannerForm',   editId:'svcBannerEditId',    badge:'svcBannerBadge',  title:'svcBannerTitle',    desc:'svcBannerDesc',    url:'svcBannerUrl',    btnText:'',                btnLink:'',                submitBtn:'svcBannerSubmitBtn',    cancelBtn:'svcBannerCancelBtn',    tableBody:'svcBannerTableBody' },
-  about: { form:'aboutBannerForm', editId:'aboutBannerEditId',  badge:'aboutBannerBadge',title:'aboutBannerTitle',  desc:'aboutBannerDesc',  url:'aboutBannerUrl',  btnText:'',                btnLink:'',                submitBtn:'aboutBannerSubmitBtn',  cancelBtn:'aboutBannerCancelBtn',  tableBody:'aboutBannerTableBody' }
+  hero:        { form:'bannerForm',          editId:'bannerEditId',           badge:'',                    title:'bannerTitle',           desc:'bannerDesc',           url:'bannerUrl',           btnText:'bannerBtnText',       btnLink:'bannerBtnLink',       submitBtn:'bannerSubmitBtn',           cancelBtn:'bannerCancelBtn',           tableBody:'bannerTableBody' },
+  mid:         { form:'midBannerForm',       editId:'midBannerEditId',        badge:'',                    title:'midBannerTitle',        desc:'midBannerDesc',        url:'midBannerUrl',        btnText:'',                    btnLink:'',                    submitBtn:'midBannerSubmitBtn',        cancelBtn:'midBannerCancelBtn',        tableBody:'midBannerTableBody',
+                 companyName:'midBannerCompany', totalUnits:'midBannerTotalUnits', timeRequired:'midBannerTimeRequired', manpower:'midBannerManpower', workDate:'midBannerWorkDate' },
+  res:         { form:'resBannerForm',       editId:'resBannerEditId',        badge:'resBannerBadge',      title:'resBannerTitle',        desc:'resBannerDesc',        url:'resBannerUrl',        btnText:'',                    btnLink:'',                    submitBtn:'resBannerSubmitBtn',        cancelBtn:'resBannerCancelBtn',        tableBody:'resBannerTableBody' },
+  svc:         { form:'svcBannerForm',       editId:'svcBannerEditId',        badge:'svcBannerBadge',      title:'svcBannerTitle',        desc:'svcBannerDesc',        url:'svcBannerUrl',        btnText:'',                    btnLink:'',                    submitBtn:'svcBannerSubmitBtn',        cancelBtn:'svcBannerCancelBtn',        tableBody:'svcBannerTableBody' },
+  about:       { form:'aboutBannerForm',     editId:'aboutBannerEditId',      badge:'aboutBannerBadge',    title:'aboutBannerTitle',      desc:'aboutBannerDesc',      url:'aboutBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'aboutBannerSubmitBtn',      cancelBtn:'aboutBannerCancelBtn',      tableBody:'aboutBannerTableBody' },
+  hanyoung:    { form:'hyBannerForm',        editId:'hyBannerEditId',         badge:'',                    title:'hyBannerTitle',         desc:'hyBannerDesc',         url:'hyBannerUrl',         btnText:'',                    btnLink:'',                    submitBtn:'hyBannerSubmitBtn',         cancelBtn:'hyBannerCancelBtn',         tableBody:'hyBannerTableBody' },
+  'hanyoung-svc': { form:'hySvcBannerForm',  editId:'hySvcBannerEditId',      badge:'',                    title:'hySvcBannerTitle',      desc:'hySvcBannerDesc',      url:'hySvcBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'hySvcBannerSubmitBtn',      cancelBtn:'hySvcBannerCancelBtn',      tableBody:'hySvcBannerTableBody' }
 };
 
 const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
@@ -324,20 +328,28 @@ window.deleteBanner = async (type, id) => {
 };
 
 // Admin onsubmit 핸들러 래핑
-window.handleBannerSubmitHero  = (e) => handleBannerSubmit(e, 'hero');
-window.handleMidBannerSubmit   = (e) => handleBannerSubmit(e, 'mid');
-window.handleResBannerSubmit   = (e) => handleBannerSubmit(e, 'res');
-window.handleSvcBannerSubmit   = (e) => handleBannerSubmit(e, 'svc');
-window.handleAboutBannerSubmit = (e) => handleBannerSubmit(e, 'about');
-window.cancelResBannerEdit     = () => cancelBannerEdit('res');
-window.cancelSvcBannerEdit     = () => cancelBannerEdit('svc');
-window.cancelAboutBannerEdit   = () => cancelBannerEdit('about');
-window.editResBanner   = (id) => editBanner('res',   id);
-window.editSvcBanner   = (id) => editBanner('svc',   id);
-window.editAboutBanner = (id) => editBanner('about', id);
-window.deleteResBanner   = (id) => deleteBanner('res',   id);
-window.deleteSvcBanner   = (id) => deleteBanner('svc',   id);
-window.deleteAboutBanner = (id) => deleteBanner('about', id);
+window.handleBannerSubmitHero     = (e) => handleBannerSubmit(e, 'hero');
+window.handleMidBannerSubmit      = (e) => handleBannerSubmit(e, 'mid');
+window.handleResBannerSubmit      = (e) => handleBannerSubmit(e, 'res');
+window.handleSvcBannerSubmit      = (e) => handleBannerSubmit(e, 'svc');
+window.handleAboutBannerSubmit    = (e) => handleBannerSubmit(e, 'about');
+window.handleHyBannerSubmit       = (e) => handleBannerSubmit(e, 'hanyoung');
+window.handleHySvcBannerSubmit    = (e) => handleBannerSubmit(e, 'hanyoung-svc');
+window.cancelResBannerEdit        = () => cancelBannerEdit('res');
+window.cancelSvcBannerEdit        = () => cancelBannerEdit('svc');
+window.cancelAboutBannerEdit      = () => cancelBannerEdit('about');
+window.cancelHyBannerEdit         = () => cancelBannerEdit('hanyoung');
+window.cancelHySvcBannerEdit      = () => cancelBannerEdit('hanyoung-svc');
+window.editResBanner      = (id) => editBanner('res',          id);
+window.editSvcBanner      = (id) => editBanner('svc',          id);
+window.editAboutBanner    = (id) => editBanner('about',        id);
+window.editHyBanner       = (id) => editBanner('hanyoung',     id);
+window.editHySvcBanner    = (id) => editBanner('hanyoung-svc', id);
+window.deleteResBanner    = (id) => deleteBanner('res',          id);
+window.deleteSvcBanner    = (id) => deleteBanner('svc',          id);
+window.deleteAboutBanner  = (id) => deleteBanner('about',        id);
+window.deleteHyBanner     = (id) => deleteBanner('hanyoung',     id);
+window.deleteHySvcBanner  = (id) => deleteBanner('hanyoung-svc', id);
 
 // =============================================
 // 4. 상담 문의
@@ -764,11 +776,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 슬라이더들 병렬 로드
   const sliderConfigs = [
-    { id: 'hero-slider-container',  type: 'hero',  dots:'hero-slider-dots',  prev:'hero-prev',         next:'hero-next' },
-    { id: 'mid-slider-container',   type: 'mid',   dots:'mid-slider-dots',   prev:'mid-prev',          next:'mid-next' },
-    { id: 'res-banner-container',   type: 'res',   dots:'res-banner-dots',   prev:'res-banner-prev',   next:'res-banner-next' },
-    { id: 'svc-banner-container',   type: 'svc',   dots:'svc-banner-dots',   prev:'svc-banner-prev',   next:'svc-banner-next' },
-    { id: 'about-banner-container', type: 'about', dots:'about-banner-dots', prev:'about-banner-prev', next:'about-banner-next' }
+    { id: 'hero-slider-container',    type: 'hero',         dots:'hero-slider-dots',    prev:'hero-prev',           next:'hero-next' },
+    { id: 'mid-slider-container',     type: 'mid',          dots:'mid-slider-dots',     prev:'mid-prev',            next:'mid-next' },
+    { id: 'res-banner-container',     type: 'res',          dots:'res-banner-dots',     prev:'res-banner-prev',     next:'res-banner-next' },
+    { id: 'svc-banner-container',     type: 'svc',          dots:'svc-banner-dots',     prev:'svc-banner-prev',     next:'svc-banner-next' },
+    { id: 'about-banner-container',   type: 'about',        dots:'about-banner-dots',   prev:'about-banner-prev',   next:'about-banner-next' },
+    { id: 'hy-banner-container',      type: 'hanyoung',     dots:'hy-banner-dots',      prev:'hy-banner-prev',      next:'hy-banner-next' },
+    { id: 'hy-svc-banner-container',  type: 'hanyoung-svc', dots:'hy-svc-banner-dots',  prev:'hy-svc-banner-prev',  next:'hy-svc-banner-next' }
   ];
   await Promise.all(sliderConfigs.map(async cfg => {
     if (!document.getElementById(cfg.id)) return;

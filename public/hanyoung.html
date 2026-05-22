@@ -106,6 +106,76 @@
         .hy-benefit-card h4 { font-size: 1rem; font-weight: 800; color: #1e293b; margin-bottom: 0.4rem; }
         .hy-benefit-card p  { font-size: 0.85rem; color: #64748b; line-height: 1.6; }
 
+        /* ── 한영 롤링배너 ── */
+        .hy-banner-section {
+            position: relative;
+            overflow: hidden;
+            height: 340px;
+            background: #0f2d6e;
+        }
+        @media (max-width: 768px) { .hy-banner-section { height: 220px; } }
+        #hy-banner-container {
+            position: relative;
+            width: 100%; height: 100%;
+        }
+        .hy-banner-section .res-banner-slide { background-position: center; }
+        .hy-banner-section .banner-dots,
+        .hy-banner-section .banner-btn { position: absolute; z-index: 10; }
+        .hy-banner-section .banner-dots {
+            bottom: 14px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 8px;
+        }
+        .hy-banner-section .banner-dots .dot {
+            width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer;
+        }
+        .hy-banner-section .banner-dots .dot.active { background: #fff; transform: scale(1.2); }
+        .hy-banner-section .banner-btn {
+            top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.2); color: #fff; border: none;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .hy-banner-section .banner-btn:hover { background: rgba(255,255,255,0.35); }
+        .hy-banner-section .banner-btn-prev { left: 16px; }
+        .hy-banner-section .banner-btn-next { right: 16px; }
+
+        /* ── 서비스 이미지 배너 ── */
+        .hy-svc-banner-section {
+            max-width: 960px; margin: 0 auto 2rem;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #e2e8f0;
+            height: 260px;
+        }
+        @media (max-width: 768px) { .hy-svc-banner-section { height: 180px; } }
+        #hy-svc-banner-container {
+            position: relative;
+            width: 100%; height: 100%;
+        }
+        .hy-svc-banner-section .res-banner-slide { background-position: center; }
+        .hy-svc-banner-section .banner-dots,
+        .hy-svc-banner-section .banner-btn { position: absolute; z-index: 10; }
+        .hy-svc-banner-section .banner-dots {
+            bottom: 10px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 6px;
+        }
+        .hy-svc-banner-section .banner-dots .dot {
+            width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer;
+        }
+        .hy-svc-banner-section .banner-dots .dot.active { background: #fff; }
+        .hy-svc-banner-section .banner-btn {
+            top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.25); color: #fff; border: none;
+            width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .hy-svc-banner-section .banner-btn:hover { background: rgba(0,0,0,0.45); }
+        .hy-svc-banner-section .banner-btn-prev { left: 12px; }
+        .hy-svc-banner-section .banner-btn-next { right: 12px; }
+
         /* ── 서비스 소개 ── */
         .hy-services {
             padding: 4rem 5%;
@@ -217,6 +287,14 @@
         </div>
     </section>
 
+    <!-- ── 한영 롤링 배너 ── -->
+    <div class="hy-banner-section">
+        <div id="hy-banner-container" class="banner-slider-container"></div>
+        <div id="hy-banner-dots" class="banner-dots"></div>
+        <button id="hy-banner-prev" class="banner-btn banner-btn-prev"><i class="fas fa-chevron-left"></i></button>
+        <button id="hy-banner-next" class="banner-btn banner-btn-next"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
     <!-- ── 혜택 ── -->
     <section class="hy-benefits">
         <div class="hy-benefits-grid">
@@ -244,6 +322,15 @@
             <h2>서비스 안내 및 할인 가격</h2>
             <p>한영 임직원 전용 특별 할인가입니다.</p>
         </div>
+
+        <!-- 서비스 이미지 배너 -->
+        <div class="hy-svc-banner-section">
+            <div id="hy-svc-banner-container" class="banner-slider-container"></div>
+            <div id="hy-svc-banner-dots" class="banner-dots"></div>
+            <button id="hy-svc-banner-prev" class="banner-btn banner-btn-prev"><i class="fas fa-chevron-left"></i></button>
+            <button id="hy-svc-banner-next" class="banner-btn banner-btn-next"><i class="fas fa-chevron-right"></i></button>
+        </div>
+
         <div class="hy-service-grid">
             <div class="hy-service-card">
                 <div class="svc-icon"><i class="fas fa-wind"></i></div>
