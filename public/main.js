@@ -557,7 +557,12 @@ window.handleProcessSubmit = async (e) => {
 
 // 6. 이메일 알림 (Web3Forms - 브라우저에서 직접 호출)
 const WEB3FORMS_ACCESS_KEY = '962f5bff-992d-4cc2-b8bf-0b4966759efa';
-const sendEmailNotification = () => {}; // 이메일 발송은 서버(nodemailer)에서 처리
+const sendEmailNotification = (subject, message) => {
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ access_key: WEB3FORMS_ACCESS_KEY, subject, message, from_name: '클린앤파트너즈 알림' })
+  }).catch(err => console.error('[Web3Forms]', err));
+};
 
 // =============================================
 // 7. 공통 배너 슬라이더
