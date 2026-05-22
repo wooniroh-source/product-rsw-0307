@@ -139,6 +139,7 @@ window.renderReservationTable = async () => {
       <td class="col-time"><span class="text-bold text-primary">${res.date}</span><small>${res.time}</small></td>
       <td class="text-bold">${res.name}</td>
       <td>${res.phone}</td>
+      <td>${res.district ? `<span style="background:#eff6ff;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:0.78rem;font-weight:600;">${res.district}</span>` : '<span style="color:#bbb;">-</span>'}</td>
       <td><span class="service-tag">${serviceMap[res.service]||res.service}</span></td>
       <td><span class="badge ${res.status}">${res.status==='pending'?'대기':res.status==='confirmed'?'확정':'취소'}</span></td>
       <td><div class="btn-group">

@@ -126,10 +126,16 @@ async function initDB() {
         service    VARCHAR(30)  NOT NULL,
         date       VARCHAR(20)  NOT NULL,
         time       VARCHAR(20)  NOT NULL,
+        district   VARCHAR(50)  DEFAULT NULL,
         status     ENUM('pending','confirmed','cancelled') DEFAULT 'pending',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // 기존 reservations 테이블에 district 컬럼 없으면 추가
+    await pool.query(`
+      ALTER TABLE reservations ADD COLUMN IF NOT EXISTS district VARCHAR(50) DEFAULT NULL
+    `).catch(() => {});
 
     await runQuery('contacts', `
       CREATE TABLE IF NOT EXISTS contacts (
@@ -370,8 +376,8 @@ app.post('/api/reservations', async (req, res) => {
   try {
     const { name, phone, service, date, time, district } = req.body;
     const [result] = await pool.query(
-      'INSERT INTO reservations (name, phone, service, date, time) VALUES (?, ?, ?, ?, ?)',
-      [name, phone, service, date, time]
+      'INSERT INTO reservations (name, phone, service, date, time, district) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, phone, service, date, time, district || null]
     );
     const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
     const districtLine = district ? `\n서비스 지역 : ${district}` : '';
