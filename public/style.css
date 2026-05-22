@@ -699,14 +699,14 @@ footer { background: #1a1a1a; color: #eee; padding: 5rem 5%; text-align: center;
 }
 
 /* 열 너비 고정 */
-.admin-table th:nth-child(1), .admin-table td:nth-child(1) { width: 110px; } /* 신청일 */
-.admin-table th:nth-child(2), .admin-table td:nth-child(2) { width: 140px; } /* 예약일시 */
-.admin-table th:nth-child(3), .admin-table td:nth-child(3) { width: 100px; } /* 고객명 */
-.admin-table th:nth-child(4), .admin-table td:nth-child(4) { width: 140px; } /* 연락처 */
-.admin-table th:nth-child(5), .admin-table td:nth-child(5) { width: 90px; }  /* 지역 */
-.admin-table th:nth-child(6), .admin-table td:nth-child(6) { width: auto; }  /* 서비스 */
-.admin-table th:nth-child(7), .admin-table td:nth-child(7) { width: 90px; }  /* 상태 */
-.admin-table th:nth-child(8), .admin-table td:nth-child(8) { width: 120px; } /* 관리 */
+.admin-table th:nth-child(1), .admin-table td:nth-child(1) { width: 95px;  } /* 신청일 */
+.admin-table th:nth-child(2), .admin-table td:nth-child(2) { width: 115px; } /* 예약일시 */
+.admin-table th:nth-child(3), .admin-table td:nth-child(3) { width: 85px;  } /* 고객명 */
+.admin-table th:nth-child(4), .admin-table td:nth-child(4) { width: 125px; } /* 연락처 */
+.admin-table th:nth-child(5), .admin-table td:nth-child(5) { width: 80px;  } /* 지역 */
+.admin-table th:nth-child(6), .admin-table td:nth-child(6) { width: auto;  } /* 서비스 */
+.admin-table th:nth-child(7), .admin-table td:nth-child(7) { width: 72px;  } /* 상태 */
+.admin-table th:nth-child(8), .admin-table td:nth-child(8) { width: 105px; } /* 관리 */
 
 .admin-table th {
     background: #f8fafc;
@@ -1144,10 +1144,15 @@ td.no-data { padding: 3rem 0; }
     .admin-content { width: 100%; padding: 1.5rem 1rem; }
     .dashboard-stats { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
     .stat-card p { font-size: 1.8rem; }
-    .admin-table { table-layout: auto; min-width: 700px; }
+    /* 태블릿: 신청일·연락처 숨김 */
+    .admin-table { table-layout: auto; min-width: 520px; }
     .admin-table th:nth-child(1), .admin-table td:nth-child(1),
-    .admin-table th:nth-child(4), .admin-table td:nth-child(4),
-    .admin-table th:nth-child(5), .admin-table td:nth-child(5) { display: none; }
+    .admin-table th:nth-child(4), .admin-table td:nth-child(4) { display: none; }
+    .admin-table th:nth-child(2), .admin-table td:nth-child(2) { width: 105px; }
+    .admin-table th:nth-child(3), .admin-table td:nth-child(3) { width: 80px; }
+    .admin-table th:nth-child(5), .admin-table td:nth-child(5) { width: 70px; }
+    .admin-table th:nth-child(7), .admin-table td:nth-child(7) { width: 65px; }
+    .admin-table th:nth-child(8), .admin-table td:nth-child(8) { width: 95px; }
 }
 
 /* Small Mobile */
@@ -1175,6 +1180,19 @@ td.no-data { padding: 3rem 0; }
     .day-cell .day-num { font-size: 0.72rem; }
     .day-cell .day-status { display: none; }
     .calendar-legend { font-size: 0.7rem; margin-top: 0.5rem; }
+
+    /* 모바일: 신청일·연락처·지역 숨김, 핵심 컬럼만 표시 */
+    .admin-table { min-width: 380px; }
+    .admin-table th:nth-child(1), .admin-table td:nth-child(1),
+    .admin-table th:nth-child(4), .admin-table td:nth-child(4),
+    .admin-table th:nth-child(5), .admin-table td:nth-child(5) { display: none; }
+    .admin-table th:nth-child(2), .admin-table td:nth-child(2) { width: 95px; }
+    .admin-table th:nth-child(3), .admin-table td:nth-child(3) { width: 70px; }
+    .admin-table th:nth-child(6), .admin-table td:nth-child(6) { width: auto; }
+    .admin-table th:nth-child(7), .admin-table td:nth-child(7) { width: 58px; font-size: 0.75rem; }
+    .admin-table th:nth-child(8), .admin-table td:nth-child(8) { width: 80px; }
+    .admin-table th, .admin-table td { padding: 0.7rem 0.4rem; font-size: 0.8rem; }
+    .btn-action { width: 26px; height: 26px; font-size: 0.7rem; }
 }
 
 /* =============================================
