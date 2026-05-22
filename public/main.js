@@ -560,7 +560,7 @@ const WEB3FORMS_ACCESS_KEY = '962f5bff-992d-4cc2-b8bf-0b4966759efa';
 const sendEmailNotification = (subject, html) => {
   fetch('https://api.web3forms.com/submit', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ access_key: WEB3FORMS_ACCESS_KEY, subject, message: html, from_name: '클린앤파트너즈 알림' })
+    body: JSON.stringify({ access_key: WEB3FORMS_ACCESS_KEY, subject, message: html, from_name: '클린앤파트너즈 알림', cc: 'myzerobiz.co@gmail.com' })
   }).catch(err => console.error('[Web3Forms]', err));
 };
 
