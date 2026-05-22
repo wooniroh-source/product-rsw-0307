@@ -793,8 +793,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bookingFormSection = document.getElementById('bookingFormSection');
     const displaySelected    = document.getElementById('displaySelectedDate');
     const inputSelected      = document.getElementById('inputSelectedDate');
+    const ALL_SLOTS = ['09:00', '11:00', '14:00', '16:00', '18:00'];
     let viewDate = new Date();
     const today  = new Date(); today.setHours(0,0,0,0);
+    let bookedSlots = {};
+
+    const loadBookedSlots = async () => {
+      bookedSlots = await api('GET', '/reservations/booked-slots') || {};
+    };
 
     const renderCalendar = () => {
       calendarDaysGrid.innerHTML = '';
@@ -808,26 +814,49 @@ document.addEventListener('DOMContentLoaded', async () => {
       for (let day = 1; day <= lastDay; day++) {
         const cell = document.createElement('div');
         cell.classList.add('day-cell');
-        const date = new Date(year, month, day);
-        const isPast = date < today;
-        cell.innerHTML = `<span class="day-num">${day}</span><span class="day-status ${isPast?'past':'avail'}">${isPast?'종료':'가능'}</span>`;
+        const date    = new Date(year, month, day);
+        const isPast  = date < today;
+        const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const taken   = bookedSlots[dateKey] || [];
+        const isFull  = !isPast && ALL_SLOTS.every(s => taken.includes(s));
+
+        let statusClass, statusText;
+        if (isPast)      { statusClass = 'past'; statusText = '종료'; }
+        else if (isFull) { statusClass = 'full'; statusText = '예약마감'; }
+        else             { statusClass = 'avail'; statusText = '가능'; }
+
+        cell.innerHTML = `<span class="day-num">${day}</span><span class="day-status ${statusClass}">${statusText}</span>`;
         if (date.getTime()===today.getTime()) cell.classList.add('today');
-        if (isPast) { cell.classList.add('disabled'); }
+        if (isPast || isFull) { cell.classList.add('disabled'); }
         else {
           cell.addEventListener('click', () => {
             document.querySelectorAll('.day-cell').forEach(c=>c.classList.remove('active'));
             cell.classList.add('active');
             if (displaySelected) displaySelected.textContent = `${year}년 ${month+1}월 ${day}일`;
-            if (inputSelected)   inputSelected.value = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            if (inputSelected)   inputSelected.value = dateKey;
+            // 해당 날짜에 이미 예약된 시간 비활성화
+            const timeSelect = document.getElementById('bookingTime');
+            if (timeSelect) {
+              const timeLabels = { '09:00':'오전 09:00', '11:00':'오전 11:00', '14:00':'오후 02:00', '16:00':'오후 04:00', '18:00':'오후 06:00' };
+              Array.from(timeSelect.options).forEach(opt => {
+                if (!opt.value) return;
+                const isBooked = taken.includes(opt.value);
+                opt.disabled = isBooked;
+                opt.textContent = isBooked ? `${timeLabels[opt.value]} (마감)` : timeLabels[opt.value];
+              });
+              timeSelect.value = '';
+            }
             if (bookingFormSection) { bookingFormSection.style.display='block'; bookingFormSection.scrollIntoView({behavior:'smooth'}); }
           });
         }
         calendarDaysGrid.appendChild(cell);
       }
     };
+
+    await loadBookedSlots();
+    renderCalendar();
     if (prevMonthBtn) prevMonthBtn.addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth()-1); if(bookingFormSection) bookingFormSection.style.display='none'; renderCalendar(); });
     if (nextMonthBtn) nextMonthBtn.addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth()+1); if(bookingFormSection) bookingFormSection.style.display='none'; renderCalendar(); });
-    renderCalendar();
   }
 
   // 예약 폼 제출

@@ -333,6 +333,23 @@ app.put('/api/auth/password', auth, async (req, res) => {
 // =============================================
 // RESERVATIONS
 // =============================================
+app.get('/api/reservations/booked-slots', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT date, time FROM reservations WHERE date >= CURDATE()"
+    );
+    const slots = {};
+    rows.forEach(({ date, time }) => {
+      const key = date instanceof Date
+        ? date.toISOString().slice(0, 10)
+        : String(date).slice(0, 10);
+      if (!slots[key]) slots[key] = [];
+      slots[key].push(time);
+    });
+    res.json(slots);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.get('/api/reservations/recent', async (req, res) => {
   try {
     const [rows] = await pool.query(
