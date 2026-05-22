@@ -763,7 +763,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="col">${res.date}</div>
           <div class="col"><span class="status-badge ${res.status==='confirmed'?'confirmed':'pending'}">${res.status==='confirmed'?'예약확정':'접수완료'}</span></div>
           <div class="col">${masked}</div>
-          <div class="col">-</div>
           <div class="col">${serviceMap[res.service]||res.service}</div>`;
         liveList.appendChild(item);
       });
