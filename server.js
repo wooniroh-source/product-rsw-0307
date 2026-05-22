@@ -142,6 +142,19 @@ async function initDB() {
       console.log('✅ reservations.district 컬럼 추가 완료');
     }
 
+    await runQuery('hanyoung_reservations', `
+      CREATE TABLE IF NOT EXISTS hanyoung_reservations (
+        id         INT AUTO_INCREMENT PRIMARY KEY,
+        name       VARCHAR(50)  NOT NULL,
+        phone      VARCHAR(20)  NOT NULL,
+        service    VARCHAR(30)  NOT NULL,
+        date       VARCHAR(20)  NOT NULL,
+        time       VARCHAR(20)  NOT NULL,
+        status     ENUM('pending','confirmed','cancelled') DEFAULT 'pending',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     await runQuery('contacts', `
       CREATE TABLE IF NOT EXISTS contacts (
         id         INT AUTO_INCREMENT PRIMARY KEY,
@@ -683,6 +696,77 @@ app.delete('/api/checklists/:id', auth, async (req, res) => {
 });
 
 // =============================================
+// HANYOUNG RESERVATIONS
+// =============================================
+app.get('/api/hanyoung/reservations/booked-slots', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT date, time FROM hanyoung_reservations WHERE date >= CURDATE()"
+    );
+    const slots = {};
+    rows.forEach(({ date, time }) => {
+      const key = date instanceof Date ? date.toISOString().slice(0,10) : String(date).slice(0,10);
+      if (!slots[key]) slots[key] = [];
+      slots[key].push(time);
+    });
+    res.json(slots);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/hanyoung/reservations/recent', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT name, date, time, service, status FROM hanyoung_reservations ORDER BY created_at DESC LIMIT 5'
+    );
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/hanyoung/reservations', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM hanyoung_reservations ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hanyoung/reservations', async (req, res) => {
+  try {
+    const { name, phone, service, date, time } = req.body;
+    const [result] = await pool.query(
+      'INSERT INTO hanyoung_reservations (name, phone, service, date, time) VALUES (?, ?, ?, ?, ?)',
+      [name, phone, service, date, time]
+    );
+    const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
+    sendMail(
+      `[한영 임직원] 새 예약 접수 - ${name} (${date})`,
+      `📋 한영 임직원 예약이 접수되었습니다\n` +
+      `──────────────────────\n` +
+      `고객명   : ${name}\n` +
+      `연락처   : ${phone}\n` +
+      `서비스   : ${svcNames[service] || service}\n` +
+      `예약 날짜 : ${date}\n` +
+      `희망 시간 : ${time}\n` +
+      `──────────────────────`
+    );
+    res.json({ id: result.insertId });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hanyoung/reservations/:id/status', auth, async (req, res) => {
+  try {
+    await pool.query('UPDATE hanyoung_reservations SET status = ? WHERE id = ?', [req.body.status, req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/hanyoung/reservations/:id', auth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM hanyoung_reservations WHERE id = ?', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================
 // REVIEWS
 // =============================================
 app.get('/api/reviews', async (req, res) => {
@@ -757,6 +841,7 @@ const cleanRoutes = {
   '/privacy':     'privacy.html',
   '/care':        'care.html',
   '/admin':       'admin.html',
+  '/hanyoung':    'hanyoung.html',
 };
 Object.entries(cleanRoutes).forEach(([route, file]) => {
   app.get(route, (req, res) => {

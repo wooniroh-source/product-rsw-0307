@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','security'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','security','hanyoung'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -108,6 +108,7 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'contacts')      renderContactTable();
   else if (sectionId === 'checklists')    renderChecklistTable();
   else if (sectionId === 'reviews')       loadReviewsAdmin();
+  else if (sectionId === 'hanyoung')      renderHanyoungTable();
 };
 
 // =============================================
@@ -159,6 +160,55 @@ window.deleteReservation = async (id) => {
   if (!confirm('정말 삭제하시겠습니까?')) return;
   await api('DELETE', `/reservations/${id}`);
   renderReservationTable();
+};
+
+// =============================================
+// 한영 임직원 예약 어드민 테이블
+// =============================================
+window.renderHanyoungTable = async () => {
+  const body     = document.getElementById('hanyoungTableBody');
+  const total    = document.getElementById('hyTotalCount');
+  const pending  = document.getElementById('hyPendingCount');
+  const confirmed= document.getElementById('hyConfirmedCount');
+  const noData   = document.getElementById('hyNoDataMessage');
+  if (!body) return;
+
+  const rows = await api('GET', '/hanyoung/reservations') || [];
+  if (total)     total.textContent     = `${rows.length}건`;
+  if (pending)   pending.textContent   = `${rows.filter(r=>r.status==='pending').length}건`;
+  if (confirmed) confirmed.textContent = `${rows.filter(r=>r.status==='confirmed').length}건`;
+
+  body.innerHTML = '';
+  if (rows.length === 0) { if (noData) noData.style.display = 'block'; return; }
+  if (noData) noData.style.display = 'none';
+
+  const svcNames = { wall:'벽걸이형', stand:'스탠드형', multi:'2-in-1 멀티', system:'시스템 천장형' };
+  rows.forEach(res => {
+    const tr = document.createElement('tr');
+    const applyDate = res.created_at ? String(res.created_at).split('T')[0] : '-';
+    tr.innerHTML = `
+      <td class="text-muted">${applyDate}</td>
+      <td class="col-time"><span class="text-bold text-primary">${res.date}</span><small>${res.time}</small></td>
+      <td class="text-bold">${res.name}</td>
+      <td>${res.phone}</td>
+      <td><span class="service-tag">${svcNames[res.service]||res.service}</span></td>
+      <td><span class="badge ${res.status}">${res.status==='pending'?'대기':res.status==='confirmed'?'확정':'취소'}</span></td>
+      <td><div class="btn-group">
+        ${res.status==='pending'?`<button class="btn-action btn-approve" onclick="updateHanyoungStatus(${res.id},'confirmed')" title="확정"><i class="fas fa-check"></i></button>`:''}
+        ${res.status!=='cancelled'?`<button class="btn-action btn-cancel" onclick="updateHanyoungStatus(${res.id},'cancelled')" title="취소"><i class="fas fa-times"></i></button>`:''}
+        <button class="btn-action btn-delete" onclick="deleteHanyoungReservation(${res.id})" title="삭제"><i class="fas fa-trash"></i></button>
+      </div></td>`;
+    body.appendChild(tr);
+  });
+};
+window.updateHanyoungStatus = async (id, status) => {
+  await api('PUT', `/hanyoung/reservations/${id}/status`, { status });
+  renderHanyoungTable();
+};
+window.deleteHanyoungReservation = async (id) => {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  await api('DELETE', `/hanyoung/reservations/${id}`);
+  renderHanyoungTable();
 };
 
 // =============================================
@@ -886,6 +936,97 @@ document.addEventListener('DOMContentLoaded', async () => {
       alert('예약이 성공적으로 접수되었습니다!');
       bookingForm.reset();
       const sec = document.getElementById('bookingFormSection');
+      if (sec) sec.style.display = 'none';
+      window.scrollTo({ top:0, behavior:'smooth' });
+    });
+  }
+
+  // 한영 임직원 예약 달력 + 폼
+  const hyCalendarDays = document.getElementById('hyCalendarDays');
+  if (hyCalendarDays) {
+    const hyTitle     = document.getElementById('hyCalendarTitle');
+    const hyPrev      = document.getElementById('hyPrevMonthBtn');
+    const hyNext      = document.getElementById('hyNextMonthBtn');
+    const hyFormSec   = document.getElementById('hyBookingFormSection');
+    const hyDisplay   = document.getElementById('hyDisplaySelectedDate');
+    const hyInput     = document.getElementById('hyInputSelectedDate');
+    const ALL_SLOTS   = ['09:00','11:00','14:00','16:00','18:00'];
+    let hyView        = new Date();
+    const today       = new Date(); today.setHours(0,0,0,0);
+    let hyBooked      = {};
+
+    const hyLoadSlots = async () => {
+      hyBooked = await api('GET', '/hanyoung/reservations/booked-slots') || {};
+    };
+
+    const hyRenderCalendar = () => {
+      hyCalendarDays.innerHTML = '';
+      const year = hyView.getFullYear(), month = hyView.getMonth();
+      if (hyTitle) hyTitle.textContent = `${year}년 ${month+1}월`;
+      const firstDay = new Date(year, month, 1).getDay();
+      const lastDay  = new Date(year, month+1, 0).getDate();
+      for (let i = 0; i < firstDay; i++) {
+        const e = document.createElement('div'); e.classList.add('day-cell','empty'); hyCalendarDays.appendChild(e);
+      }
+      for (let day = 1; day <= lastDay; day++) {
+        const cell    = document.createElement('div');
+        cell.classList.add('day-cell');
+        const date    = new Date(year, month, day);
+        const isPast  = date < today;
+        const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const taken   = hyBooked[dateKey] || [];
+        const isFull  = !isPast && ALL_SLOTS.every(s => taken.includes(s));
+
+        let statusClass, statusText;
+        if (isPast)      { statusClass='past';  statusText='종료'; }
+        else if (isFull) { statusClass='full';  statusText='예약마감'; }
+        else             { statusClass='avail'; statusText='가능'; }
+
+        cell.innerHTML = `<span class="day-num">${day}</span><span class="day-status ${statusClass}">${statusText}</span>`;
+        if (date.getTime()===today.getTime()) cell.classList.add('today');
+        if (isPast || isFull) { cell.classList.add('disabled'); }
+        else {
+          cell.addEventListener('click', () => {
+            document.querySelectorAll('#hyCalendarDays .day-cell').forEach(c=>c.classList.remove('active'));
+            cell.classList.add('active');
+            if (hyDisplay) hyDisplay.textContent = `${year}년 ${month+1}월 ${day}일`;
+            if (hyInput)   hyInput.value = dateKey;
+            const timeSelect = document.getElementById('hyBookingTime');
+            if (timeSelect) {
+              const timeLabels = {'09:00':'오전 09:00','11:00':'오전 11:00','14:00':'오후 02:00','16:00':'오후 04:00','18:00':'오후 06:00'};
+              Array.from(timeSelect.options).forEach(opt => {
+                if (!opt.value) return;
+                const isBooked = taken.includes(opt.value);
+                opt.disabled = isBooked;
+                opt.textContent = isBooked ? `${timeLabels[opt.value]} (마감)` : timeLabels[opt.value];
+              });
+              timeSelect.value = '';
+            }
+            if (hyFormSec) { hyFormSec.style.display='block'; hyFormSec.scrollIntoView({behavior:'smooth'}); }
+          });
+        }
+        hyCalendarDays.appendChild(cell);
+      }
+    };
+
+    await hyLoadSlots();
+    hyRenderCalendar();
+    if (hyPrev) hyPrev.addEventListener('click', () => { hyView.setMonth(hyView.getMonth()-1); if(hyFormSec) hyFormSec.style.display='none'; hyRenderCalendar(); });
+    if (hyNext) hyNext.addEventListener('click', () => { hyView.setMonth(hyView.getMonth()+1); if(hyFormSec) hyFormSec.style.display='none'; hyRenderCalendar(); });
+  }
+
+  // 한영 예약 폼 제출
+  const hyForm = document.getElementById('hyBookingForm');
+  if (hyForm) {
+    hyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(hyForm);
+      const d  = Object.fromEntries(fd.entries());
+      const result = await api('POST', '/hanyoung/reservations', { name:d.user_name, phone:d.user_phone, service:d.service_type, date:d.selected_date, time:d.booking_time });
+      if (!result) return alert('예약 접수 중 오류가 발생했습니다.');
+      alert('임직원 예약이 성공적으로 접수되었습니다!\n담당자가 개별 연락드리겠습니다.');
+      hyForm.reset();
+      const sec = document.getElementById('hyBookingFormSection');
       if (sec) sec.style.display = 'none';
       window.scrollTo({ top:0, behavior:'smooth' });
     });

@@ -125,6 +125,12 @@
                     </a>
                 </li>
                 <li class="menu-divider"></li>
+                <li id="menu-hanyoung">
+                    <a href="javascript:void(0)" onclick="showSection('hanyoung')">
+                        <i class="fas fa-building"></i> <span>한영 예약현황</span>
+                    </a>
+                </li>
+                <li class="menu-divider"></li>
                 <li>
                     <a href="/">
                         <i class="fas fa-home"></i> <span>홈페이지로</span>
@@ -188,6 +194,53 @@
                     <div id="noDataMessage" class="no-data" style="display: none;">
                         접수된 예약이 없습니다.
                     </div>
+                </div>
+            </div>
+
+            <!-- 한영 예약현황 섹션 -->
+            <div id="section-hanyoung" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1><i class="fas fa-building" style="color:#1a56db;margin-right:0.5rem;"></i>한영 임직원 예약현황</h1>
+                    <div class="admin-user"><span>한영 임직원 전용 예약 관리</span></div>
+                </header>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>전체 예약</h3>
+                        <p id="hyTotalCount">0건</p>
+                    </div>
+                    <div class="stat-card pending">
+                        <h3>대기중</h3>
+                        <p id="hyPendingCount">0건</p>
+                    </div>
+                    <div class="stat-card confirmed">
+                        <h3>예약 확정</h3>
+                        <p id="hyConfirmedCount">0건</p>
+                    </div>
+                </div>
+                <div class="admin-table-wrapper">
+                    <div class="table-header">
+                        <h3>한영 예약 목록</h3>
+                        <button class="btn-sm" onclick="renderHanyoungTable()">
+                            <i class="fas fa-sync-alt"></i> 새로고침
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>신청일</th>
+                                    <th>예약일시</th>
+                                    <th>고객명</th>
+                                    <th>연락처</th>
+                                    <th>서비스</th>
+                                    <th>상태</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hanyoungTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="hyNoDataMessage" class="no-data" style="display:none;">접수된 예약이 없습니다.</div>
                 </div>
             </div>
 
