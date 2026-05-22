@@ -840,18 +840,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       const result = await api('POST', '/reservations', { name:d.user_name, phone:d.user_phone, service:d.service_type, date:d.selected_date, time:d.booking_time, district:d.district||'' });
       if (!result) return alert('예약 접수 중 오류가 발생했습니다.');
       const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
-      const districtRow = d.district ? `<tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">서비스 지역</td><td style="padding:12px 20px;border-bottom:1px solid #eee;font-weight:bold;">${d.district}</td></tr>` : '';
+      const districtLine = d.district ? `\n서비스 지역 : ${d.district}` : '';
       sendEmailNotification(
         `[클린앤파트너즈] 새 예약 접수 - ${d.user_name} (${d.selected_date})`,
-        `<table style="width:100%;max-width:500px;border-collapse:collapse;font-family:sans-serif;font-size:15px;">
-          <tr><td colspan="2" style="background:#1a56db;color:#fff;padding:16px 20px;font-size:18px;font-weight:bold;">📋 새 예약이 접수되었습니다</td></tr>
-          <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;width:35%;">고객명</td><td style="padding:12px 20px;border-bottom:1px solid #eee;font-weight:bold;">${d.user_name}</td></tr>
-          <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">연락처</td><td style="padding:12px 20px;border-bottom:1px solid #eee;">${d.user_phone}</td></tr>
-          ${districtRow}
-          <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">서비스</td><td style="padding:12px 20px;border-bottom:1px solid #eee;">${svcNames[d.service_type]||d.service_type}</td></tr>
-          <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">예약 날짜</td><td style="padding:12px 20px;border-bottom:1px solid #eee;font-weight:bold;color:#1a56db;">${d.selected_date}</td></tr>
-          <tr><td style="padding:12px 20px;color:#555;">희망 시간</td><td style="padding:12px 20px;">${d.booking_time}</td></tr>
-        </table>`
+        `📋 새 예약이 접수되었습니다\n` +
+        `──────────────────────\n` +
+        `고객명   : ${d.user_name}\n` +
+        `연락처   : ${d.user_phone}` +
+        `${districtLine}\n` +
+        `서비스   : ${svcNames[d.service_type] || d.service_type}\n` +
+        `예약 날짜 : ${d.selected_date}\n` +
+        `희망 시간 : ${d.booking_time}\n` +
+        `──────────────────────`
       );
       alert('예약이 성공적으로 접수되었습니다!');
       bookingForm.reset();
@@ -872,12 +872,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!result) return alert('문의 접수 중 오류가 발생했습니다.');
       sendEmailNotification(
         `[클린앤파트너즈] 새 문의 접수 - ${d.name}`,
-        `<table style="width:100%;max-width:500px;border-collapse:collapse;font-family:sans-serif;font-size:15px;">
-          <tr><td colspan="2" style="background:#0e9f6e;color:#fff;padding:16px 20px;font-size:18px;font-weight:bold;">💬 새 문의가 접수되었습니다</td></tr>
-          <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;width:35%;">고객명</td><td style="padding:12px 20px;border-bottom:1px solid #eee;font-weight:bold;">${d.name}</td></tr>
-          <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">연락처</td><td style="padding:12px 20px;border-bottom:1px solid #eee;">${d.phone}</td></tr>
-          <tr><td style="padding:12px 20px;color:#555;">문의 내용</td><td style="padding:12px 20px;white-space:pre-wrap;">${d.message}</td></tr>
-        </table>`
+        `💬 새 문의가 접수되었습니다\n` +
+        `──────────────────────\n` +
+        `고객명   : ${d.name}\n` +
+        `연락처   : ${d.phone}\n` +
+        `──────────────────────\n` +
+        `문의 내용 :\n${d.message}\n` +
+        `──────────────────────`
       );
       contactForm.style.display = 'none';
       const successEl = document.getElementById('contact-success');
