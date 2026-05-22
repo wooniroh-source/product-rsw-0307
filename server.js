@@ -21,13 +21,15 @@ const sendMail = (subject, text) => {
     console.log('[Mail] GMAIL_USER 또는 GMAIL_PASS 미설정 - 발송 건너뜀');
     return;
   }
-  mailTransporter.sendMail({
-    from: `"클린앤파트너즈 알림" <${process.env.GMAIL_USER}>`,
-    to: NOTIFY_EMAILS.join(', '),
-    subject,
-    text
-  }).then(() => console.log('[Mail] 발송 완료:', NOTIFY_EMAILS.join(', ')))
-    .catch(err => console.error('[Mail] 발송 실패:', err.message));
+  NOTIFY_EMAILS.forEach(to => {
+    mailTransporter.sendMail({
+      from: `"클린앤파트너즈 알림" <${process.env.GMAIL_USER}>`,
+      to,
+      subject,
+      text
+    }).then(() => console.log('[Mail] 발송 완료:', to))
+      .catch(err => console.error('[Mail] 발송 실패:', to, err.message));
+  });
 };
 const JWT_SECRET = process.env.JWT_SECRET || 'cleanpartners_secret';
 
