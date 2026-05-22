@@ -133,9 +133,14 @@ async function initDB() {
     `);
 
     // 기존 reservations 테이블에 district 컬럼 없으면 추가
-    await pool.query(`
-      ALTER TABLE reservations ADD COLUMN IF NOT EXISTS district VARCHAR(50) DEFAULT NULL
-    `).catch(() => {});
+    const [districtCols] = await pool.query(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'reservations' AND COLUMN_NAME = 'district'`
+    );
+    if (districtCols.length === 0) {
+      await pool.query(`ALTER TABLE reservations ADD COLUMN district VARCHAR(50) DEFAULT NULL`);
+      console.log('✅ reservations.district 컬럼 추가 완료');
+    }
 
     await runQuery('contacts', `
       CREATE TABLE IF NOT EXISTS contacts (
