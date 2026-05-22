@@ -771,6 +771,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // URL 파라미터에서 지역명 읽어 표시
+  const urlDistrict = new URLSearchParams(window.location.search).get('district');
+  if (urlDistrict) {
+    const inputDistrict = document.getElementById('inputDistrict');
+    const displayDistrict = document.getElementById('displayDistrict');
+    const displayDistrictName = document.getElementById('displayDistrictName');
+    if (inputDistrict) inputDistrict.value = urlDistrict;
+    if (displayDistrict && displayDistrictName) {
+      displayDistrictName.textContent = urlDistrict;
+      displayDistrict.style.display = 'block';
+    }
+  }
+
   // 예약 달력
   const calendarDaysGrid = document.getElementById('calendarDays');
   if (calendarDaysGrid) {
@@ -824,15 +837,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
       const fd = new FormData(bookingForm);
       const d  = Object.fromEntries(fd.entries());
-      const result = await api('POST', '/reservations', { name:d.user_name, phone:d.user_phone, service:d.service_type, date:d.selected_date, time:d.booking_time });
+      const result = await api('POST', '/reservations', { name:d.user_name, phone:d.user_phone, service:d.service_type, date:d.selected_date, time:d.booking_time, district:d.district||'' });
       if (!result) return alert('예약 접수 중 오류가 발생했습니다.');
       const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
+      const districtRow = d.district ? `<tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">서비스 지역</td><td style="padding:12px 20px;border-bottom:1px solid #eee;font-weight:bold;">${d.district}</td></tr>` : '';
       sendEmailNotification(
         `[클린앤파트너즈] 새 예약 접수 - ${d.user_name} (${d.selected_date})`,
         `<table style="width:100%;max-width:500px;border-collapse:collapse;font-family:sans-serif;font-size:15px;">
           <tr><td colspan="2" style="background:#1a56db;color:#fff;padding:16px 20px;font-size:18px;font-weight:bold;">📋 새 예약이 접수되었습니다</td></tr>
           <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;width:35%;">고객명</td><td style="padding:12px 20px;border-bottom:1px solid #eee;font-weight:bold;">${d.user_name}</td></tr>
           <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">연락처</td><td style="padding:12px 20px;border-bottom:1px solid #eee;">${d.user_phone}</td></tr>
+          ${districtRow}
           <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">서비스</td><td style="padding:12px 20px;border-bottom:1px solid #eee;">${svcNames[d.service_type]||d.service_type}</td></tr>
           <tr><td style="padding:12px 20px;border-bottom:1px solid #eee;color:#555;">예약 날짜</td><td style="padding:12px 20px;border-bottom:1px solid #eee;font-weight:bold;color:#1a56db;">${d.selected_date}</td></tr>
           <tr><td style="padding:12px 20px;color:#555;">희망 시간</td><td style="padding:12px 20px;">${d.booking_time}</td></tr>
@@ -1046,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           // 두 번째 탭 → 예약 페이지 이동
           mapTooltip.style.opacity = '0';
           activeTooltipBubble = null;
-          window.location.href = 'reservation.html';
+          window.location.href = 'reservation.html?district=' + encodeURIComponent(d.name);
         } else {
           // 첫 번째 탭 → 툴팁 표시
           mapTooltip.innerHTML = d.name + '<span>탭하여 예약하기</span>';
@@ -1057,9 +1072,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }, { passive: false });
 
-      // 클릭 → 실시간 예약 페이지
+      // 클릭 → 실시간 예약 페이지 (지역명 파라미터 포함)
       g.addEventListener('click', () => {
-        window.location.href = 'reservation.html';
+        window.location.href = 'reservation.html?district=' + encodeURIComponent(d.name);
       });
     });
   }

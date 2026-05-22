@@ -62,6 +62,11 @@
                 <p>원하시는 날짜를 선택하여 간편하게 예약하세요.</p>
             </div>
 
+            <!-- 선택 지역 표시 배너 -->
+            <div id="displayDistrict" style="display:none; max-width:700px; margin:0 auto 1.5rem; padding:0.7rem 1.2rem; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; font-size:0.95rem; color:#1d4ed8; text-align:center;">
+                <i class="fas fa-map-marker-alt"></i> 선택하신 지역: <strong id="displayDistrictName"></strong>
+            </div>
+
             <!-- 이벤트 배너 슬라이더 -->
             <div class="res-banner-slider">
                 <div id="res-banner-container" class="res-banner-inner"></div>
@@ -97,6 +102,7 @@
                         <form id="realtimeBookingForm">
                             <input type="hidden" name="access_key" value="962f5bff-992d-4cc2-b8bf-0b4966759efa">
                             <input type="hidden" id="inputSelectedDate" name="selected_date">
+                            <input type="hidden" id="inputDistrict" name="district">
                             
                             <div class="input-group">
                                 <label for="userName">예약자 성함</label>
