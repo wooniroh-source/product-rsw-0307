@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','security','hanyoung','hanyoung-svc-banners'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','security','hanyoung','hanyoung-hero','hanyoung-svc-banners'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -103,6 +103,7 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'res-banners')   renderBannerTable('res',   'resBannerTableBody');
   else if (sectionId === 'svc-banners')   renderBannerTable('svc',   'svcBannerTableBody');
   else if (sectionId === 'about-banners')        renderBannerTable('about',        'aboutBannerTableBody');
+  else if (sectionId === 'hanyoung-hero')         renderHyHeroSection();
   else if (sectionId === 'hanyoung-svc-banners') renderBannerTable('hanyoung-svc', 'hySvcBannerTableBody');
   else if (sectionId === 'gallery')       renderGalleryTable();
   else if (sectionId === 'process')       renderProcessEditForm();
@@ -790,6 +791,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = await api('GET', `/banners/${cfg.type}`) || [];
     renderBannerSlider(data, cfg.id, cfg.dots, cfg.prev, cfg.next);
   }));
+
+  // 한영 히어로 배경 이미지 동적 적용
+  const hyHero = document.querySelector('.hy-hero');
+  if (hyHero) {
+    const heroData = await fetch('/api/banners/hanyoung-hero').then(r => r.ok ? r.json() : []).catch(() => []);
+    if (heroData.length && heroData[0].image_url) {
+      hyHero.style.setProperty('--hy-hero-bg', `url('${heroData[0].image_url}')`);
+    }
+  }
 
   // 6단계 공정 (index.html)
   const processDisplay = document.getElementById('process-display-container');
@@ -1515,6 +1525,58 @@ window.renderClosedDateTable = async () => {
       </td>
     </tr>
   `).join('');
+};
+
+// =============================================
+// 한영 히어로 이미지 관리 (Admin)
+// =============================================
+window.renderHyHeroSection = async () => {
+  const preview = document.getElementById('hyHeroPreview');
+  const urlInput = document.getElementById('hyHeroImageUrl');
+  if (!preview) return;
+  const data = await api('GET', '/banners/hanyoung-hero') || [];
+  const current = data[0]?.image_url || '';
+  if (current) {
+    preview.style.backgroundImage = `url('${current}')`;
+    if (urlInput) urlInput.value = current;
+  } else {
+    preview.style.background = '#e2e8f0';
+    preview.innerHTML = '<p style="text-align:center;line-height:200px;color:#94a3b8;font-size:0.9rem;">등록된 이미지가 없습니다.</p>';
+  }
+};
+
+window.saveHyHeroImage = async (e) => {
+  e.preventDefault();
+  const imageUrl = document.getElementById('hyHeroImageUrl').value.trim();
+  const msgEl   = document.getElementById('hyHeroMsg');
+  const btn     = document.getElementById('hyHeroSubmitBtn');
+  if (!imageUrl) return;
+
+  btn.disabled = true;
+  btn.textContent = '저장 중...';
+
+  const existing = await api('GET', '/banners/hanyoung-hero') || [];
+  let ok;
+  if (existing.length) {
+    ok = await api('PUT', `/banners/hanyoung-hero/${existing[0].id}`, { title: 'hero', image_url: imageUrl });
+  } else {
+    ok = await api('POST', '/banners/hanyoung-hero', { title: 'hero', image_url: imageUrl });
+  }
+
+  btn.disabled = false;
+  btn.textContent = '저장하기';
+
+  if (ok) {
+    msgEl.style.display = 'block';
+    msgEl.style.cssText += ';background:#d1fae5;color:#065f46;';
+    msgEl.textContent = '✅ 이미지가 저장되었습니다.';
+    renderHyHeroSection();
+  } else {
+    msgEl.style.display = 'block';
+    msgEl.style.cssText += ';background:#fef2f2;color:#dc2626;';
+    msgEl.textContent = '❌ 저장 중 오류가 발생했습니다.';
+  }
+  setTimeout(() => { msgEl.style.display = 'none'; }, 3000);
 };
 
 window.handleClosedDateSubmit = async (e) => {

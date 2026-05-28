@@ -135,6 +135,11 @@
                         <i class="fas fa-building"></i> <span>한영 예약현황</span>
                     </a>
                 </li>
+                <li id="menu-hanyoung-hero">
+                    <a href="javascript:void(0)" onclick="showSection('hanyoung-hero')">
+                        <i class="fas fa-image"></i> <span>한영 히어로 이미지</span>
+                    </a>
+                </li>
                 <li id="menu-hanyoung-svc-banners">
                     <a href="javascript:void(0)" onclick="showSection('hanyoung-svc-banners')">
                         <i class="fas fa-photo-video"></i> <span>한영 서비스이미지</span>
@@ -256,6 +261,27 @@
                 </div>
             </div>
 
+
+            <!-- 한영 히어로 이미지 관리 섹션 -->
+            <div id="section-hanyoung-hero" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1><i class="fas fa-image" style="color:#1a56db;margin-right:0.5rem;"></i>한영 히어로 배경 이미지</h1>
+                    <div class="admin-user"><span>히어로 섹션 배경 이미지를 변경합니다.</span></div>
+                </header>
+                <div class="admin-table-wrapper" style="max-width:640px;">
+                    <h3>현재 배경 이미지</h3>
+                    <div id="hyHeroPreview" style="width:100%;height:200px;border-radius:12px;background:#e2e8f0;margin:1rem 0 1.5rem;background-size:cover;background-position:center;border:1px solid #e2e8f0;"></div>
+                    <h3>이미지 변경</h3>
+                    <form id="hyHeroForm" class="admin-form" onsubmit="saveHyHeroImage(event)" style="margin-top:1rem;">
+                        <div class="input-group">
+                            <label>이미지 URL <small style="color:#e00;">*</small></label>
+                            <input type="url" id="hyHeroImageUrl" placeholder="https://..." required>
+                        </div>
+                        <div id="hyHeroMsg" style="display:none;padding:0.7rem 1rem;border-radius:8px;font-size:0.9rem;margin-bottom:1rem;"></div>
+                        <button type="submit" id="hyHeroSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">저장하기</button>
+                    </form>
+                </div>
+            </div>
 
             <!-- 한영 서비스이미지 관리 섹션 -->
             <div id="section-hanyoung-svc-banners" class="admin-section" style="display: none;">
