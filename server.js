@@ -208,18 +208,15 @@ async function initDB() {
       )
     `);
 
-    // banner_type 컬럼이 VARCHAR(10)이면 VARCHAR(50)으로 확장 (hanyoung-hero 등 13자 초과 타입 지원)
+    // banner_type 컬럼을 VARCHAR(50)으로 보장 (hanyoung-hero 등 13자 초과 타입 지원)
     try {
-      const [btColInfo] = await pool.query(
-        `SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS
-         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'banners' AND COLUMN_NAME = 'banner_type'`
-      );
-      if (btColInfo.length > 0 && Number(btColInfo[0].CHARACTER_MAXIMUM_LENGTH) < 50) {
+      const [cols] = await pool.query(`SHOW COLUMNS FROM banners LIKE 'banner_type'`);
+      if (cols.length > 0 && cols[0].Type === 'varchar(10)') {
         await pool.query(`ALTER TABLE banners MODIFY COLUMN banner_type VARCHAR(50) NOT NULL`);
-        console.log('✅ banners.banner_type 컬럼 크기 확장 완료 (VARCHAR(10) → VARCHAR(50))');
+        console.log('✅ banners.banner_type VARCHAR(10) → VARCHAR(50) 확장 완료');
       }
     } catch(e) {
-      console.warn('⚠️ banner_type 컬럼 마이그레이션 스킵:', e.message);
+      console.warn('⚠️ banner_type 마이그레이션:', e.message);
     }
 
     // 기존 배너 테이블에 새 컬럼이 없을 경우 추가 (기존 배포 호환)
