@@ -30,10 +30,15 @@
         .hy-hero::before {
             content: '';
             position: absolute; inset: 0;
-            background: url('https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?auto=format&fit=crop&w=1400&q=60') center/cover no-repeat;
-            opacity: 0.08;
+            background: url('https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+            opacity: 0.35;
         }
-        .hy-hero-inner { position: relative; max-width: 720px; margin: 0 auto; }
+        .hy-hero::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(15,45,110,0.6) 0%, rgba(26,86,219,0.5) 100%);
+        }
+        .hy-hero-inner { position: relative; max-width: 720px; margin: 0 auto; z-index: 1; }
         .hy-badge {
             display: inline-block;
             background: var(--hy-gold);
