@@ -1049,7 +1049,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const d  = Object.fromEntries(fd.entries());
       const result = await api('POST', '/hanyoung/reservations', { name:d.user_name, phone:d.user_phone, address:d.user_address||'', service:d.service_type, date:d.selected_date, time:d.booking_time });
       if (!result) return alert('예약 접수 중 오류가 발생했습니다.');
-      alert('임직원 예약이 성공적으로 접수되었습니다!\n담당자가 개별 연락드리겠습니다.');
+      alert('예약신청이 성공적으로 접수되었습니다!\n담당자가 개별 연락드리겠습니다.');
       hyForm.reset();
       const sec = document.getElementById('hyBookingFormSection');
       if (sec) sec.style.display = 'none';
