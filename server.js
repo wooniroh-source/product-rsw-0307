@@ -191,7 +191,7 @@ async function initDB() {
     await runQuery('banners', `
       CREATE TABLE IF NOT EXISTS banners (
         id            INT AUTO_INCREMENT PRIMARY KEY,
-        banner_type   VARCHAR(10)  NOT NULL,
+        banner_type   VARCHAR(50)  NOT NULL,
         badge         VARCHAR(50),
         title         VARCHAR(200) NOT NULL,
         description   TEXT,
@@ -207,6 +207,20 @@ async function initDB() {
         created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // banner_type 컬럼이 VARCHAR(10)이면 VARCHAR(50)으로 확장 (hanyoung-hero 등 13자 초과 타입 지원)
+    try {
+      const [btColInfo] = await pool.query(
+        `SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'banners' AND COLUMN_NAME = 'banner_type'`
+      );
+      if (btColInfo.length > 0 && Number(btColInfo[0].CHARACTER_MAXIMUM_LENGTH) < 50) {
+        await pool.query(`ALTER TABLE banners MODIFY COLUMN banner_type VARCHAR(50) NOT NULL`);
+        console.log('✅ banners.banner_type 컬럼 크기 확장 완료 (VARCHAR(10) → VARCHAR(50))');
+      }
+    } catch(e) {
+      console.warn('⚠️ banner_type 컬럼 마이그레이션 스킵:', e.message);
+    }
 
     // 기존 배너 테이블에 새 컬럼이 없을 경우 추가 (기존 배포 호환)
     // errno 1060 = Duplicate column (이미 존재) → 무시, 그 외 오류는 무시
