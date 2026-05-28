@@ -195,6 +195,7 @@ window.renderHanyoungTable = async () => {
       <td class="col-time"><span class="text-bold text-primary">${res.date}</span><small>${res.time}</small></td>
       <td class="text-bold">${res.name}</td>
       <td>${res.phone}</td>
+      <td style="font-size:0.82rem;color:#334155;">${res.address || '<span style="color:#bbb;">-</span>'}</td>
       <td><span class="service-tag">${svcNames[res.service]||res.service}</span></td>
       <td><span class="badge ${res.status}">${res.status==='pending'?'대기':res.status==='confirmed'?'확정':'취소'}</span></td>
       <td><div class="btn-group">
@@ -1044,7 +1045,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
       const fd = new FormData(hyForm);
       const d  = Object.fromEntries(fd.entries());
-      const result = await api('POST', '/hanyoung/reservations', { name:d.user_name, phone:d.user_phone, service:d.service_type, date:d.selected_date, time:d.booking_time });
+      const result = await api('POST', '/hanyoung/reservations', { name:d.user_name, phone:d.user_phone, address:d.user_address||'', service:d.service_type, date:d.selected_date, time:d.booking_time });
       if (!result) return alert('예약 접수 중 오류가 발생했습니다.');
       alert('임직원 예약이 성공적으로 접수되었습니다!\n담당자가 개별 연락드리겠습니다.');
       hyForm.reset();

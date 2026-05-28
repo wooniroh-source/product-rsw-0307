@@ -158,6 +158,7 @@ async function initDB() {
         id         INT AUTO_INCREMENT PRIMARY KEY,
         name       VARCHAR(50)  NOT NULL,
         phone      VARCHAR(20)  NOT NULL,
+        address    VARCHAR(200) DEFAULT NULL,
         service    VARCHAR(30)  NOT NULL,
         date       VARCHAR(20)  NOT NULL,
         time       VARCHAR(20)  NOT NULL,
@@ -165,6 +166,16 @@ async function initDB() {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // 기존 hanyoung_reservations 테이블에 address 컬럼 없으면 추가
+    const [hyAddressCols] = await pool.query(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'hanyoung_reservations' AND COLUMN_NAME = 'address'`
+    );
+    if (hyAddressCols.length === 0) {
+      await pool.query(`ALTER TABLE hanyoung_reservations ADD COLUMN address VARCHAR(200) DEFAULT NULL AFTER phone`);
+      console.log('✅ hanyoung_reservations.address 컬럼 추가 완료');
+    }
 
     await runQuery('contacts', `
       CREATE TABLE IF NOT EXISTS contacts (
@@ -753,18 +764,20 @@ app.get('/api/hanyoung/reservations', auth, async (req, res) => {
 
 app.post('/api/hanyoung/reservations', async (req, res) => {
   try {
-    const { name, phone, service, date, time } = req.body;
+    const { name, phone, address, service, date, time } = req.body;
     const [result] = await pool.query(
-      'INSERT INTO hanyoung_reservations (name, phone, service, date, time) VALUES (?, ?, ?, ?, ?)',
-      [name, phone, service, date, time]
+      'INSERT INTO hanyoung_reservations (name, phone, address, service, date, time) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, phone, address || null, service, date, time]
     );
     const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
+    const addressLine = address ? `\n상세주소   : ${address}` : '';
     sendMail(
       `[한영 임직원] 새 예약 접수 - ${name} (${date})`,
       `📋 한영 임직원 예약이 접수되었습니다\n` +
       `──────────────────────\n` +
       `고객명   : ${name}\n` +
-      `연락처   : ${phone}\n` +
+      `연락처   : ${phone}` +
+      `${addressLine}\n` +
       `서비스   : ${svcNames[service] || service}\n` +
       `예약 날짜 : ${date}\n` +
       `희망 시간 : ${time}\n` +
