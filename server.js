@@ -123,6 +123,7 @@ async function initDB() {
         id         INT AUTO_INCREMENT PRIMARY KEY,
         name       VARCHAR(50)  NOT NULL,
         phone      VARCHAR(20)  NOT NULL,
+        address    VARCHAR(200) DEFAULT NULL,
         service    VARCHAR(30)  NOT NULL,
         date       VARCHAR(20)  NOT NULL,
         time       VARCHAR(20)  NOT NULL,
@@ -140,6 +141,16 @@ async function initDB() {
     if (districtCols.length === 0) {
       await pool.query(`ALTER TABLE reservations ADD COLUMN district VARCHAR(50) DEFAULT NULL`);
       console.log('✅ reservations.district 컬럼 추가 완료');
+    }
+
+    // 기존 reservations 테이블에 address 컬럼 없으면 추가
+    const [addressCols] = await pool.query(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'reservations' AND COLUMN_NAME = 'address'`
+    );
+    if (addressCols.length === 0) {
+      await pool.query(`ALTER TABLE reservations ADD COLUMN address VARCHAR(200) DEFAULT NULL AFTER phone`);
+      console.log('✅ reservations.address 컬럼 추가 완료');
     }
 
     await runQuery('hanyoung_reservations', `
@@ -401,19 +412,21 @@ app.get('/api/reservations', auth, async (req, res) => {
 
 app.post('/api/reservations', async (req, res) => {
   try {
-    const { name, phone, service, date, time, district } = req.body;
+    const { name, phone, address, service, date, time, district } = req.body;
     const [result] = await pool.query(
-      'INSERT INTO reservations (name, phone, service, date, time, district) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, phone, service, date, time, district || null]
+      'INSERT INTO reservations (name, phone, address, service, date, time, district) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, phone, address || null, service, date, time, district || null]
     );
     const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
     const districtLine = district ? `\n서비스 지역 : ${district}` : '';
+    const addressLine  = address  ? `\n상세주소   : ${address}` : '';
     sendMail(
       `[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`,
       `📋 새 예약이 접수되었습니다\n` +
       `──────────────────────\n` +
       `고객명   : ${name}\n` +
       `연락처   : ${phone}` +
+      `${addressLine}` +
       `${districtLine}\n` +
       `서비스   : ${svcNames[service] || service}\n` +
       `예약 날짜 : ${date}\n` +

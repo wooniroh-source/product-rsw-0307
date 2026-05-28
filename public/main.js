@@ -143,6 +143,7 @@ window.renderReservationTable = async () => {
       <td class="col-time"><span class="text-bold text-primary">${res.date}</span><small>${res.time}</small></td>
       <td class="text-bold">${res.name}</td>
       <td>${res.phone}</td>
+      <td style="font-size:0.82rem;color:#334155;">${res.address || '<span style="color:#bbb;">-</span>'}</td>
       <td>${res.district ? `<span style="background:#eff6ff;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:0.78rem;font-weight:600;">${res.district}</span>` : '<span style="color:#bbb;">-</span>'}</td>
       <td><span class="service-tag">${serviceMap[res.service]||res.service}</span></td>
       <td><span class="badge ${res.status}">${res.status==='pending'?'대기':res.status==='confirmed'?'확정':'취소'}</span></td>
@@ -936,16 +937,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
       const fd = new FormData(bookingForm);
       const d  = Object.fromEntries(fd.entries());
-      const result = await api('POST', '/reservations', { name:d.user_name, phone:d.user_phone, service:d.service_type, date:d.selected_date, time:d.booking_time, district:d.district||'' });
+      const result = await api('POST', '/reservations', { name:d.user_name, phone:d.user_phone, address:d.user_address||'', service:d.service_type, date:d.selected_date, time:d.booking_time, district:d.district||'' });
       if (!result) return alert('예약 접수 중 오류가 발생했습니다.');
       const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
       const districtLine = d.district ? `\n서비스 지역 : ${d.district}` : '';
+      const addressLine  = d.user_address ? `\n상세주소   : ${d.user_address}` : '';
       sendEmailNotification(
         `[클린앤파트너즈] 새 예약 접수 - ${d.user_name} (${d.selected_date})`,
         `📋 새 예약이 접수되었습니다\n` +
         `──────────────────────\n` +
         `고객명   : ${d.user_name}\n` +
         `연락처   : ${d.user_phone}` +
+        `${addressLine}` +
         `${districtLine}\n` +
         `서비스   : ${svcNames[d.service_type] || d.service_type}\n` +
         `예약 날짜 : ${d.selected_date}\n` +
