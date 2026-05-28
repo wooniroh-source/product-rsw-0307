@@ -335,6 +335,8 @@ section { padding: 6rem 5%; max-width: 1400px; margin: 0 auto; width: 100%; }
 /* =============================================
    Live Reservation Rolling List
    ============================================= */
+.live-status-container { margin-top: 5rem; }
+
 .rolling-wrapper {
     max-width: 1000px; margin: 0 auto;
     background: #fff; border-radius: 16px;
@@ -1132,6 +1134,11 @@ td.no-data { padding: 3rem 0; }
     .day-cell .day-status { font-size: 0.55rem; padding: 1px 2px; }
 
     #contact form, .form-card { padding: 2.5rem 1.5rem; }
+    .form-card h3 { font-size: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 8px; padding-bottom: 1rem; }
+    .input-group { margin-bottom: 1.2rem; }
+    .rolling-header { font-size: 0.85rem; padding: 0.8rem 0.5rem; }
+    .rolling-item { padding: 0 0.5rem; }
+    .live-status-container { margin-top: 2.5rem !important; }
 
     /* Service Area Map */
     .service-area-layout { flex-direction: column; gap: 2rem; }
@@ -1182,6 +1189,19 @@ td.no-data { padding: 3rem 0; }
     .day-cell .day-num { font-size: 0.72rem; }
     .day-cell .day-status { display: none; }
     .calendar-legend { font-size: 0.7rem; margin-top: 0.5rem; }
+
+    /* 예약 폼 소형 모바일 */
+    #contact form, .form-card { padding: 1.5rem 1rem; border-radius: 16px; }
+    .form-card h3 { font-size: 1rem; margin-bottom: 1rem; padding-bottom: 0.7rem; }
+    .input-group { margin-bottom: 1rem; }
+    .input-group label { font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .input-group input,
+    .input-group select,
+    .input-group textarea { padding: 0.85rem; font-size: 0.95rem; border-radius: 10px; }
+    .submit-booking-btn { font-size: 1.05rem; padding: 1rem; margin-top: 1rem; }
+    .rolling-header { font-size: 0.75rem; padding: 0.6rem 0.4rem; }
+    .rolling-item { height: 54px; font-size: 0.75rem; padding: 0 0.4rem; }
+    .status-badge { padding: 3px 7px; font-size: 0.7rem; }
 
     /* 모바일: 신청일·연락처·지역 숨김 → 5컬럼 */
     .admin-table { min-width: 340px; }
