@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','security','hanyoung','hanyoung-banners','hanyoung-svc-banners'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','security','hanyoung','hanyoung-svc-banners'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -103,7 +103,6 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'res-banners')   renderBannerTable('res',   'resBannerTableBody');
   else if (sectionId === 'svc-banners')   renderBannerTable('svc',   'svcBannerTableBody');
   else if (sectionId === 'about-banners')        renderBannerTable('about',        'aboutBannerTableBody');
-  else if (sectionId === 'hanyoung-banners')     renderBannerTable('hanyoung',     'hyBannerTableBody');
   else if (sectionId === 'hanyoung-svc-banners') renderBannerTable('hanyoung-svc', 'hySvcBannerTableBody');
   else if (sectionId === 'gallery')       renderGalleryTable();
   else if (sectionId === 'process')       renderProcessEditForm();
