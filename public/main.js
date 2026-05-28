@@ -977,9 +977,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     let hyView        = new Date();
     const today       = new Date(); today.setHours(0,0,0,0);
     let hyBooked      = {};
+    let hyManualClosedDates = new Set();
 
     const hyLoadSlots = async () => {
       hyBooked = await api('GET', '/hanyoung/reservations/booked-slots') || {};
+      const closed = await fetch('/api/closed-dates').then(r => r.ok ? r.json() : []).catch(() => []);
+      hyManualClosedDates = new Set(closed.map(c => c.close_date));
     };
 
     const hyRenderCalendar = () => {
@@ -998,7 +1001,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isPast  = date < today;
         const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
         const taken   = hyBooked[dateKey] || [];
-        const isFull  = !isPast && ALL_SLOTS.every(s => taken.includes(s));
+        const isClosed = hyManualClosedDates.has(dateKey);
+        const isFull  = !isPast && (isClosed || ALL_SLOTS.every(s => taken.includes(s)));
 
         let statusClass, statusText;
         if (isPast)      { statusClass='past';  statusText='종료'; }
