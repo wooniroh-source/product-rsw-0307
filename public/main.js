@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','security','hanyoung','hanyoung-banners','hanyoung-svc-banners'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','security','hanyoung','hanyoung-banners','hanyoung-svc-banners'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -111,6 +111,7 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'checklists')    renderChecklistTable();
   else if (sectionId === 'reviews')       loadReviewsAdmin();
   else if (sectionId === 'hanyoung')      renderHanyoungTable();
+  else if (sectionId === 'closed-dates')  renderClosedDateTable();
 };
 
 // =============================================
@@ -862,9 +863,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     let viewDate = new Date();
     const today  = new Date(); today.setHours(0,0,0,0);
     let bookedSlots = {};
+    let manualClosedDates = new Set();
 
     const loadBookedSlots = async () => {
       bookedSlots = await api('GET', '/reservations/booked-slots') || {};
+      const closed = await fetch('/api/closed-dates').then(r => r.ok ? r.json() : []).catch(() => []);
+      manualClosedDates = new Set(closed.map(c => c.close_date));
     };
 
     const renderCalendar = () => {
@@ -883,7 +887,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isPast  = date < today;
         const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
         const taken   = bookedSlots[dateKey] || [];
-        const isFull  = !isPast && ALL_SLOTS.every(s => taken.includes(s));
+        const isClosed = manualClosedDates.has(dateKey);
+        const isFull  = !isPast && (isClosed || ALL_SLOTS.every(s => taken.includes(s)));
 
         let statusClass, statusText;
         if (isPast)      { statusClass = 'past'; statusText = '종료'; }
@@ -1477,3 +1482,57 @@ window.deleteReview = async (id) => {
     deferredPrompt = null;
   });
 })();
+
+// =============================================
+// 예약 마감 날짜 관리 (Admin)
+// =============================================
+window.renderClosedDateTable = async () => {
+  const body = document.getElementById('closedDateTableBody');
+  const noMsg = document.getElementById('noClosedDateMessage');
+  if (!body) return;
+  const rows = await api('GET', '/closed-dates/all') || [];
+  if (!rows.length) {
+    body.innerHTML = '';
+    if (noMsg) noMsg.style.display = 'block';
+    return;
+  }
+  if (noMsg) noMsg.style.display = 'none';
+  body.innerHTML = rows.map(r => `
+    <tr>
+      <td><strong>${r.close_date}</strong></td>
+      <td>${r.reason || '<span style="color:#aaa;">-</span>'}</td>
+      <td>${r.created_at ? new Date(r.created_at).toLocaleString('ko-KR') : '-'}</td>
+      <td>
+        <button class="btn-sm btn-delete" onclick="deleteClosedDate('${r.close_date}')">
+          <i class="fas fa-trash"></i> 해제
+        </button>
+      </td>
+    </tr>
+  `).join('');
+};
+
+window.handleClosedDateSubmit = async (e) => {
+  e.preventDefault();
+  const date = document.getElementById('closedDateInput').value;
+  const reason = document.getElementById('closedDateReason').value.trim();
+  if (!date) return alert('날짜를 선택해주세요.');
+  const res = await api('POST', '/closed-dates', { close_date: date, reason: reason || null });
+  if (res?.ok) {
+    document.getElementById('closedDateInput').value = '';
+    document.getElementById('closedDateReason').value = '';
+    renderClosedDateTable();
+    alert(`${date} 날짜가 마감 처리되었습니다.`);
+  } else {
+    alert('등록 중 오류가 발생했습니다.');
+  }
+};
+
+window.deleteClosedDate = async (date) => {
+  if (!confirm(`${date} 마감을 해제하시겠습니까?`)) return;
+  const res = await api('DELETE', `/closed-dates/${date}`);
+  if (res?.ok) {
+    renderClosedDateTable();
+  } else {
+    alert('해제 중 오류가 발생했습니다.');
+  }
+};

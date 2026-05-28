@@ -119,6 +119,11 @@
                         <i class="fas fa-star"></i> <span>후기 관리</span>
                     </a>
                 </li>
+                <li id="menu-closed-dates">
+                    <a href="javascript:void(0)" onclick="showSection('closed-dates')">
+                        <i class="fas fa-calendar-times"></i> <span>예약 마감 관리</span>
+                    </a>
+                </li>
                 <li id="menu-security">
                     <a href="javascript:void(0)" onclick="showSection('security')">
                         <i class="fas fa-lock"></i> <span>보안 설정</span>
@@ -929,6 +934,53 @@
                         <tbody id="reviewTableBody"></tbody>
                     </table>
                     <div id="noReviewMessage" class="no-data">등록된 후기가 없습니다.</div>
+                </div>
+            </div>
+
+            <!-- 예약 마감 관리 섹션 -->
+            <div id="section-closed-dates" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1><i class="fas fa-calendar-times" style="color:#dc2626;margin-right:0.5rem;"></i>예약 마감 날짜 관리</h1>
+                    <div class="admin-user"><span>특정 날짜를 예약 불가(마감)로 설정합니다.</span></div>
+                </header>
+
+                <div class="admin-table-wrapper" style="max-width:600px; margin-bottom: 2rem;">
+                    <h3>마감 날짜 추가</h3>
+                    <form id="closedDateForm" class="admin-form" onsubmit="handleClosedDateSubmit(event)" style="margin-top:1rem;">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>마감 날짜 <small style="color:#e00;">*</small></label>
+                                <input type="date" id="closedDateInput" required>
+                            </div>
+                            <div class="input-group">
+                                <label>사유 <small style="color:#888;">(선택)</small></label>
+                                <input type="text" id="closedDateReason" placeholder="예: 휴무일, 만원, 자체 일정">
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">마감 날짜 등록</button>
+                    </form>
+                </div>
+
+                <div class="admin-table-wrapper">
+                    <h3>등록된 마감 날짜 목록</h3>
+                    <p style="font-size:0.85rem;color:#64748b;margin-bottom:1rem;">
+                        <i class="fas fa-info-circle" style="margin-right:0.3rem;"></i>
+                        지난 날짜는 자동으로 목록에서 숨겨집니다. 해제하면 예약 가능 상태로 돌아갑니다.
+                    </p>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>마감 날짜</th>
+                                    <th>사유</th>
+                                    <th>등록일시</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="closedDateTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="noClosedDateMessage" class="no-data" style="display:none;">등록된 마감 날짜가 없습니다.</div>
                 </div>
             </div>
 

@@ -263,6 +263,15 @@ async function initDB() {
       )
     `);
 
+    await runQuery('closed_dates', `
+      CREATE TABLE IF NOT EXISTS closed_dates (
+        id         INT AUTO_INCREMENT PRIMARY KEY,
+        close_date VARCHAR(10) NOT NULL UNIQUE,
+        reason     VARCHAR(100) DEFAULT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // 3. 기본 데이터 채우기 (생략 가능 시 건너뜀)
     const [processRows] = await pool.query('SELECT id FROM process_steps LIMIT 1');
     if (!processRows.length) {
@@ -811,6 +820,44 @@ app.patch('/api/reviews/:id/approve', auth, async (req, res) => {
 app.delete('/api/reviews/:id', auth, async (req, res) => {
   try {
     await pool.query('DELETE FROM reviews WHERE id = ?', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================
+// CLOSED DATES (수동 마감 날짜)
+// =============================================
+app.get('/api/closed-dates', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT close_date, reason FROM closed_dates WHERE close_date >= DATE_FORMAT(CURDATE(), '%Y-%m-%d') ORDER BY close_date ASC"
+    );
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/closed-dates/all', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM closed_dates ORDER BY close_date ASC');
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/closed-dates', auth, async (req, res) => {
+  try {
+    const { close_date, reason } = req.body;
+    if (!close_date) return res.status(400).json({ error: '날짜를 입력하세요.' });
+    await pool.query(
+      'INSERT INTO closed_dates (close_date, reason) VALUES (?, ?) ON DUPLICATE KEY UPDATE reason = ?',
+      [close_date, reason || null, reason || null]
+    );
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/closed-dates/:date', auth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM closed_dates WHERE close_date = ?', [req.params.date]);
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
