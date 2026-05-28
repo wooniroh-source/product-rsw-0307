@@ -269,7 +269,6 @@ const bannerFormMap = {
   res:         { form:'resBannerForm',       editId:'resBannerEditId',        badge:'resBannerBadge',      title:'resBannerTitle',        desc:'resBannerDesc',        url:'resBannerUrl',        btnText:'',                    btnLink:'',                    submitBtn:'resBannerSubmitBtn',        cancelBtn:'resBannerCancelBtn',        tableBody:'resBannerTableBody' },
   svc:         { form:'svcBannerForm',       editId:'svcBannerEditId',        badge:'svcBannerBadge',      title:'svcBannerTitle',        desc:'svcBannerDesc',        url:'svcBannerUrl',        btnText:'',                    btnLink:'',                    submitBtn:'svcBannerSubmitBtn',        cancelBtn:'svcBannerCancelBtn',        tableBody:'svcBannerTableBody' },
   about:       { form:'aboutBannerForm',     editId:'aboutBannerEditId',      badge:'aboutBannerBadge',    title:'aboutBannerTitle',      desc:'aboutBannerDesc',      url:'aboutBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'aboutBannerSubmitBtn',      cancelBtn:'aboutBannerCancelBtn',      tableBody:'aboutBannerTableBody' },
-  hanyoung:    { form:'hyBannerForm',        editId:'hyBannerEditId',         badge:'',                    title:'hyBannerTitle',         desc:'hyBannerDesc',         url:'hyBannerUrl',         btnText:'',                    btnLink:'',                    submitBtn:'hyBannerSubmitBtn',         cancelBtn:'hyBannerCancelBtn',         tableBody:'hyBannerTableBody' },
   'hanyoung-svc': { form:'hySvcBannerForm',  editId:'hySvcBannerEditId',      badge:'',                    title:'hySvcBannerTitle',      desc:'hySvcBannerDesc',      url:'hySvcBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'hySvcBannerSubmitBtn',      cancelBtn:'hySvcBannerCancelBtn',      tableBody:'hySvcBannerTableBody' }
 };
 
@@ -336,22 +335,18 @@ window.handleMidBannerSubmit      = (e) => handleBannerSubmit(e, 'mid');
 window.handleResBannerSubmit      = (e) => handleBannerSubmit(e, 'res');
 window.handleSvcBannerSubmit      = (e) => handleBannerSubmit(e, 'svc');
 window.handleAboutBannerSubmit    = (e) => handleBannerSubmit(e, 'about');
-window.handleHyBannerSubmit       = (e) => handleBannerSubmit(e, 'hanyoung');
 window.handleHySvcBannerSubmit    = (e) => handleBannerSubmit(e, 'hanyoung-svc');
 window.cancelResBannerEdit        = () => cancelBannerEdit('res');
 window.cancelSvcBannerEdit        = () => cancelBannerEdit('svc');
 window.cancelAboutBannerEdit      = () => cancelBannerEdit('about');
-window.cancelHyBannerEdit         = () => cancelBannerEdit('hanyoung');
 window.cancelHySvcBannerEdit      = () => cancelBannerEdit('hanyoung-svc');
 window.editResBanner      = (id) => editBanner('res',          id);
 window.editSvcBanner      = (id) => editBanner('svc',          id);
 window.editAboutBanner    = (id) => editBanner('about',        id);
-window.editHyBanner       = (id) => editBanner('hanyoung',     id);
 window.editHySvcBanner    = (id) => editBanner('hanyoung-svc', id);
 window.deleteResBanner    = (id) => deleteBanner('res',          id);
 window.deleteSvcBanner    = (id) => deleteBanner('svc',          id);
 window.deleteAboutBanner  = (id) => deleteBanner('about',        id);
-window.deleteHyBanner     = (id) => deleteBanner('hanyoung',     id);
 window.deleteHySvcBanner  = (id) => deleteBanner('hanyoung-svc', id);
 
 // =============================================
