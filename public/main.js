@@ -784,7 +784,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     { id: 'res-banner-container',     type: 'res',          dots:'res-banner-dots',     prev:'res-banner-prev',     next:'res-banner-next' },
     { id: 'svc-banner-container',     type: 'svc',          dots:'svc-banner-dots',     prev:'svc-banner-prev',     next:'svc-banner-next' },
     { id: 'about-banner-container',   type: 'about',        dots:'about-banner-dots',   prev:'about-banner-prev',   next:'about-banner-next' },
-    { id: 'hy-banner-container',      type: 'hanyoung',     dots:'hy-banner-dots',      prev:'hy-banner-prev',      next:'hy-banner-next' },
     { id: 'hy-svc-banner-container',  type: 'hanyoung-svc', dots:'hy-svc-banner-dots',  prev:'hy-svc-banner-prev',  next:'hy-svc-banner-next' }
   ];
   await Promise.all(sliderConfigs.map(async cfg => {
