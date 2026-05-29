@@ -134,7 +134,7 @@ window.renderReservationTable = async () => {
   if (reservations.length === 0) { if (noDataMessage) noDataMessage.style.display = 'block'; return; }
   if (noDataMessage) noDataMessage.style.display = 'none';
 
-  const serviceMap = { wall:'벽걸이형', stand:'스탠드형', multi:'2-in-1 멀티', system:'시스템 천장형' };
+  const serviceMap = { wall:'상업용 스탠드 에어컨', stand:'가정용 스탠드', multi:'2-in-1 멀티', system:'시스템 천장형' };
   reservations.forEach(res => {
     const tr = document.createElement('tr');
     const applyDate = res.created_at ? String(res.created_at).split('T')[0] : '-';
@@ -186,7 +186,7 @@ window.renderHanyoungTable = async () => {
   if (rows.length === 0) { if (noData) noData.style.display = 'block'; return; }
   if (noData) noData.style.display = 'none';
 
-  const svcNames = { wall:'벽걸이형', stand:'스탠드형', multi:'2-in-1 멀티', system:'시스템 천장형' };
+  const svcNames = { wall:'상업용 스탠드 에어컨', stand:'가정용 스탠드', multi:'2-in-1 멀티', system:'시스템 천장형' };
   rows.forEach(res => {
     const tr = document.createElement('tr');
     const applyDate = res.created_at ? String(res.created_at).split('T')[0] : '-';
@@ -823,7 +823,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
       const display = [...reservations, ...reservations];
       liveList.innerHTML = '';
-      const serviceMap = { wall:'벽걸이', stand:'스탠드', multi:'2-in-1', system:'시스템' };
+      const serviceMap = { wall:'상업용 스탠드 에어컨', stand:'가정용 스탠드', multi:'2-in-1', system:'시스템' };
       display.forEach(res => {
         const masked = res.name.length > 2
           ? res.name[0] + '*'.repeat(res.name.length-2) + res.name[res.name.length-1]
@@ -943,7 +943,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const d  = Object.fromEntries(fd.entries());
       const result = await api('POST', '/reservations', { name:d.user_name, phone:d.user_phone, address:d.user_address||'', service:d.service_type, date:d.selected_date, time:d.booking_time, district:d.district||'' });
       if (!result) return alert('예약 접수 중 오류가 발생했습니다.');
-      const svcNames = { wall:'벽걸이 에어컨', stand:'스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
+      const svcNames = { wall:'상업용 스탠드 에어컨', stand:'가정용 스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
       const districtLine = d.district ? `\n서비스 지역 : ${d.district}` : '';
       const addressLine  = d.user_address ? `\n상세주소   : ${d.user_address}` : '';
       sendEmailNotification(
