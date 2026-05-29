@@ -780,7 +780,7 @@ app.post('/api/hanyoung/reservations', async (req, res) => {
       'INSERT INTO hanyoung_reservations (name, phone, address, service, date, time) VALUES (?, ?, ?, ?, ?, ?)',
       [name, phone, address || null, service, date, time]
     );
-    const svcNames = { stand:'가정용 스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 4Way 시스템' };
+    const svcNames = { stand:'가정용 스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 4Way 시스템', system1way:'천장형 1Way 시스템' };
     const addressLine = address ? `\n상세주소   : ${address}` : '';
     sendMail(
       `[한영 임직원] 새 예약 접수 - ${name} (${date})`,
