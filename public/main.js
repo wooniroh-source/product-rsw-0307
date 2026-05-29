@@ -872,8 +872,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const loadBookedSlots = async () => {
       bookedSlots = await api('GET', '/reservations/booked-slots') || {};
-      const closed = await fetch('/api/closed-dates').then(r => r.ok ? r.json() : []).catch(() => []);
-      manualClosedDates = new Set(closed.map(c => c.close_date));
+      try {
+        const r = await fetch('/api/closed-dates');
+        if (!r.ok) throw new Error(`status ${r.status}`);
+        const closed = await r.json();
+        manualClosedDates = new Set(closed.map(c => c.close_date));
+      } catch (err) {
+        console.error('[calendar] 마감 날짜 로드 실패:', err.message);
+        manualClosedDates = new Set();
+      }
     };
 
     const renderCalendar = () => {
@@ -984,8 +991,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const hyLoadSlots = async () => {
       hyBooked = await api('GET', '/hanyoung/reservations/booked-slots') || {};
-      const closed = await fetch('/api/closed-dates').then(r => r.ok ? r.json() : []).catch(() => []);
-      hyManualClosedDates = new Set(closed.map(c => c.close_date));
+      try {
+        const r = await fetch('/api/closed-dates');
+        if (!r.ok) throw new Error(`status ${r.status}`);
+        const closed = await r.json();
+        hyManualClosedDates = new Set(closed.map(c => c.close_date));
+      } catch (err) {
+        console.error('[hy-calendar] 마감 날짜 로드 실패:', err.message);
+        hyManualClosedDates = new Set();
+      }
     };
 
     const hyRenderCalendar = () => {
@@ -1501,7 +1515,12 @@ window.renderClosedDateTable = async () => {
   const body = document.getElementById('closedDateTableBody');
   const noMsg = document.getElementById('noClosedDateMessage');
   if (!body) return;
-  const rows = await api('GET', '/closed-dates/all') || [];
+  const rows = await api('GET', '/closed-dates/all');
+  if (rows === null) {
+    body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#dc2626;padding:1rem;">⚠️ 데이터를 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.</td></tr>';
+    if (noMsg) noMsg.style.display = 'none';
+    return;
+  }
   if (!rows.length) {
     body.innerHTML = '';
     if (noMsg) noMsg.style.display = 'block';
@@ -1583,7 +1602,7 @@ window.handleClosedDateSubmit = async (e) => {
   if (res?.ok) {
     document.getElementById('closedDateInput').value = '';
     document.getElementById('closedDateReason').value = '';
-    renderClosedDateTable();
+    await renderClosedDateTable();
     alert(`${date} 날짜가 마감 처리되었습니다.`);
   } else {
     alert('등록 중 오류가 발생했습니다.');
