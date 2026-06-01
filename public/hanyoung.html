@@ -276,9 +276,16 @@
                 <i class="fas fa-tag"></i> 할인혜택 <strong>20% OFF</strong>
             </div>
             <br>
-            <a href="#hy-booking" class="hy-hero-cta">
+            <a href="#hy-booking" class="hy-hero-cta" id="hy-cta-btn" style="opacity:0; pointer-events:none; transition: opacity 0.6s ease;">
                 <i class="fas fa-calendar-check"></i> 지금 바로 예약하기
             </a>
+            <script>
+                setTimeout(function() {
+                    var btn = document.getElementById('hy-cta-btn');
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                }, 5000);
+            </script>
         </div>
     </section>
 
