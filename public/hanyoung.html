@@ -21,7 +21,12 @@
         /* ── 히어로 ── */
         .hy-hero {
             background: linear-gradient(135deg, #0f2d6e 0%, #1a56db 60%, #2563eb 100%);
+            aspect-ratio: 1444 / 854;
             padding: 5rem 5% 4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             color: #fff;
             position: relative;
@@ -30,7 +35,7 @@
         .hy-hero::before {
             content: '';
             position: absolute; inset: 0;
-            background: var(--hy-hero-bg, url('https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?auto=format&fit=crop&w=1400&q=80')) center/cover no-repeat;
+            background: var(--hy-hero-bg, url('https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?auto=format&fit=crop&w=1400&q=80')) top center/cover no-repeat;
             opacity: 0.6;
         }
         .hy-hero::after {
@@ -230,7 +235,7 @@
 
         /* 반응형 */
         @media (max-width: 768px) {
-            .hy-hero { padding: 3rem 5% 2.5rem; }
+            .hy-hero { aspect-ratio: unset; min-height: 480px; padding: 3rem 5% 2.5rem; }
             .hy-discount-tag { font-size: 1.2rem; padding: 0.6rem 1.4rem; }
             .hy-benefits { padding: 2rem 4%; }
             .hy-benefits-grid { grid-template-columns: 1fr; gap: 1rem; }
@@ -242,7 +247,7 @@
             .hy-section-title { margin-bottom: 1.5rem; }
         }
         @media (max-width: 480px) {
-            .hy-hero { padding: 2.5rem 4% 2rem; }
+            .hy-hero { aspect-ratio: unset; min-height: 420px; padding: 2.5rem 4% 2rem; }
             .hy-discount-tag { font-size: 1rem; padding: 0.5rem 1rem; margin-bottom: 1.5rem; }
             .hy-hero-cta { font-size: 0.95rem; padding: 0.85rem 1.8rem; }
             .hy-benefits { padding: 1.5rem 4%; }
