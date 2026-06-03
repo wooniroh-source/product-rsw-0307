@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>에어컨 청소 간편 견적 계산기 - 클린앤파트너즈</title>
-    <meta name="description" content="에어컨 청소 예상 비용을 바로 확인하세요. 에어컨 종류와 수량을 선택하면 즉시 견적이 계산됩니다. 3대 이상 10% 할인, 10대 이상 20% 할인 혜택 제공.">
+    <meta name="description" content="에어컨 청소 예상 비용을 바로 확인하세요. 에어컨 종류와 수량을 선택하면 즉시 견적이 계산됩니다. 3대 이상 5% 할인, 5대 이상 10% 할인, 10대 이상 15% 할인, 20대 이상 20% 할인 혜택 제공.">
     <meta name="keywords" content="에어컨청소 견적, 에어컨세척 가격, 에어컨청소 비용, 에어컨청소 얼마, 견적계산기">
     <meta name="robots" content="index, follow">
     <meta property="og:type" content="website">
@@ -625,7 +625,7 @@
                 <div class="total-qty-bar" id="total-qty-bar">
                     <span class="tqb-label">총 선택 수량</span>
                     <span class="tqb-count" id="total-qty-display">0대</span>
-                    <span class="tqb-hint">3대↑ <strong style="color:var(--primary)">10%</strong> · 10대↑ <strong style="color:var(--primary)">20%</strong> · 15대↑ <strong style="color:var(--primary)">25%</strong> · 20대↑ <strong style="color:var(--primary)">30%</strong> 할인</span>
+                    <span class="tqb-hint">3대↑ <strong style="color:var(--primary)">5%</strong> · 5대↑ <strong style="color:var(--primary)">10%</strong> · 10대↑ <strong style="color:var(--primary)">15%</strong> · 20대↑ <strong style="color:var(--primary)">20%</strong> 할인</span>
                 </div>
             </div>
 
@@ -818,7 +818,7 @@
             const subtotal = baseSubtotal + optionSubtotal;
 
             // 총 수량 기준 할인율
-            const discountRate = totalQty >= 20 ? 0.30 : totalQty >= 15 ? 0.25 : totalQty >= 10 ? 0.20 : totalQty >= 3 ? 0.10 : 0;
+            const discountRate = totalQty >= 20 ? 0.20 : totalQty >= 10 ? 0.15 : totalQty >= 5 ? 0.10 : totalQty >= 3 ? 0.05 : 0;
             const discountAmt = Math.floor(subtotal * discountRate);
             const final = subtotal - discountAmt;
 
@@ -838,7 +838,7 @@
             const discountText = document.getElementById('discount-text');
             if (discountRate > 0) {
                 badge.style.display = 'inline-flex';
-                const label = totalQty >= 20 ? '20대 이상 30% 할인' : totalQty >= 15 ? '15대 이상 25% 할인' : totalQty >= 10 ? '10대 이상 20% 할인' : '3대 이상 10% 할인';
+                const label = totalQty >= 20 ? '20대 이상 20% 할인' : totalQty >= 10 ? '10대 이상 15% 할인' : totalQty >= 5 ? '5대 이상 10% 할인' : '3대 이상 5% 할인';
                 discountText.textContent = `${label} — ${discountAmt.toLocaleString()}원 절약`;
             } else {
                 badge.style.display = 'none';
@@ -859,7 +859,7 @@
                 rows += `<div class="pb-row"><span>${o.name} × ${totalQty}대</span><span>${(o.val * totalQty).toLocaleString()}원</span></div>`;
             });
             if (discountRate > 0) {
-                const label = totalQty >= 20 ? '30% 할인' : totalQty >= 15 ? '25% 할인' : totalQty >= 10 ? '20% 할인' : '10% 할인';
+                const label = totalQty >= 20 ? '20% 할인' : totalQty >= 10 ? '15% 할인' : totalQty >= 5 ? '10% 할인' : '5% 할인';
                 rows += `<div class="pb-row"><span class="discount-row">${label} (총 ${totalQty}대)</span><span class="discount-row">−${discountAmt.toLocaleString()}원</span></div>`;
             }
             rows += `<div class="pb-row total"><span>합계</span><span>${final.toLocaleString()}원</span></div>`;
