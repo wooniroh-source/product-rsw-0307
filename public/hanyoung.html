@@ -21,7 +21,7 @@
         /* ── 히어로 ── */
         .hy-hero {
             background: linear-gradient(135deg, #0f2d6e 0%, #1a56db 60%, #2563eb 100%);
-            aspect-ratio: 1444 / 854;
+            aspect-ratio: 1920 / 600;
             padding: 5rem 5% 4rem;
             display: flex;
             flex-direction: column;
@@ -35,7 +35,7 @@
         .hy-hero::before {
             content: '';
             position: absolute; inset: 0;
-            background: var(--hy-hero-bg, url('https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?auto=format&fit=crop&w=1400&q=80')) top center/cover no-repeat;
+            background: var(--hy-hero-bg, url('https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?auto=format&fit=crop&w=1400&q=80')) center/contain no-repeat;
             opacity: 0.6;
         }
         .hy-hero::after {
