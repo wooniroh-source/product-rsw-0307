@@ -856,6 +856,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 예약 달력
+  let _reloadCalendar = null;
   const calendarDaysGrid = document.getElementById('calendarDays');
   if (calendarDaysGrid) {
     const calendarTitle      = document.getElementById('calendarTitle');
@@ -937,6 +938,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await loadBookedSlots();
     renderCalendar();
+    _reloadCalendar = async () => { await loadBookedSlots(); renderCalendar(); };
     if (prevMonthBtn) prevMonthBtn.addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth()-1); if(bookingFormSection) bookingFormSection.style.display='none'; renderCalendar(); });
     if (nextMonthBtn) nextMonthBtn.addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth()+1); if(bookingFormSection) bookingFormSection.style.display='none'; renderCalendar(); });
   }
@@ -970,6 +972,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       bookingForm.reset();
       const sec = document.getElementById('bookingFormSection');
       if (sec) sec.style.display = 'none';
+      if (_reloadCalendar) await _reloadCalendar();
       window.scrollTo({ top:0, behavior:'smooth' });
     });
   }
