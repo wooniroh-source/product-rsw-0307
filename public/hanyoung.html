@@ -185,21 +185,6 @@
             color: var(--hy-primary);
         }
         .hy-service-card h4 { font-size: 0.95rem; font-weight: 800; color: #1e293b; margin-bottom: 0.5rem; }
-        .hy-service-card .price-row {
-            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-            margin-top: 0.8rem;
-        }
-        .hy-service-card .price-original {
-            font-size: 0.8rem; color: #94a3b8; text-decoration: line-through;
-        }
-        .hy-service-card .price-discount {
-            font-size: 1rem; font-weight: 800; color: var(--hy-accent);
-        }
-        .hy-service-card .discount-badge {
-            font-size: 0.72rem; font-weight: 700;
-            background: #fef2f2; color: var(--hy-accent);
-            padding: 2px 6px; border-radius: 4px;
-        }
 
         /* ── 예약 섹션 ── */
         .hy-reservation {
@@ -254,8 +239,6 @@
             .hy-services { padding: 2rem 4%; }
             .hy-service-grid { grid-template-columns: 1fr 1fr; gap: 0.8rem; }
             .hy-service-card { padding: 1.2rem 0.8rem; }
-            .hy-service-card .price-row { flex-wrap: wrap; gap: 0.2rem; justify-content: center; }
-            .hy-service-card .price-original { width: 100%; text-align: center; }
             .hy-reservation { padding: 2rem 4%; }
             .form-card { padding: 1.5rem 1rem; }
             .form-card h3 { font-size: 1rem; padding-bottom: 0.8rem; margin-bottom: 1.2rem; }
@@ -310,8 +293,8 @@
     <!-- ── 서비스 소개 ── -->
     <section class="hy-services">
         <div class="hy-section-title">
-            <h2>서비스 안내 및 할인 가격</h2>
-            <p>EY한영 임직원 전용 특별 할인가입니다.</p>
+            <h2>서비스 안내</h2>
+            <p>EY한영 임직원 전용 서비스입니다.</p>
         </div>
 
         <!-- 서비스 이미지 배너 -->
@@ -327,41 +310,21 @@
                 <div class="svc-icon"><i class="fas fa-fan"></i></div>
                 <h4>스탠드 에어컨</h4>
                 <p style="font-size:0.8rem;color:#64748b;">완전 분해 프리미엄 세척</p>
-                <div class="price-row">
-                    <span class="price-original">150,000원</span>
-                    <span class="price-discount">120,000원</span>
-                    <span class="discount-badge">20%↓</span>
-                </div>
             </div>
             <div class="hy-service-card">
                 <div class="svc-icon"><i class="fas fa-snowflake"></i></div>
                 <h4>2-in-1 멀티형</h4>
                 <p style="font-size:0.8rem;color:#64748b;">실내기 2대 통합 세척</p>
-                <div class="price-row">
-                    <span class="price-original">210,000원</span>
-                    <span class="price-discount">168,000원</span>
-                    <span class="discount-badge">20%↓</span>
-                </div>
             </div>
             <div class="hy-service-card">
                 <div class="svc-icon"><i class="fas fa-th-large"></i></div>
                 <h4>천장형 4Way 시스템</h4>
                 <p style="font-size:0.8rem;color:#64748b;">시스템에어컨 전문 세척</p>
-                <div class="price-row">
-                    <span class="price-original">150,000원</span>
-                    <span class="price-discount">120,000원</span>
-                    <span class="discount-badge">20%↓</span>
-                </div>
             </div>
             <div class="hy-service-card">
                 <div class="svc-icon"><span style="display:inline-block;width:1.5em;height:0.75em;border:0.15em solid currentColor;border-radius:0.1em;"></span></div>
                 <h4>천장형 1Way 시스템</h4>
                 <p style="font-size:0.8rem;color:#64748b;">시스템에어컨 전문 세척</p>
-                <div class="price-row">
-                    <span class="price-original">90,000원</span>
-                    <span class="price-discount">72,000원</span>
-                    <span class="discount-badge">20%↓</span>
-                </div>
             </div>
         </div>
     </section>
