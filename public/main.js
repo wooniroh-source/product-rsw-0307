@@ -653,8 +653,9 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
 
   container.innerHTML = '';
   if (dotsContainer) dotsContainer.innerHTML = '';
-  const isHero = containerId === 'hero-slider-container';
-  const isMid  = containerId === 'mid-slider-container';
+  const isHero   = containerId === 'hero-slider-container';
+  const isMid    = containerId === 'mid-slider-container';
+  const isHySvc  = containerId === 'hy-svc-banner-container';
   const imgWidth = isHero ? 1200 : 800;
 
   items.forEach((item, index) => {
@@ -668,13 +669,15 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
       ? 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5))'
       : isMid
         ? 'linear-gradient(rgba(0,0,0,0.58),rgba(0,0,0,0.58))'
-        : 'linear-gradient(to right,rgba(0,0,0,0.65) 40%,rgba(0,0,0,0.25))';
+        : isHySvc
+          ? null
+          : 'linear-gradient(to right,rgba(0,0,0,0.65) 40%,rgba(0,0,0,0.25))';
 
     if (index === 0) {
-      slide.style.backgroundImage = `${gradient},url('${imgUrl}')`;
+      slide.style.backgroundImage = gradient ? `${gradient},url('${imgUrl}')` : `url('${imgUrl}')`;
     } else {
       slide.dataset.bgUrl = imgUrl;
-      slide.dataset.bgGradient = gradient;
+      if (gradient) slide.dataset.bgGradient = gradient;
     }
 
     if (isHero) {
@@ -719,7 +722,9 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
 
   const loadSlideBg = (slide) => {
     if (slide.dataset.bgUrl && !slide.dataset.bgLoaded) {
-      slide.style.backgroundImage = `${slide.dataset.bgGradient},url('${slide.dataset.bgUrl}')`;
+      slide.style.backgroundImage = slide.dataset.bgGradient
+        ? `${slide.dataset.bgGradient},url('${slide.dataset.bgUrl}')`
+        : `url('${slide.dataset.bgUrl}')`;
       slide.dataset.bgLoaded = '1';
     }
   };
