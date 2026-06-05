@@ -402,7 +402,7 @@ app.put('/api/auth/password', auth, async (req, res) => {
 app.get('/api/reservations/booked-slots', async (req, res) => {
   try {
     const [rows] = await pool.query(
-      "SELECT date, time FROM reservations WHERE date >= CURDATE()"
+      "SELECT date, time FROM reservations WHERE date >= CURDATE() AND status != 'cancelled'"
     );
     const slots = {};
     rows.forEach(({ date, time }) => {
@@ -745,7 +745,7 @@ app.delete('/api/checklists/:id', auth, async (req, res) => {
 app.get('/api/hanyoung/reservations/booked-slots', async (req, res) => {
   try {
     const [rows] = await pool.query(
-      "SELECT date, time FROM hanyoung_reservations WHERE date >= CURDATE()"
+      "SELECT date, time FROM hanyoung_reservations WHERE date >= CURDATE() AND status != 'cancelled'"
     );
     const slots = {};
     rows.forEach(({ date, time }) => {

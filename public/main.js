@@ -892,16 +892,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     let manualClosedDates = new Set();
 
     const loadBookedSlots = async () => {
-      bookedSlots = await api('GET', '/reservations/booked-slots') || {};
-      try {
-        const r = await fetch('/api/closed-dates');
-        if (!r.ok) throw new Error(`status ${r.status}`);
-        const closed = await r.json();
-        manualClosedDates = new Set(closed.map(c => c.close_date));
-      } catch (err) {
-        console.error('[calendar] 마감 날짜 로드 실패:', err.message);
-        manualClosedDates = new Set();
-      }
+      const [bookedResult, closedResult] = await Promise.allSettled([
+        api('GET', '/reservations/booked-slots'),
+        fetch('/api/closed-dates').then(r => r.ok ? r.json() : []).catch(() => [])
+      ]);
+      bookedSlots = (bookedResult.status === 'fulfilled' ? bookedResult.value : null) || {};
+      const closed = (closedResult.status === 'fulfilled' ? closedResult.value : null) || [];
+      manualClosedDates = new Set(closed.map(c => String(c.close_date).slice(0, 10)));
     };
 
     const renderCalendar = () => {
@@ -1013,16 +1010,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     let hyManualClosedDates = new Set();
 
     const hyLoadSlots = async () => {
-      hyBooked = await api('GET', '/hanyoung/reservations/booked-slots') || {};
-      try {
-        const r = await fetch('/api/closed-dates');
-        if (!r.ok) throw new Error(`status ${r.status}`);
-        const closed = await r.json();
-        hyManualClosedDates = new Set(closed.map(c => c.close_date));
-      } catch (err) {
-        console.error('[hy-calendar] 마감 날짜 로드 실패:', err.message);
-        hyManualClosedDates = new Set();
-      }
+      const [bookedResult, closedResult] = await Promise.allSettled([
+        api('GET', '/hanyoung/reservations/booked-slots'),
+        fetch('/api/closed-dates').then(r => r.ok ? r.json() : []).catch(() => [])
+      ]);
+      hyBooked = (bookedResult.status === 'fulfilled' ? bookedResult.value : null) || {};
+      const closed = (closedResult.status === 'fulfilled' ? closedResult.value : null) || [];
+      hyManualClosedDates = new Set(closed.map(c => String(c.close_date).slice(0, 10)));
     };
 
     const hyRenderCalendar = () => {
