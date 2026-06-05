@@ -8,6 +8,25 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <script>
+    (function(){
+        try {
+            var hu = localStorage.getItem('hy_hero_img_url');
+            if (hu) {
+                document.documentElement.style.setProperty('--hy-hero-bg', 'url("' + hu + '")');
+                var pl = document.createElement('link');
+                pl.rel = 'preload'; pl.as = 'image'; pl.href = hu;
+                document.head.appendChild(pl);
+            }
+            var su = localStorage.getItem('hy_svc_first_img_url');
+            if (su) {
+                var pl2 = document.createElement('link');
+                pl2.rel = 'preload'; pl2.as = 'image'; pl2.href = su;
+                document.head.appendChild(pl2);
+            }
+        } catch(e) {}
+    })();
+    </script>
     <style>
         /* 한영 전용 스타일 */
         :root {
@@ -126,8 +145,8 @@
         }
         @media (max-width: 768px) { .hy-svc-banner-section { aspect-ratio: 16/9; } }
         #hy-svc-banner-container {
-            position: relative;
-            width: 100%; height: 100%;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
         }
         .hy-svc-banner-section .res-banner-slide { background-position: center; background-size: contain; background-repeat: no-repeat; transition: none; }
         .hy-svc-banner-section .res-banner-slide.active { opacity: 1; }

@@ -800,6 +800,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!document.getElementById(cfg.id)) return;
       const data = await api('GET', `/banners/${cfg.type}`) || [];
       renderBannerSlider(data, cfg.id, cfg.dots, cfg.prev, cfg.next);
+      if (cfg.type === 'hanyoung-svc' && data.length && data[0].image_url) {
+        try { localStorage.setItem('hy_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
+      }
     })),
     hyHero
       ? fetch('/api/banners/hanyoung-hero').then(r => r.ok ? r.json() : []).catch(() => [])
