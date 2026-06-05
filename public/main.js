@@ -786,19 +786,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     { id: 'about-banner-container',   type: 'about',        dots:'about-banner-dots',   prev:'about-banner-prev',   next:'about-banner-next' },
     { id: 'hy-svc-banner-container',  type: 'hanyoung-svc', dots:'hy-svc-banner-dots',  prev:'hy-svc-banner-prev',  next:'hy-svc-banner-next' }
   ];
-  await Promise.all(sliderConfigs.map(async cfg => {
-    if (!document.getElementById(cfg.id)) return;
-    const data = await api('GET', `/banners/${cfg.type}`) || [];
-    renderBannerSlider(data, cfg.id, cfg.dots, cfg.prev, cfg.next);
-  }));
-
-  // 한영 히어로 배경 이미지 동적 적용
+  // 캐시된 히어로 URL 즉시 적용 (API 응답 전에 먼저 표시)
   const hyHero = document.querySelector('.hy-hero');
+  const HY_HERO_CACHE_KEY = 'hy_hero_img_url';
   if (hyHero) {
-    const heroData = await fetch('/api/banners/hanyoung-hero').then(r => r.ok ? r.json() : []).catch(() => []);
-    if (heroData.length && heroData[0].image_url) {
-      hyHero.style.setProperty('--hy-hero-bg', `url('${heroData[0].image_url}')`);
-    }
+    const cached = localStorage.getItem(HY_HERO_CACHE_KEY);
+    if (cached) hyHero.style.setProperty('--hy-hero-bg', `url('${cached}')`);
+  }
+
+  // 슬라이더 + 히어로 데이터를 병렬로 fetch
+  const [, heroData] = await Promise.all([
+    Promise.all(sliderConfigs.map(async cfg => {
+      if (!document.getElementById(cfg.id)) return;
+      const data = await api('GET', `/banners/${cfg.type}`) || [];
+      renderBannerSlider(data, cfg.id, cfg.dots, cfg.prev, cfg.next);
+    })),
+    hyHero
+      ? fetch('/api/banners/hanyoung-hero').then(r => r.ok ? r.json() : []).catch(() => [])
+      : Promise.resolve([])
+  ]);
+
+  // 히어로 배경 이미지 적용 및 캐시 갱신
+  if (hyHero && heroData.length && heroData[0].image_url) {
+    const url = heroData[0].image_url;
+    localStorage.setItem(HY_HERO_CACHE_KEY, url);
+    hyHero.style.setProperty('--hy-hero-bg', `url('${url}')`);
   }
 
   // 6단계 공정 (index.html)
