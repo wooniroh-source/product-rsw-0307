@@ -745,7 +745,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
   };
   const next  = () => showSlide((current + 1) % slides.length);
   const prev  = () => showSlide((current - 1 + slides.length) % slides.length);
-  const start = () => { clearInterval(timer); if (slides.length > 1) timer = setInterval(next, isHero ? 5000 : 4000); };
+  const start = () => { clearInterval(timer); if (slides.length > 1) timer = setInterval(next, isHero ? 5000 : isHySvc ? 10000 : 4000); };
 
   if (nextBtn) nextBtn.addEventListener('click', () => { next(); start(); });
   if (prevBtn) prevBtn.addEventListener('click', () => { prev(); start(); });
