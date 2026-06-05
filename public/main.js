@@ -1074,23 +1074,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     hyRenderCalendar();
     if (hyPrev) hyPrev.addEventListener('click', () => { hyView.setMonth(hyView.getMonth()-1); if(hyFormSec) hyFormSec.style.display='none'; hyRenderCalendar(); });
     if (hyNext) hyNext.addEventListener('click', () => { hyView.setMonth(hyView.getMonth()+1); if(hyFormSec) hyFormSec.style.display='none'; hyRenderCalendar(); });
-  }
 
-  // 한영 예약 폼 제출
-  const hyForm = document.getElementById('hyBookingForm');
-  if (hyForm) {
-    hyForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fd = new FormData(hyForm);
-      const d  = Object.fromEntries(fd.entries());
-      const result = await api('POST', '/hanyoung/reservations', { name:d.user_name, phone:d.user_phone, address:d.user_address||'', service:d.service_type, date:d.selected_date, time:d.booking_time });
-      if (!result) return alert('예약 접수 중 오류가 발생했습니다.');
-      alert('예약신청이 성공적으로 접수되었습니다!\n담당자가 개별 연락드리겠습니다.');
-      hyForm.reset();
-      const sec = document.getElementById('hyBookingFormSection');
-      if (sec) sec.style.display = 'none';
-      window.scrollTo({ top:0, behavior:'smooth' });
-    });
+    // 한영 예약 폼 제출 (캘린더 블록 안에서 hyLoadSlots/hyRenderCalendar 접근)
+    const hyForm = document.getElementById('hyBookingForm');
+    if (hyForm) {
+      hyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(hyForm);
+        const d  = Object.fromEntries(fd.entries());
+        const res = await fetch('/api/hanyoung/reservations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name:d.user_name, phone:d.user_phone, address:d.user_address||'', service:d.service_type, date:d.selected_date, time:d.booking_time })
+        }).catch(() => null);
+        if (!res || !res.ok) {
+          const errData = res ? await res.json().catch(() => ({})) : {};
+          return alert(errData.error || '예약 접수 중 오류가 발생했습니다.');
+        }
+        alert('예약신청이 성공적으로 접수되었습니다!\n담당자가 개별 연락드리겠습니다.');
+        hyForm.reset();
+        if (hyFormSec) hyFormSec.style.display = 'none';
+        // 예약 완료 후 슬롯 데이터 갱신하여 캘린더 즉시 반영
+        await hyLoadSlots();
+        hyRenderCalendar();
+        window.scrollTo({ top:0, behavior:'smooth' });
+      });
+    }
   }
 
   // 상담 문의 폼

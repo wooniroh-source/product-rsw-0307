@@ -776,6 +776,22 @@ app.get('/api/hanyoung/reservations', auth, async (req, res) => {
 app.post('/api/hanyoung/reservations', async (req, res) => {
   try {
     const { name, phone, address, service, date, time } = req.body;
+    if (!name || !phone || !service || !date || !time)
+      return res.status(400).json({ error: '필수 항목을 모두 입력해주세요.' });
+
+    const [[closedRow]] = await pool.query(
+      'SELECT id FROM closed_dates WHERE close_date = ?', [date]
+    );
+    if (closedRow)
+      return res.status(409).json({ error: '해당 날짜는 예약 마감일입니다.' });
+
+    const [[takenRow]] = await pool.query(
+      "SELECT id FROM hanyoung_reservations WHERE date = ? AND time = ? AND status != 'cancelled'",
+      [date, time]
+    );
+    if (takenRow)
+      return res.status(409).json({ error: '해당 시간대는 이미 예약이 완료되었습니다.' });
+
     const [result] = await pool.query(
       'INSERT INTO hanyoung_reservations (name, phone, address, service, date, time) VALUES (?, ?, ?, ?, ?, ?)',
       [name, phone, address || null, service, date, time]
