@@ -1045,6 +1045,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         cell.innerHTML = `<span class="day-num">${day}</span><span class="day-status ${statusClass}">${statusText}</span>`;
         if (date.getTime()===today.getTime()) cell.classList.add('today');
+        if (isFull) cell.classList.add('full');
         if (isPast || isFull) { cell.classList.add('disabled'); }
         else {
           cell.addEventListener('click', () => {
@@ -1072,8 +1073,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await hyLoadSlots();
     hyRenderCalendar();
-    if (hyPrev) hyPrev.addEventListener('click', () => { hyView.setMonth(hyView.getMonth()-1); if(hyFormSec) hyFormSec.style.display='none'; hyRenderCalendar(); });
-    if (hyNext) hyNext.addEventListener('click', () => { hyView.setMonth(hyView.getMonth()+1); if(hyFormSec) hyFormSec.style.display='none'; hyRenderCalendar(); });
+    if (hyPrev) hyPrev.addEventListener('click', async () => { hyView.setMonth(hyView.getMonth()-1); if(hyFormSec) hyFormSec.style.display='none'; await hyLoadSlots(); hyRenderCalendar(); });
+    if (hyNext) hyNext.addEventListener('click', async () => { hyView.setMonth(hyView.getMonth()+1); if(hyFormSec) hyFormSec.style.display='none'; await hyLoadSlots(); hyRenderCalendar(); });
 
     // 한영 예약 폼 제출 (캘린더 블록 안에서 hyLoadSlots/hyRenderCalendar 접근)
     const hyForm = document.getElementById('hyBookingForm');

@@ -238,6 +238,10 @@
         .hy-footer a { color: #94a3b8; text-decoration: none; }
         .hy-footer a:hover { color: #fff; }
 
+        /* ── 예약마감 날짜 강조 (모든 화면) ── */
+        #hyCalendarDays .day-cell.full { background: #fff0f0 !important; border-color: #fca5a5 !important; }
+        #hyCalendarDays .day-cell.full .day-status { display: inline-block !important; background: #fee2e2; color: #dc2626; font-weight: 700; }
+
         /* 반응형 */
         @media (max-width: 768px) {
             .hy-hero { aspect-ratio: unset; min-height: 480px; padding: 3rem 5% 2.5rem; }
