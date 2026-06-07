@@ -44,6 +44,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// 부정클릭 방지: 차단된 IP 접근 차단 (API 제외)
+app.use(async (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  try {
+    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    const [rows] = await pool.query(
+      'SELECT id FROM blocked_ips WHERE ip = ? AND unblocked_at IS NULL',
+      [ip]
+    );
+    if (rows.length) return res.status(403).send('접근이 일시적으로 제한되었습니다.');
+  } catch (_) {}
+  next();
+});
+
 // favicon.ico 파일 없을 때 204로 응답 (크롤러 4xx 방지)
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
@@ -302,6 +316,32 @@ async function initDB() {
         close_date VARCHAR(10) NOT NULL UNIQUE,
         reason     VARCHAR(100) DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await runQuery('ad_clicks', `
+      CREATE TABLE IF NOT EXISTS ad_clicks (
+        id             INT AUTO_INCREMENT PRIMARY KEY,
+        ip             VARCHAR(45)  NOT NULL,
+        user_agent     VARCHAR(500),
+        referrer       VARCHAR(500),
+        page           VARCHAR(200),
+        naver_keyword  VARCHAR(200),
+        naver_query    VARCHAR(200),
+        is_suspicious  TINYINT(1)   DEFAULT 0,
+        clicked_at     DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await runQuery('blocked_ips', `
+      CREATE TABLE IF NOT EXISTS blocked_ips (
+        id           INT AUTO_INCREMENT PRIMARY KEY,
+        ip           VARCHAR(45)  NOT NULL UNIQUE,
+        reason       VARCHAR(200),
+        click_count  INT          DEFAULT 0,
+        is_auto      TINYINT(1)   DEFAULT 0,
+        blocked_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+        unblocked_at DATETIME DEFAULT NULL
       )
     `);
 
@@ -911,6 +951,107 @@ app.post('/api/closed-dates', auth, async (req, res) => {
 app.delete('/api/closed-dates/:date', auth, async (req, res) => {
   try {
     await pool.query('DELETE FROM closed_dates WHERE close_date = ?', [req.params.date]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================
+// 부정클릭 방지
+// =============================================
+const AD_CLICK_LIMIT = 5;   // 24시간 내 동일 IP 허용 클릭 수
+const AD_CLICK_WINDOW_H = 24;
+
+app.post('/api/ad-click', async (req, res) => {
+  try {
+    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    const { page, naver_keyword, naver_query } = req.body;
+    const user_agent = (req.headers['user-agent'] || '').slice(0, 500);
+    const referrer   = (req.headers['referer'] || '').slice(0, 500);
+
+    // 이미 차단된 IP면 기록하지 않음
+    const [[blocked]] = await pool.query(
+      'SELECT id FROM blocked_ips WHERE ip = ? AND unblocked_at IS NULL', [ip]
+    );
+    if (blocked) return res.json({ ok: true, blocked: true });
+
+    await pool.query(
+      'INSERT INTO ad_clicks (ip, user_agent, referrer, page, naver_keyword, naver_query) VALUES (?,?,?,?,?,?)',
+      [ip, user_agent, referrer, page || '/', naver_keyword || null, naver_query || null]
+    );
+
+    // 24시간 내 클릭 수 확인 → 초과 시 자동 차단
+    const [[{ cnt }]] = await pool.query(
+      `SELECT COUNT(*) AS cnt FROM ad_clicks
+       WHERE ip = ? AND clicked_at >= NOW() - INTERVAL ? HOUR`,
+      [ip, AD_CLICK_WINDOW_H]
+    );
+
+    if (cnt >= AD_CLICK_LIMIT) {
+      await pool.query(
+        `INSERT INTO blocked_ips (ip, reason, click_count, is_auto)
+         VALUES (?, ?, ?, 1)
+         ON DUPLICATE KEY UPDATE
+           reason = VALUES(reason), click_count = VALUES(click_count),
+           blocked_at = NOW(), unblocked_at = NULL`,
+        [ip, `${AD_CLICK_WINDOW_H}시간 내 ${cnt}회 광고 클릭 자동 차단`, cnt]
+      );
+      // 해당 IP 클릭 로그 의심 표시
+      await pool.query(
+        'UPDATE ad_clicks SET is_suspicious = 1 WHERE ip = ?', [ip]
+      );
+      sendMail(
+        `[클린앤파트너즈] 부정클릭 자동 차단 알림`,
+        `⚠️ 부정클릭 의심 IP가 자동 차단되었습니다\n` +
+        `──────────────────────\n` +
+        `IP        : ${ip}\n` +
+        `클릭 횟수 : ${cnt}회 (${AD_CLICK_WINDOW_H}시간 내)\n` +
+        `마지막 페이지: ${page || '/'}\n` +
+        `검색어    : ${naver_query || '-'}\n` +
+        `──────────────────────`
+      );
+      return res.json({ ok: true, blocked: true, auto: true });
+    }
+
+    res.json({ ok: true, blocked: false, count: cnt });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/ad-clicks', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM ad_clicks ORDER BY clicked_at DESC LIMIT 500'
+    );
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/blocked-ips', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM blocked_ips ORDER BY blocked_at DESC');
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/blocked-ips', auth, async (req, res) => {
+  try {
+    const { ip, reason } = req.body;
+    if (!ip) return res.status(400).json({ error: 'IP를 입력하세요.' });
+    await pool.query(
+      `INSERT INTO blocked_ips (ip, reason, is_auto)
+       VALUES (?, ?, 0)
+       ON DUPLICATE KEY UPDATE reason = VALUES(reason), blocked_at = NOW(), unblocked_at = NULL`,
+      [ip, reason || '수동 차단']
+    );
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/blocked-ips/:ip', auth, async (req, res) => {
+  try {
+    await pool.query(
+      'UPDATE blocked_ips SET unblocked_at = NOW() WHERE ip = ?',
+      [req.params.ip]
+    );
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

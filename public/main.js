@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','security','hanyoung','hanyoung-hero','hanyoung-svc-banners'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','ad-protection','security','hanyoung','hanyoung-hero','hanyoung-svc-banners'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -111,7 +111,8 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'checklists')    renderChecklistTable();
   else if (sectionId === 'reviews')       loadReviewsAdmin();
   else if (sectionId === 'hanyoung')      renderHanyoungTable();
-  else if (sectionId === 'closed-dates')  renderClosedDateTable();
+  else if (sectionId === 'closed-dates')   renderClosedDateTable();
+  else if (sectionId === 'ad-protection') { renderAdClickTable(); renderBlockedIpTable(); }
 };
 
 // =============================================
@@ -1643,5 +1644,117 @@ window.deleteClosedDate = async (date) => {
     renderClosedDateTable();
   } else {
     alert('해제 중 오류가 발생했습니다.');
+  }
+};
+
+// =============================================
+// 부정클릭 방지 — 네이버 광고 유입 감지
+// =============================================
+(function detectNaverAdClick() {
+  const params = new URLSearchParams(window.location.search);
+  const naverAdKeys = ['n_media', 'n_query', 'n_rank', 'n_ad_group', 'n_ad', 'n_keyword', 'n_campaign_type'];
+  const isNaverAd = naverAdKeys.some(k => params.has(k));
+  if (!isNaverAd) return;
+
+  fetch('/api/ad-click', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      page: window.location.pathname,
+      naver_keyword: params.get('n_keyword') || '',
+      naver_query:   params.get('n_query')   || ''
+    })
+  }).catch(() => {});
+})();
+
+// =============================================
+// 부정클릭 방지 — 관리자 UI
+// =============================================
+window.renderAdClickTable = async () => {
+  const rows = await api('GET', '/ad-clicks');
+  if (!rows) return;
+
+  const tbody = document.getElementById('adClickTableBody');
+  if (!tbody) return;
+
+  const suspicious = document.getElementById('adClickSuspiciousCount');
+  const total      = document.getElementById('adClickTotalCount');
+  if (total)      total.textContent      = rows.length;
+  if (suspicious) suspicious.textContent = rows.filter(r => r.is_suspicious).length;
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;">클릭 기록이 없습니다.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr style="${r.is_suspicious ? 'background:#fef2f2;' : ''}">
+      <td>${r.is_suspicious ? '<span style="color:#dc2626;font-weight:600;">의심</span>' : '정상'}</td>
+      <td><code>${r.ip}</code></td>
+      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.naver_query || ''}">${r.naver_query || '-'}</td>
+      <td>${r.page || '/'}</td>
+      <td style="font-size:0.82rem;color:#64748b;">${r.clicked_at ? new Date(r.clicked_at).toLocaleString('ko-KR') : '-'}</td>
+      <td><button class="action-btn" style="background:#dc2626;" onclick="manualBlockIp('${r.ip}')">차단</button></td>
+    </tr>
+  `).join('');
+};
+
+window.renderBlockedIpTable = async () => {
+  const rows = await api('GET', '/blocked-ips');
+  if (!rows) return;
+
+  const tbody = document.getElementById('blockedIpTableBody');
+  if (!tbody) return;
+
+  const countEl = document.getElementById('blockedIpCount');
+  if (countEl) countEl.textContent = rows.filter(r => !r.unblocked_at).length;
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">차단된 IP가 없습니다.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => {
+    const active = !r.unblocked_at;
+    return `
+    <tr style="${active ? '' : 'opacity:0.5;'}">
+      <td><code>${r.ip}</code></td>
+      <td>${r.is_auto ? '자동' : '수동'}</td>
+      <td>${r.reason || '-'}</td>
+      <td style="font-size:0.82rem;color:#64748b;">${r.blocked_at ? new Date(r.blocked_at).toLocaleString('ko-KR') : '-'}</td>
+      <td>
+        ${active
+          ? `<button class="action-btn" style="background:#059669;" onclick="unblockIp('${r.ip}')">해제</button>`
+          : '<span style="color:#64748b;font-size:0.85rem;">해제됨</span>'}
+      </td>
+    </tr>`;
+  }).join('');
+};
+
+window.manualBlockIp = async (ip) => {
+  if (!confirm(`${ip} 를 차단하시겠습니까?`)) return;
+  const res = await api('POST', '/blocked-ips', { ip, reason: '수동 차단' });
+  if (res?.ok) { renderBlockedIpTable(); alert('차단되었습니다.'); }
+  else alert('처리 중 오류가 발생했습니다.');
+};
+
+window.unblockIp = async (ip) => {
+  if (!confirm(`${ip} 차단을 해제하시겠습니까?`)) return;
+  const res = await api('DELETE', `/blocked-ips/${ip}`);
+  if (res?.ok) { renderBlockedIpTable(); }
+  else alert('처리 중 오류가 발생했습니다.');
+};
+
+window.addManualBlockIp = async () => {
+  const ipInput     = document.getElementById('manualBlockIpInput');
+  const reasonInput = document.getElementById('manualBlockReasonInput');
+  const ip = ipInput?.value.trim();
+  if (!ip) return alert('IP 주소를 입력하세요.');
+  const res = await api('POST', '/blocked-ips', { ip, reason: reasonInput?.value.trim() || '수동 차단' });
+  if (res?.ok) {
+    ipInput.value = '';
+    if (reasonInput) reasonInput.value = '';
+    renderBlockedIpTable();
+    alert('차단되었습니다.');
+  } else {
+    alert('처리 중 오류가 발생했습니다.');
   }
 };
