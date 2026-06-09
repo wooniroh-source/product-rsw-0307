@@ -1093,6 +1093,20 @@ document.addEventListener('DOMContentLoaded', async () => {
           const errData = res ? await res.json().catch(() => ({})) : {};
           return alert(errData.error || '예약 접수 중 오류가 발생했습니다.');
         }
+        const svcNames = { stand:'가정용 스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 4Way 시스템', system1way:'천장형 1Way 시스템' };
+        const addressLine = d.user_address ? `\n상세주소   : ${d.user_address}` : '';
+        sendEmailNotification(
+          `[한영 임직원] 새 예약 접수 - ${d.user_name} (${d.selected_date})`,
+          `📋 한영 임직원 예약이 접수되었습니다\n` +
+          `──────────────────────\n` +
+          `고객명   : ${d.user_name}\n` +
+          `연락처   : ${d.user_phone}` +
+          `${addressLine}\n` +
+          `서비스   : ${svcNames[d.service_type] || d.service_type}\n` +
+          `예약 날짜 : ${d.selected_date}\n` +
+          `희망 시간 : ${d.booking_time}\n` +
+          `──────────────────────`
+        );
         alert('예약신청이 성공적으로 접수되었습니다!\n담당자가 개별 연락드리겠습니다.');
         hyForm.reset();
         if (hyFormSec) hyFormSec.style.display = 'none';
