@@ -191,6 +191,20 @@ async function initDB() {
       console.log('✅ hanyoung_reservations.address 컬럼 추가 완료');
     }
 
+    await runQuery('com_reservations', `
+      CREATE TABLE IF NOT EXISTS com_reservations (
+        id         INT AUTO_INCREMENT PRIMARY KEY,
+        name       VARCHAR(50)  NOT NULL,
+        phone      VARCHAR(20)  NOT NULL,
+        address    VARCHAR(200) DEFAULT NULL,
+        service    VARCHAR(30)  NOT NULL,
+        date       VARCHAR(20)  NOT NULL,
+        time       VARCHAR(20)  NOT NULL,
+        status     ENUM('pending','confirmed','cancelled') DEFAULT 'pending',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     await runQuery('contacts', `
       CREATE TABLE IF NOT EXISTS contacts (
         id         INT AUTO_INCREMENT PRIMARY KEY,
@@ -869,6 +883,95 @@ app.delete('/api/hanyoung/reservations/:id', auth, async (req, res) => {
 });
 
 // =============================================
+// COM RESERVATIONS
+// =============================================
+app.get('/api/com/reservations/booked-slots', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT date, time FROM com_reservations WHERE date >= CURDATE() AND status != 'cancelled'"
+    );
+    const slots = {};
+    rows.forEach(({ date, time }) => {
+      const key = date instanceof Date ? date.toISOString().slice(0,10) : String(date).slice(0,10);
+      if (!slots[key]) slots[key] = [];
+      slots[key].push(time);
+    });
+    res.json(slots);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/com/reservations/recent', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT name, date, time, service, status FROM com_reservations ORDER BY created_at DESC LIMIT 5'
+    );
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/com/reservations', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM com_reservations ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/com/reservations', async (req, res) => {
+  try {
+    const { name, phone, address, service, date, time } = req.body;
+    if (!name || !phone || !service || !date || !time)
+      return res.status(400).json({ error: '필수 항목을 모두 입력해주세요.' });
+
+    const [[closedRow]] = await pool.query(
+      'SELECT id FROM closed_dates WHERE close_date = ?', [date]
+    );
+    if (closedRow)
+      return res.status(409).json({ error: '해당 날짜는 예약 마감일입니다.' });
+
+    const [[takenRow]] = await pool.query(
+      "SELECT id FROM com_reservations WHERE date = ? AND time = ? AND status != 'cancelled'",
+      [date, time]
+    );
+    if (takenRow)
+      return res.status(409).json({ error: '해당 시간대는 이미 예약이 완료되었습니다.' });
+
+    const [result] = await pool.query(
+      'INSERT INTO com_reservations (name, phone, address, service, date, time) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, phone, address || null, service, date, time]
+    );
+    const svcNames = { stand:'가정용 스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 4Way 시스템', system1way:'천장형 1Way 시스템' };
+    const addressLine = address ? `\n상세주소   : ${address}` : '';
+    sendMail(
+      `[임직원] 새 예약 접수 - ${name} (${date})`,
+      `📋 임직원 예약이 접수되었습니다\n` +
+      `──────────────────────\n` +
+      `고객명   : ${name}\n` +
+      `연락처   : ${phone}` +
+      `${addressLine}\n` +
+      `서비스   : ${svcNames[service] || service}\n` +
+      `예약 날짜 : ${date}\n` +
+      `희망 시간 : ${time}\n` +
+      `──────────────────────`
+    );
+    res.json({ id: result.insertId });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/com/reservations/:id/status', auth, async (req, res) => {
+  try {
+    await pool.query('UPDATE com_reservations SET status = ? WHERE id = ?', [req.body.status, req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/com/reservations/:id', auth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM com_reservations WHERE id = ?', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================
 // REVIEWS
 // =============================================
 app.get('/api/reviews', async (req, res) => {
@@ -1083,6 +1186,7 @@ const cleanRoutes = {
   '/care':        'care.html',
   '/admin':       'admin.html',
   '/hanyoung':    'hanyoung.html',
+  '/com':         'com.html',
 };
 Object.entries(cleanRoutes).forEach(([route, file]) => {
   app.get(route, (req, res) => {

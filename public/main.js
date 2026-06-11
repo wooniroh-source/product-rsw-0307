@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','ad-protection','security','hanyoung','hanyoung-hero','hanyoung-svc-banners'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','ad-protection','security','hanyoung','hanyoung-hero','hanyoung-svc-banners','com','com-hero','com-svc-banners'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -105,12 +105,16 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'about-banners')        renderBannerTable('about',        'aboutBannerTableBody');
   else if (sectionId === 'hanyoung-hero')         renderHyHeroSection();
   else if (sectionId === 'hanyoung-svc-banners') renderBannerTable('hanyoung-svc', 'hySvcBannerTableBody');
+  else if (sectionId === 'com')              renderComTable();
+  else if (sectionId === 'com-hero')         renderCoHeroSection();
+  else if (sectionId === 'com-svc-banners')  renderBannerTable('com-svc', 'coSvcBannerTableBody');
   else if (sectionId === 'gallery')       renderGalleryTable();
   else if (sectionId === 'process')       renderProcessEditForm();
   else if (sectionId === 'contacts')      renderContactTable();
   else if (sectionId === 'checklists')    renderChecklistTable();
   else if (sectionId === 'reviews')       loadReviewsAdmin();
   else if (sectionId === 'hanyoung')      renderHanyoungTable();
+  // com은 위에서 이미 처리됨
   else if (sectionId === 'closed-dates')   renderClosedDateTable();
   else if (sectionId === 'ad-protection') { renderAdClickTable(); renderBlockedIpTable(); }
 };
@@ -211,6 +215,56 @@ window.updateHanyoungStatus = async (id, status) => {
   await api('PUT', `/hanyoung/reservations/${id}/status`, { status });
   renderHanyoungTable();
 };
+
+// =============================================
+// COM 임직원 예약 어드민 테이블
+// =============================================
+window.renderComTable = async () => {
+  const body     = document.getElementById('comTableBody');
+  const total    = document.getElementById('coTotalCount');
+  const pending  = document.getElementById('coPendingCount');
+  const confirmed= document.getElementById('coConfirmedCount');
+  const noData   = document.getElementById('coNoDataMessage');
+  if (!body) return;
+
+  const rows = await api('GET', '/com/reservations') || [];
+  if (total)     total.textContent     = `${rows.length}건`;
+  if (pending)   pending.textContent   = `${rows.filter(r=>r.status==='pending').length}건`;
+  if (confirmed) confirmed.textContent = `${rows.filter(r=>r.status==='confirmed').length}건`;
+
+  body.innerHTML = '';
+  if (rows.length === 0) { if (noData) noData.style.display = 'block'; return; }
+  if (noData) noData.style.display = 'none';
+
+  const svcNames = { wall:'상업용 스탠드 에어컨', stand:'가정용 스탠드', multi:'2-in-1 멀티', system:'시스템 천장형' };
+  rows.forEach(res => {
+    const tr = document.createElement('tr');
+    const applyDate = res.created_at ? String(res.created_at).split('T')[0] : '-';
+    tr.innerHTML = `
+      <td class="text-muted">${applyDate}</td>
+      <td class="col-time"><span class="text-bold text-primary">${res.date}</span><small>${res.time}</small></td>
+      <td class="text-bold">${res.name}</td>
+      <td>${res.phone}</td>
+      <td style="font-size:0.82rem;color:#334155;">${res.address || '<span style="color:#bbb;">-</span>'}</td>
+      <td><span class="service-tag">${svcNames[res.service]||res.service}</span></td>
+      <td><span class="badge ${res.status}">${res.status==='pending'?'대기':res.status==='confirmed'?'확정':'취소'}</span></td>
+      <td><div class="btn-group">
+        ${res.status==='pending'?`<button class="btn-action btn-approve" onclick="updateComStatus(${res.id},'confirmed')" title="확정"><i class="fas fa-check"></i></button>`:''}
+        ${res.status!=='cancelled'?`<button class="btn-action btn-cancel" onclick="updateComStatus(${res.id},'cancelled')" title="취소"><i class="fas fa-times"></i></button>`:''}
+        <button class="btn-action btn-delete" onclick="deleteComReservation(${res.id})" title="삭제"><i class="fas fa-trash"></i></button>
+      </div></td>`;
+    body.appendChild(tr);
+  });
+};
+window.updateComStatus = async (id, status) => {
+  await api('PUT', `/com/reservations/${id}/status`, { status });
+  renderComTable();
+};
+window.deleteComReservation = async (id) => {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  await api('DELETE', `/com/reservations/${id}`);
+  renderComTable();
+};
 window.deleteHanyoungReservation = async (id) => {
   if (!confirm('정말 삭제하시겠습니까?')) return;
   await api('DELETE', `/hanyoung/reservations/${id}`);
@@ -270,7 +324,8 @@ const bannerFormMap = {
   res:         { form:'resBannerForm',       editId:'resBannerEditId',        badge:'resBannerBadge',      title:'resBannerTitle',        desc:'resBannerDesc',        url:'resBannerUrl',        btnText:'',                    btnLink:'',                    submitBtn:'resBannerSubmitBtn',        cancelBtn:'resBannerCancelBtn',        tableBody:'resBannerTableBody' },
   svc:         { form:'svcBannerForm',       editId:'svcBannerEditId',        badge:'svcBannerBadge',      title:'svcBannerTitle',        desc:'svcBannerDesc',        url:'svcBannerUrl',        btnText:'',                    btnLink:'',                    submitBtn:'svcBannerSubmitBtn',        cancelBtn:'svcBannerCancelBtn',        tableBody:'svcBannerTableBody' },
   about:       { form:'aboutBannerForm',     editId:'aboutBannerEditId',      badge:'aboutBannerBadge',    title:'aboutBannerTitle',      desc:'aboutBannerDesc',      url:'aboutBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'aboutBannerSubmitBtn',      cancelBtn:'aboutBannerCancelBtn',      tableBody:'aboutBannerTableBody' },
-  'hanyoung-svc': { form:'hySvcBannerForm',  editId:'hySvcBannerEditId',      badge:'',                    title:'hySvcBannerTitle',      desc:'hySvcBannerDesc',      url:'hySvcBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'hySvcBannerSubmitBtn',      cancelBtn:'hySvcBannerCancelBtn',      tableBody:'hySvcBannerTableBody' }
+  'hanyoung-svc': { form:'hySvcBannerForm',  editId:'hySvcBannerEditId',      badge:'',                    title:'hySvcBannerTitle',      desc:'hySvcBannerDesc',      url:'hySvcBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'hySvcBannerSubmitBtn',      cancelBtn:'hySvcBannerCancelBtn',      tableBody:'hySvcBannerTableBody' },
+  'com-svc':      { form:'coSvcBannerForm',  editId:'coSvcBannerEditId',      badge:'',                    title:'coSvcBannerTitle',      desc:'coSvcBannerDesc',      url:'coSvcBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'coSvcBannerSubmitBtn',      cancelBtn:'coSvcBannerCancelBtn',      tableBody:'coSvcBannerTableBody' }
 };
 
 const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
@@ -337,18 +392,22 @@ window.handleResBannerSubmit      = (e) => handleBannerSubmit(e, 'res');
 window.handleSvcBannerSubmit      = (e) => handleBannerSubmit(e, 'svc');
 window.handleAboutBannerSubmit    = (e) => handleBannerSubmit(e, 'about');
 window.handleHySvcBannerSubmit    = (e) => handleBannerSubmit(e, 'hanyoung-svc');
+window.handleCoSvcBannerSubmit    = (e) => handleBannerSubmit(e, 'com-svc');
 window.cancelResBannerEdit        = () => cancelBannerEdit('res');
 window.cancelSvcBannerEdit        = () => cancelBannerEdit('svc');
 window.cancelAboutBannerEdit      = () => cancelBannerEdit('about');
 window.cancelHySvcBannerEdit      = () => cancelBannerEdit('hanyoung-svc');
+window.cancelCoSvcBannerEdit      = () => cancelBannerEdit('com-svc');
 window.editResBanner      = (id) => editBanner('res',          id);
 window.editSvcBanner      = (id) => editBanner('svc',          id);
 window.editAboutBanner    = (id) => editBanner('about',        id);
 window.editHySvcBanner    = (id) => editBanner('hanyoung-svc', id);
+window.editCoSvcBanner    = (id) => editBanner('com-svc', id);
 window.deleteResBanner    = (id) => deleteBanner('res',          id);
 window.deleteSvcBanner    = (id) => deleteBanner('svc',          id);
 window.deleteAboutBanner  = (id) => deleteBanner('about',        id);
 window.deleteHySvcBanner  = (id) => deleteBanner('hanyoung-svc', id);
+window.deleteCoSvcBanner  = (id) => deleteBanner('com-svc', id);
 
 // =============================================
 // 4. 상담 문의
@@ -785,7 +844,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     { id: 'res-banner-container',     type: 'res',          dots:'res-banner-dots',     prev:'res-banner-prev',     next:'res-banner-next' },
     { id: 'svc-banner-container',     type: 'svc',          dots:'svc-banner-dots',     prev:'svc-banner-prev',     next:'svc-banner-next' },
     { id: 'about-banner-container',   type: 'about',        dots:'about-banner-dots',   prev:'about-banner-prev',   next:'about-banner-next' },
-    { id: 'hy-svc-banner-container',  type: 'hanyoung-svc', dots:'hy-svc-banner-dots',  prev:'hy-svc-banner-prev',  next:'hy-svc-banner-next' }
+    { id: 'hy-svc-banner-container',  type: 'hanyoung-svc', dots:'hy-svc-banner-dots',  prev:'hy-svc-banner-prev',  next:'hy-svc-banner-next' },
+    { id: 'co-svc-banner-container',  type: 'com-svc',      dots:'co-svc-banner-dots',  prev:'co-svc-banner-prev',  next:'co-svc-banner-next' }
   ];
   // 캐시된 히어로 URL 즉시 적용 (API 응답 전에 먼저 표시)
   const hyHero = document.querySelector('.hy-hero');
@@ -794,9 +854,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cached = localStorage.getItem(HY_HERO_CACHE_KEY);
     if (cached) hyHero.style.setProperty('--hy-hero-bg', `url('${cached}')`);
   }
+  const coHero = document.querySelector('.co-hero');
+  const CO_HERO_CACHE_KEY = 'co_hero_img_url';
+  if (coHero) {
+    const cached = localStorage.getItem(CO_HERO_CACHE_KEY);
+    if (cached) coHero.style.setProperty('--co-hero-bg', `url('${cached}')`);
+  }
 
   // 슬라이더 + 히어로 데이터를 병렬로 fetch
-  const [, heroData] = await Promise.all([
+  const [, heroData, coHeroData] = await Promise.all([
     Promise.all(sliderConfigs.map(async cfg => {
       if (!document.getElementById(cfg.id)) return;
       const data = await api('GET', `/banners/${cfg.type}`) || [];
@@ -804,9 +870,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (cfg.type === 'hanyoung-svc' && data.length && data[0].image_url) {
         try { localStorage.setItem('hy_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
       }
+      if (cfg.type === 'com-svc' && data.length && data[0].image_url) {
+        try { localStorage.setItem('co_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
+      }
     })),
     hyHero
       ? fetch('/api/banners/hanyoung-hero').then(r => r.ok ? r.json() : []).catch(() => [])
+      : Promise.resolve([]),
+    coHero
+      ? fetch('/api/banners/com-hero').then(r => r.ok ? r.json() : []).catch(() => [])
       : Promise.resolve([])
   ]);
 
@@ -815,6 +887,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const url = heroData[0].image_url;
     localStorage.setItem(HY_HERO_CACHE_KEY, url);
     hyHero.style.setProperty('--hy-hero-bg', `url('${url}')`);
+  }
+  if (coHero && coHeroData.length && coHeroData[0].image_url) {
+    const url = coHeroData[0].image_url;
+    localStorage.setItem(CO_HERO_CACHE_KEY, url);
+    coHero.style.setProperty('--co-hero-bg', `url('${url}')`);
   }
 
   // 6단계 공정 (index.html)
@@ -1113,6 +1190,127 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 예약 완료 후 슬롯 데이터 갱신하여 캘린더 즉시 반영
         await hyLoadSlots();
         hyRenderCalendar();
+        window.scrollTo({ top:0, behavior:'smooth' });
+      });
+    }
+  }
+
+  // COM 임직원 예약 달력 + 폼
+  const coCalendarDays = document.getElementById('coCalendarDays');
+  if (coCalendarDays) {
+    const coTitle     = document.getElementById('coCalendarTitle');
+    const coPrev      = document.getElementById('coPrevMonthBtn');
+    const coNext      = document.getElementById('coNextMonthBtn');
+    const coFormSec   = document.getElementById('coBookingFormSection');
+    const coDisplay   = document.getElementById('coDisplaySelectedDate');
+    const coInput     = document.getElementById('coInputSelectedDate');
+    const ALL_SLOTS_CO = ['09:00','11:00','14:00','16:00','18:00'];
+    let coView        = new Date();
+    const todayCo     = new Date(); todayCo.setHours(0,0,0,0);
+    let coBooked      = {};
+    let coManualClosedDates = new Set();
+
+    const coLoadSlots = async () => {
+      const [bookedResult, closedResult] = await Promise.allSettled([
+        api('GET', '/com/reservations/booked-slots'),
+        fetch('/api/closed-dates').then(r => r.ok ? r.json() : []).catch(() => [])
+      ]);
+      coBooked = (bookedResult.status === 'fulfilled' ? bookedResult.value : null) || {};
+      const closed = (closedResult.status === 'fulfilled' ? closedResult.value : null) || [];
+      coManualClosedDates = new Set(closed.map(c => String(c.close_date).slice(0, 10)));
+    };
+
+    const coRenderCalendar = () => {
+      coCalendarDays.innerHTML = '';
+      const year = coView.getFullYear(), month = coView.getMonth();
+      if (coTitle) coTitle.textContent = `${year}년 ${month+1}월`;
+      const firstDay = new Date(year, month, 1).getDay();
+      const lastDay  = new Date(year, month+1, 0).getDate();
+      for (let i = 0; i < firstDay; i++) {
+        const e = document.createElement('div'); e.classList.add('day-cell','empty'); coCalendarDays.appendChild(e);
+      }
+      for (let day = 1; day <= lastDay; day++) {
+        const cell    = document.createElement('div');
+        cell.classList.add('day-cell');
+        const date    = new Date(year, month, day);
+        const isPast  = date < todayCo;
+        const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const taken   = coBooked[dateKey] || [];
+        const isClosed = coManualClosedDates.has(dateKey);
+        const isFull  = !isPast && (isClosed || ALL_SLOTS_CO.every(s => taken.includes(s)));
+
+        let statusClass, statusText;
+        if (isPast)      { statusClass='past';  statusText='종료'; }
+        else if (isFull) { statusClass='full';  statusText='예약마감'; }
+        else             { statusClass='avail'; statusText='가능'; }
+
+        cell.innerHTML = `<span class="day-num">${day}</span><span class="day-status ${statusClass}">${statusText}</span>`;
+        if (date.getTime()===todayCo.getTime()) cell.classList.add('today');
+        if (isFull) cell.classList.add('full');
+        if (isPast || isFull) { cell.classList.add('disabled'); }
+        else {
+          cell.addEventListener('click', () => {
+            document.querySelectorAll('#coCalendarDays .day-cell').forEach(c=>c.classList.remove('active'));
+            cell.classList.add('active');
+            if (coDisplay) coDisplay.textContent = `${year}년 ${month+1}월 ${day}일`;
+            if (coInput)   coInput.value = dateKey;
+            const timeSelect = document.getElementById('coBookingTime');
+            if (timeSelect) {
+              const timeLabels = {'09:00':'오전 09:00','11:00':'오전 11:00','14:00':'오후 02:00','16:00':'오후 04:00','18:00':'오후 06:00'};
+              Array.from(timeSelect.options).forEach(opt => {
+                if (!opt.value) return;
+                const isBooked = taken.includes(opt.value);
+                opt.disabled = isBooked;
+                opt.textContent = isBooked ? `${timeLabels[opt.value]} (마감)` : timeLabels[opt.value];
+              });
+              timeSelect.value = '';
+            }
+            if (coFormSec) { coFormSec.style.display='block'; coFormSec.scrollIntoView({behavior:'smooth'}); }
+          });
+        }
+        coCalendarDays.appendChild(cell);
+      }
+    };
+
+    await coLoadSlots();
+    coRenderCalendar();
+    if (coPrev) coPrev.addEventListener('click', async () => { coView.setMonth(coView.getMonth()-1); if(coFormSec) coFormSec.style.display='none'; await coLoadSlots(); coRenderCalendar(); });
+    if (coNext) coNext.addEventListener('click', async () => { coView.setMonth(coView.getMonth()+1); if(coFormSec) coFormSec.style.display='none'; await coLoadSlots(); coRenderCalendar(); });
+
+    const coForm = document.getElementById('coBookingForm');
+    if (coForm) {
+      coForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(coForm);
+        const d  = Object.fromEntries(fd.entries());
+        const res = await fetch('/api/com/reservations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name:d.user_name, phone:d.user_phone, address:d.user_address||'', service:d.service_type, date:d.selected_date, time:d.booking_time })
+        }).catch(() => null);
+        if (!res || !res.ok) {
+          const errData = res ? await res.json().catch(() => ({})) : {};
+          return alert(errData.error || '예약 접수 중 오류가 발생했습니다.');
+        }
+        const svcNames = { stand:'가정용 스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 4Way 시스템', system1way:'천장형 1Way 시스템' };
+        const addressLine = d.user_address ? `\n상세주소   : ${d.user_address}` : '';
+        sendEmailNotification(
+          `[임직원] 새 예약 접수 - ${d.user_name} (${d.selected_date})`,
+          `📋 임직원 예약이 접수되었습니다\n` +
+          `──────────────────────\n` +
+          `고객명   : ${d.user_name}\n` +
+          `연락처   : ${d.user_phone}` +
+          `${addressLine}\n` +
+          `서비스   : ${svcNames[d.service_type] || d.service_type}\n` +
+          `예약 날짜 : ${d.selected_date}\n` +
+          `희망 시간 : ${d.booking_time}\n` +
+          `──────────────────────`
+        );
+        alert('예약신청이 성공적으로 접수되었습니다!\n담당자가 개별 연락드리겠습니다.');
+        coForm.reset();
+        if (coFormSec) coFormSec.style.display = 'none';
+        await coLoadSlots();
+        coRenderCalendar();
         window.scrollTo({ top:0, behavior:'smooth' });
       });
     }
@@ -1627,6 +1825,58 @@ window.saveHyHeroImage = async (e) => {
     msgEl.style.cssText += ';background:#d1fae5;color:#065f46;';
     msgEl.textContent = '✅ 이미지가 저장되었습니다.';
     renderHyHeroSection();
+  } else {
+    msgEl.style.display = 'block';
+    msgEl.style.cssText += ';background:#fef2f2;color:#dc2626;';
+    msgEl.textContent = '❌ 저장 중 오류가 발생했습니다.';
+  }
+  setTimeout(() => { msgEl.style.display = 'none'; }, 3000);
+};
+
+// =============================================
+// COM 히어로 이미지 관리 (Admin)
+// =============================================
+window.renderCoHeroSection = async () => {
+  const preview = document.getElementById('coHeroPreview');
+  const urlInput = document.getElementById('coHeroImageUrl');
+  if (!preview) return;
+  const data = await api('GET', '/banners/com-hero') || [];
+  const current = data[0]?.image_url || '';
+  if (current) {
+    preview.style.backgroundImage = `url('${current}')`;
+    if (urlInput) urlInput.value = current;
+  } else {
+    preview.style.background = '#e2e8f0';
+    preview.innerHTML = '<p style="text-align:center;line-height:200px;color:#94a3b8;font-size:0.9rem;">등록된 이미지가 없습니다.</p>';
+  }
+};
+
+window.saveCoHeroImage = async (e) => {
+  e.preventDefault();
+  const imageUrl = document.getElementById('coHeroImageUrl').value.trim();
+  const msgEl   = document.getElementById('coHeroMsg');
+  const btn     = document.getElementById('coHeroSubmitBtn');
+  if (!imageUrl) return;
+
+  btn.disabled = true;
+  btn.textContent = '저장 중...';
+
+  const existing = await api('GET', '/banners/com-hero') || [];
+  let ok;
+  if (existing.length) {
+    ok = await api('PUT', `/banners/com-hero/${existing[0].id}`, { title: 'hero', image_url: imageUrl });
+  } else {
+    ok = await api('POST', '/banners/com-hero', { title: 'hero', image_url: imageUrl });
+  }
+
+  btn.disabled = false;
+  btn.textContent = '저장하기';
+
+  if (ok) {
+    msgEl.style.display = 'block';
+    msgEl.style.cssText += ';background:#d1fae5;color:#065f46;';
+    msgEl.textContent = '✅ 이미지가 저장되었습니다.';
+    renderCoHeroSection();
   } else {
     msgEl.style.display = 'block';
     msgEl.style.cssText += ';background:#fef2f2;color:#dc2626;';

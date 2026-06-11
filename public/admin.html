@@ -151,6 +151,22 @@
                     </a>
                 </li>
                 <li class="menu-divider"></li>
+                <li id="menu-com">
+                    <a href="javascript:void(0)" onclick="showSection('com')">
+                        <i class="fas fa-briefcase"></i> <span>COM 예약현황</span>
+                    </a>
+                </li>
+                <li id="menu-com-hero">
+                    <a href="javascript:void(0)" onclick="showSection('com-hero')">
+                        <i class="fas fa-image"></i> <span>COM 히어로 이미지</span>
+                    </a>
+                </li>
+                <li id="menu-com-svc-banners">
+                    <a href="javascript:void(0)" onclick="showSection('com-svc-banners')">
+                        <i class="fas fa-photo-video"></i> <span>COM 서비스이미지</span>
+                    </a>
+                </li>
+                <li class="menu-divider"></li>
                 <li>
                     <a href="/">
                         <i class="fas fa-home"></i> <span>홈페이지로</span>
@@ -285,6 +301,116 @@
                         <div id="hyHeroMsg" style="display:none;padding:0.7rem 1rem;border-radius:8px;font-size:0.9rem;margin-bottom:1rem;"></div>
                         <button type="submit" id="hyHeroSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">저장하기</button>
                     </form>
+                </div>
+            </div>
+
+            <!-- COM 예약현황 섹션 -->
+            <div id="section-com" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1><i class="fas fa-briefcase" style="color:#047857;margin-right:0.5rem;"></i>COM 임직원 예약현황</h1>
+                    <div class="admin-user"><span>COM 임직원 전용 예약 관리</span></div>
+                </header>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>전체 예약</h3>
+                        <p id="coTotalCount">0건</p>
+                    </div>
+                    <div class="stat-card pending">
+                        <h3>대기중</h3>
+                        <p id="coPendingCount">0건</p>
+                    </div>
+                    <div class="stat-card confirmed">
+                        <h3>예약 확정</h3>
+                        <p id="coConfirmedCount">0건</p>
+                    </div>
+                </div>
+                <div class="admin-table-wrapper">
+                    <div class="table-header">
+                        <h3>COM 예약 목록</h3>
+                        <button class="btn-sm" onclick="renderComTable()">
+                            <i class="fas fa-sync-alt"></i> 새로고침
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>신청일</th>
+                                    <th>예약일시</th>
+                                    <th>고객명</th>
+                                    <th>연락처</th>
+                                    <th>상세주소</th>
+                                    <th>서비스</th>
+                                    <th>상태</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="coNoDataMessage" class="no-data" style="display:none;">접수된 예약이 없습니다.</div>
+                </div>
+            </div>
+
+            <!-- COM 히어로 이미지 관리 섹션 -->
+            <div id="section-com-hero" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1><i class="fas fa-image" style="color:#047857;margin-right:0.5rem;"></i>COM 히어로 배경 이미지</h1>
+                    <div class="admin-user"><span>히어로 섹션 배경 이미지를 변경합니다.</span></div>
+                </header>
+                <div class="admin-table-wrapper" style="max-width:640px;">
+                    <h3>현재 배경 이미지</h3>
+                    <div id="coHeroPreview" style="width:100%;height:200px;border-radius:12px;background:#e2e8f0;margin:1rem 0 1.5rem;background-size:cover;background-position:center;border:1px solid #e2e8f0;"></div>
+                    <h3>이미지 변경</h3>
+                    <form id="coHeroForm" class="admin-form" onsubmit="saveCoHeroImage(event)" style="margin-top:1rem;">
+                        <div class="input-group">
+                            <label>이미지 URL <small style="color:#e00;">*</small></label>
+                            <input type="url" id="coHeroImageUrl" placeholder="https://..." required>
+                        </div>
+                        <div id="coHeroMsg" style="display:none;padding:0.7rem 1rem;border-radius:8px;font-size:0.9rem;margin-bottom:1rem;"></div>
+                        <button type="submit" id="coHeroSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">저장하기</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- COM 서비스이미지 관리 섹션 -->
+            <div id="section-com-svc-banners" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1><i class="fas fa-photo-video" style="color:#047857;margin-right:0.5rem;"></i>COM 서비스 이미지 관리</h1>
+                </header>
+                <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+                    <h3>새 이미지 추가 / 수정</h3>
+                    <form id="coSvcBannerForm" class="admin-form" onsubmit="handleCoSvcBannerSubmit(event)">
+                        <input type="hidden" id="coSvcBannerEditId" value="">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>이미지 제목 <small style="color:#888;">(관리용)</small></label>
+                                <input type="text" id="coSvcBannerTitle" placeholder="이미지 제목" required>
+                            </div>
+                            <div class="input-group">
+                                <label>이미지 URL</label>
+                                <input type="url" id="coSvcBannerUrl" placeholder="https://..." required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>이미지 설명 <small style="color:#888;">(선택)</small></label>
+                            <input type="text" id="coSvcBannerDesc" placeholder="이미지 설명 (선택사항)">
+                        </div>
+                        <div style="display:flex; gap:1rem; align-items:center;">
+                            <button type="submit" id="coSvcBannerSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">이미지 등록하기</button>
+                            <button type="button" id="coSvcBannerCancelBtn" onclick="cancelCoSvcBannerEdit()" style="display:none;padding:0.8rem 1.5rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">취소</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="admin-table-wrapper">
+                    <h3>현재 등록된 이미지 목록</h3>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead><tr><th>미리보기</th><th>내용</th><th>관리</th></tr></thead>
+                            <tbody id="coSvcBannerTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="noCoSvcBannerMessage" class="no-data" style="display:none;">등록된 이미지가 없습니다.</div>
                 </div>
             </div>
 
