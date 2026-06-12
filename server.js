@@ -31,6 +31,18 @@ const sendMail = (subject, text) => {
       .catch(err => console.error('[Mail] 발송 실패:', to, err.message));
   });
 };
+
+// Web3Forms 서버 측 호출 (Gmail 실패 시 백업 및 클라이언트 미호출 시 보완)
+const WEB3FORMS_KEY = '962f5bff-992d-4cc2-b8bf-0b4966759efa';
+const sendWeb3Forms = (subject, message) => {
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, message, from_name: '클린앤파트너즈 알림' })
+  }).then(r => r.json())
+    .then(r => console.log('[Web3Forms] 서버 발송:', r.success ? '성공' : r.message))
+    .catch(err => console.error('[Web3Forms] 서버 발송 실패:', err.message));
+};
 const JWT_SECRET = process.env.JWT_SECRET || 'cleanpartners_secret';
 
 app.use(express.json());
@@ -504,9 +516,7 @@ app.post('/api/reservations', async (req, res) => {
     const svcNames = { wall:'상업용 스탠드 에어컨', stand:'가정용 스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
     const districtLine = district ? `\n서비스 지역 : ${district}` : '';
     const addressLine  = address  ? `\n상세주소   : ${address}` : '';
-    sendMail(
-      `[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`,
-      `📋 새 예약이 접수되었습니다\n` +
+    const mailBody = `📋 새 예약이 접수되었습니다\n` +
       `──────────────────────\n` +
       `고객명   : ${name}\n` +
       `연락처   : ${phone}` +
@@ -515,8 +525,9 @@ app.post('/api/reservations', async (req, res) => {
       `서비스   : ${svcNames[service] || service}\n` +
       `예약 날짜 : ${date}\n` +
       `희망 시간 : ${time}\n` +
-      `──────────────────────`
-    );
+      `──────────────────────`;
+    sendMail(`[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`, mailBody);
+    sendWeb3Forms(`[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`, mailBody);
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -552,16 +563,15 @@ app.post('/api/contacts', async (req, res) => {
       'INSERT INTO contacts (name, phone, message) VALUES (?, ?, ?)',
       [name, phone, message]
     );
-    sendMail(
-      `[클린앤파트너즈] 새 문의 접수 - ${name}`,
-      `💬 새 문의가 접수되었습니다\n` +
+    const contactBody = `💬 새 문의가 접수되었습니다\n` +
       `──────────────────────\n` +
       `고객명   : ${name}\n` +
       `연락처   : ${phone}\n` +
       `──────────────────────\n` +
       `문의 내용 :\n${message}\n` +
-      `──────────────────────`
-    );
+      `──────────────────────`;
+    sendMail(`[클린앤파트너즈] 새 문의 접수 - ${name}`, contactBody);
+    sendWeb3Forms(`[클린앤파트너즈] 새 문의 접수 - ${name}`, contactBody);
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -860,9 +870,7 @@ app.post('/api/hanyoung/reservations', async (req, res) => {
     );
     const svcNames = { stand:'가정용 스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 4Way 시스템', system1way:'천장형 1Way 시스템' };
     const addressLine = address ? `\n상세주소   : ${address}` : '';
-    sendMail(
-      `[한영 임직원] 새 예약 접수 - ${name} (${date})`,
-      `📋 한영 임직원 예약이 접수되었습니다\n` +
+    const hyBody = `📋 한영 임직원 예약이 접수되었습니다\n` +
       `──────────────────────\n` +
       `고객명   : ${name}\n` +
       `연락처   : ${phone}` +
@@ -870,8 +878,9 @@ app.post('/api/hanyoung/reservations', async (req, res) => {
       `서비스   : ${svcNames[service] || service}\n` +
       `예약 날짜 : ${date}\n` +
       `희망 시간 : ${time}\n` +
-      `──────────────────────`
-    );
+      `──────────────────────`;
+    sendMail(`[한영 임직원] 새 예약 접수 - ${name} (${date})`, hyBody);
+    sendWeb3Forms(`[한영 임직원] 새 예약 접수 - ${name} (${date})`, hyBody);
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -949,9 +958,7 @@ app.post('/api/com/reservations', async (req, res) => {
     );
     const svcNames = { stand:'가정용 스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 4Way 시스템', system1way:'천장형 1Way 시스템' };
     const addressLine = address ? `\n상세주소   : ${address}` : '';
-    sendMail(
-      `[임직원] 새 예약 접수 - ${name} (${date})`,
-      `📋 임직원 예약이 접수되었습니다\n` +
+    const coBody = `📋 임직원 예약이 접수되었습니다\n` +
       `──────────────────────\n` +
       `고객명   : ${name}\n` +
       `연락처   : ${phone}` +
@@ -959,8 +966,9 @@ app.post('/api/com/reservations', async (req, res) => {
       `서비스   : ${svcNames[service] || service}\n` +
       `예약 날짜 : ${date}\n` +
       `희망 시간 : ${time}\n` +
-      `──────────────────────`
-    );
+      `──────────────────────`;
+    sendMail(`[임직원] 새 예약 접수 - ${name} (${date})`, coBody);
+    sendWeb3Forms(`[임직원] 새 예약 접수 - ${name} (${date})`, coBody);
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
