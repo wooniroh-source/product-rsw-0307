@@ -1,7 +1,11 @@
 // 클린앤파트너즈 Service Worker
-const CACHE_NAME = 'cleannpartners-v27';
+const CACHE_NAME = 'cleannpartners-v28';
 const IMAGE_CACHE = 'cleannpartners-images-v1';
-const PRECACHE = ['/', '/style.css', '/main.js', '/icon.svg', '/manifest.json'];
+// main.js, style.css 는 network-first 로 처리하므로 PRECACHE 에서 제외
+const PRECACHE = ['/', '/icon.svg', '/manifest.json'];
+
+// main.js, style.css 는 항상 네트워크에서 최신 버전을 가져와야 하는 파일
+const NETWORK_FIRST = ['/main.js', '/style.css'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -26,6 +30,23 @@ function isExternalImage(url) {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   if (e.request.url.includes('/api/')) return;
+
+  const path = new URL(e.request.url).pathname;
+
+  // main.js, style.css: network-first (항상 최신 버전 유지)
+  if (NETWORK_FIRST.includes(path)) {
+    e.respondWith(
+      fetch(e.request)
+        .then(res => {
+          if (res.ok) {
+            caches.open(CACHE_NAME).then(cache => cache.put(e.request, res.clone()));
+          }
+          return res;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
 
   // 외부 이미지: stale-while-revalidate (캐시 우선, 백그라운드 갱신)
   if (isExternalImage(e.request.url)) {
