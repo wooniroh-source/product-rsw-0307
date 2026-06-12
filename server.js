@@ -82,6 +82,14 @@ app.use((req, res, next) => {
   next();
 });
 
+// main.js, sw.js 는 항상 최신 버전 제공 (캐시 완전 비활성화)
+app.get(['/main.js', '/sw.js'], (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.sendFile(path.join(__dirname, 'public', req.path.slice(1)));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // =============================================

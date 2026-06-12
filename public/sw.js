@@ -1,5 +1,5 @@
 // 클린앤파트너즈 Service Worker
-const CACHE_NAME = 'cleannpartners-v28';
+const CACHE_NAME = 'cleannpartners-v29';
 const IMAGE_CACHE = 'cleannpartners-images-v1';
 // main.js, style.css 는 network-first 로 처리하므로 PRECACHE 에서 제외
 const PRECACHE = ['/', '/icon.svg', '/manifest.json'];
