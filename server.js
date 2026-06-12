@@ -2,6 +2,7 @@ require('dotenv').config();
 const express    = require('express');
 const jwt        = require('jsonwebtoken');
 const path       = require('path');
+const https      = require('https');
 const nodemailer = require('nodemailer');
 const pool       = require('./src/db');
 const auth       = require('./src/middleware/auth');
@@ -40,16 +41,27 @@ const sendMail = (subject, text) => {
   });
 };
 
-// Web3Forms 서버 측 백업 발송
+// Web3Forms 서버 측 백업 발송 (Node.js 내장 https 모듈 사용)
 const WEB3FORMS_KEY = '962f5bff-992d-4cc2-b8bf-0b4966759efa';
 const sendWeb3Forms = (subject, message) => {
-  fetch('https://api.web3forms.com/submit', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, message, from_name: '클린앤파트너즈 알림' })
-  }).then(r => r.json())
-    .then(r => { if (!r.success) console.warn('[Web3Forms] ⚠️ 발송 실패:', r.message); })
-    .catch(err => console.error('[Web3Forms] ❌ 오류:', err.message));
+  const data = JSON.stringify({ access_key: WEB3FORMS_KEY, subject, message, from_name: '클린앤파트너즈 알림' });
+  const req = https.request({
+    hostname: 'api.web3forms.com', port: 443, path: '/submit', method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) }
+  }, (res) => {
+    let body = '';
+    res.on('data', chunk => body += chunk);
+    res.on('end', () => {
+      try {
+        const parsed = JSON.parse(body);
+        if (parsed.success) console.log('[Web3Forms] ✅ 발송 완료');
+        else console.warn('[Web3Forms] ⚠️ 발송 실패:', parsed.message);
+      } catch(e) {}
+    });
+  });
+  req.on('error', err => console.error('[Web3Forms] ❌ 오류:', err.message));
+  req.write(data);
+  req.end();
 };
 const JWT_SECRET = process.env.JWT_SECRET || 'cleanpartners_secret';
 
@@ -102,11 +114,19 @@ app.use((req, res, next) => {
   next();
 });
 
-// main.js, sw.js 는 항상 최신 버전 제공 (캐시 완전 비활성화)
+// main.js, sw.js, HTML 파일은 항상 최신 버전 제공 (캐시 완전 비활성화)
+app.use((req, res, next) => {
+  const p = req.path;
+  if (p === '/main.js' || p === '/sw.js' || p.endsWith('.html') ||
+      ['/reservation','/hanyoung','/com','/services','/estimate','/gallery','/about','/contact','/privacy','/care','/admin','/'].includes(p)) {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+  }
+  next();
+});
+
 app.get(['/main.js', '/sw.js'], (req, res) => {
-  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.set('Pragma', 'no-cache');
-  res.set('Expires', '0');
   res.sendFile(path.join(__dirname, 'public', req.path.slice(1)));
 });
 
