@@ -10,29 +10,37 @@ const app = express();
 
 // 이메일 발송 설정
 const mailTransporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS }
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
+  tls: { rejectUnauthorized: false }
 });
 
 const NOTIFY_EMAILS = ['wooniroh@gmail.com', 'myzerobiz.co@gmail.com'];
 
+// 서버 시작 시 Gmail 연결 테스트
+if (process.env.GMAIL_USER && process.env.GMAIL_PASS) {
+  mailTransporter.verify((err) => {
+    if (err) console.error('[Mail] ❌ Gmail 연결 실패:', err.message, '→ 앱 비밀번호 확인 필요');
+    else     console.log('[Mail] ✅ Gmail 연결 성공:', process.env.GMAIL_USER);
+  });
+} else {
+  console.warn('[Mail] ⚠️ GMAIL_USER 또는 GMAIL_PASS 미설정');
+}
+
 const sendMail = (subject, text) => {
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
-    console.log('[Mail] GMAIL_USER 또는 GMAIL_PASS 미설정 - 발송 건너뜀');
-    return;
-  }
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) return;
   NOTIFY_EMAILS.forEach(to => {
     mailTransporter.sendMail({
       from: `"클린앤파트너즈 알림" <${process.env.GMAIL_USER}>`,
-      to,
-      subject,
-      text
-    }).then(() => console.log('[Mail] 발송 완료:', to))
-      .catch(err => console.error('[Mail] 발송 실패:', to, err.message));
+      to, subject, text
+    }).then(() => console.log('[Mail] ✅ 발송 완료:', to))
+      .catch(err => console.error('[Mail] ❌ 발송 실패:', to, err.message));
   });
 };
 
-// Web3Forms 서버 측 호출 (Gmail 실패 시 백업 및 클라이언트 미호출 시 보완)
+// Web3Forms 서버 측 백업 발송
 const WEB3FORMS_KEY = '962f5bff-992d-4cc2-b8bf-0b4966759efa';
 const sendWeb3Forms = (subject, message) => {
   fetch('https://api.web3forms.com/submit', {
@@ -40,8 +48,8 @@ const sendWeb3Forms = (subject, message) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, message, from_name: '클린앤파트너즈 알림' })
   }).then(r => r.json())
-    .then(r => console.log('[Web3Forms] 서버 발송:', r.success ? '성공' : r.message))
-    .catch(err => console.error('[Web3Forms] 서버 발송 실패:', err.message));
+    .then(r => { if (!r.success) console.warn('[Web3Forms] ⚠️ 발송 실패:', r.message); })
+    .catch(err => console.error('[Web3Forms] ❌ 오류:', err.message));
 };
 const JWT_SECRET = process.env.JWT_SECRET || 'cleanpartners_secret';
 
