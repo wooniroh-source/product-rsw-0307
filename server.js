@@ -517,6 +517,13 @@ app.get('/api/reservations', auth, async (req, res) => {
 app.post('/api/reservations', async (req, res) => {
   try {
     const { name, phone, address, service, date, time, district } = req.body;
+
+    const [[closedRow]] = await pool.query(
+      'SELECT id FROM closed_dates WHERE close_date = ?', [date]
+    );
+    if (closedRow)
+      return res.status(409).json({ error: '해당 날짜는 예약 마감일입니다.' });
+
     const [result] = await pool.query(
       'INSERT INTO reservations (name, phone, address, service, date, time, district) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [name, phone, address || null, service, date, time, district || null]
