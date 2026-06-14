@@ -716,6 +716,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
   const isHero   = containerId === 'hero-slider-container';
   const isMid    = containerId === 'mid-slider-container';
   const isHySvc  = containerId === 'hy-svc-banner-container';
+  const isCoSvc  = containerId === 'co-svc-banner-container';
   const imgWidth = isHero ? 1200 : 800;
 
   items.forEach((item, index) => {
@@ -729,7 +730,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
       ? 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5))'
       : isMid
         ? 'linear-gradient(rgba(0,0,0,0.58),rgba(0,0,0,0.58))'
-        : isHySvc
+        : (isHySvc || isCoSvc)
           ? null
           : 'linear-gradient(to right,rgba(0,0,0,0.65) 40%,rgba(0,0,0,0.25))';
 
@@ -762,7 +763,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
             ${statsHtml ? `<div class="mid-slide-stats">${statsHtml}</div>` : ''}
           </div>
         </div>`;
-    } else {
+    } else if (!isCoSvc) {
       slide.innerHTML = `<div class="res-banner-content">${item.badge?`<span class="res-banner-badge">${item.badge}</span>`:''}<h4>${item.title}</h4><p>${item.description||''}</p></div>`;
     }
     container.appendChild(slide);
