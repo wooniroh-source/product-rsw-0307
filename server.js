@@ -6,6 +6,7 @@ const https      = require('https');
 const nodemailer = require('nodemailer');
 const pool       = require('./src/db');
 const auth       = require('./src/middleware/auth');
+const querystring = require('querystring');
 
 const app = express();
 
@@ -63,6 +64,35 @@ const sendWeb3Forms = (subject, message) => {
   req.write(data);
   req.end();
 };
+// 알리고 SMS/LMS 발송
+const sendSMS = (msg, msgType = 'LMS', title = '') => {
+  const { ALIGO_KEY, ALIGO_USER_ID, ALIGO_SENDER, ALIGO_RECEIVER } = process.env;
+  if (!ALIGO_KEY || !ALIGO_USER_ID || !ALIGO_SENDER || !ALIGO_RECEIVER) {
+    console.warn('[SMS] ⚠️ 알리고 환경변수 미설정 (ALIGO_KEY, ALIGO_USER_ID, ALIGO_SENDER, ALIGO_RECEIVER)');
+    return;
+  }
+  const params = { key: ALIGO_KEY, user_id: ALIGO_USER_ID, sender: ALIGO_SENDER, receiver: ALIGO_RECEIVER, msg, msg_type: msgType };
+  if (msgType === 'LMS' && title) params.title = title;
+  const data = querystring.stringify(params);
+  const req = https.request({
+    hostname: 'apis.aligo.in', port: 443, path: '/send/', method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(data) }
+  }, (res) => {
+    let body = '';
+    res.on('data', chunk => body += chunk);
+    res.on('end', () => {
+      try {
+        const parsed = JSON.parse(body);
+        if (String(parsed.result_code) === '1') console.log('[SMS] ✅ 발송 완료, 건수:', parsed.success_cnt);
+        else console.warn('[SMS] ⚠️ 발송 실패:', parsed.message);
+      } catch(e) { console.error('[SMS] ❌ 응답 파싱 오류:', e.message); }
+    });
+  });
+  req.on('error', err => console.error('[SMS] ❌ 요청 오류:', err.message));
+  req.write(data);
+  req.end();
+};
+
 const JWT_SECRET = process.env.JWT_SECRET || 'cleanpartners_secret';
 
 app.use(express.json());
@@ -563,6 +593,8 @@ app.post('/api/reservations', async (req, res) => {
       `──────────────────────`;
     sendMail(`[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`, mailBody);
     sendWeb3Forms(`[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`, mailBody);
+    const smsMsg = `[클린앤파트너즈] 예약접수\n${name} ${phone}\n${date} ${time}`;
+    sendSMS(smsMsg, 'SMS');
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -607,6 +639,8 @@ app.post('/api/contacts', async (req, res) => {
       `──────────────────────`;
     sendMail(`[클린앤파트너즈] 새 문의 접수 - ${name}`, contactBody);
     sendWeb3Forms(`[클린앤파트너즈] 새 문의 접수 - ${name}`, contactBody);
+    const contactSms = `[클린앤파트너즈] 문의접수\n${name} ${phone}`;
+    sendSMS(contactSms, 'SMS');
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -916,6 +950,8 @@ app.post('/api/hanyoung/reservations', async (req, res) => {
       `──────────────────────`;
     sendMail(`[한영 임직원] 새 예약 접수 - ${name} (${date})`, hyBody);
     sendWeb3Forms(`[한영 임직원] 새 예약 접수 - ${name} (${date})`, hyBody);
+    const hySms = `[한영임직원] 예약접수\n${name} ${phone}\n${date} ${time}`;
+    sendSMS(hySms, 'SMS');
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -1004,6 +1040,8 @@ app.post('/api/com/reservations', async (req, res) => {
       `──────────────────────`;
     sendMail(`[임직원] 새 예약 접수 - ${name} (${date})`, coBody);
     sendWeb3Forms(`[임직원] 새 예약 접수 - ${name} (${date})`, coBody);
+    const coSms = `[임직원] 예약접수\n${name} ${phone}\n${date} ${time}`;
+    sendSMS(coSms, 'SMS');
     res.json({ id: result.insertId });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
