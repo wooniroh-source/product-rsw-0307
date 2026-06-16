@@ -10,19 +10,32 @@ const auth       = require('./src/middleware/auth');
 const querystring = require('querystring');
 
 // Railway 컨테이너가 IPv6 아웃바운드를 지원하지 않아 smtp.gmail.com이
-// AAAA로 해석되면 ENETUNREACH로 실패함 → IPv4 우선 해석 강제
+// AAAA로 해석되면 ENETUNREACH로 실패함 → IPv4 주소로 직접 연결
 dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
 
-// 이메일 발송 설정
-const mailTransporter = nodemailer.createTransport({
+// 이메일 발송 설정 (smtp.gmail.com을 IPv4로 직접 resolve해서 연결 - nodemailer는 family 옵션을 지원하지 않음)
+let mailTransporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   secure: false,
-  family: 4,
   auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
-  tls: { rejectUnauthorized: false }
+  tls: { rejectUnauthorized: false, servername: 'smtp.gmail.com' }
+});
+dns.resolve4('smtp.gmail.com', (err, addresses) => {
+  if (err || !addresses || !addresses.length) {
+    console.warn('[Mail] ⚠️ smtp.gmail.com IPv4 resolve 실패, 기본 호스트명 사용:', err && err.message);
+    return;
+  }
+  mailTransporter = nodemailer.createTransport({
+    host: addresses[0],
+    port: 587,
+    secure: false,
+    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
+    tls: { rejectUnauthorized: false, servername: 'smtp.gmail.com' }
+  });
+  console.log('[Mail] ✅ smtp.gmail.com IPv4 주소로 연결 설정:', addresses[0]);
 });
 
 const NOTIFY_EMAILS = ['wooniroh@gmail.com', 'myzerobiz.co@gmail.com'];
