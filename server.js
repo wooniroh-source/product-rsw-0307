@@ -95,6 +95,15 @@ const sendSMS = (msg, msgType = 'LMS', title = '') => {
 
 const JWT_SECRET = process.env.JWT_SECRET || 'cleanpartners_secret';
 
+// TEMP: 알리고 IP 인증 오류 진단용 - 운영 서버의 아웃바운드 IP 확인 후 제거할 것
+app.get('/api/debug/egress-ip', (req, res) => {
+  https.get('https://api.ipify.org?format=json', (r) => {
+    let body = '';
+    r.on('data', c => body += c);
+    r.on('end', () => res.type('json').send(body));
+  }).on('error', e => res.status(500).json({ error: e.message }));
+});
+
 app.use(express.json());
 
 // www → non-www 리디렉션
