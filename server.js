@@ -144,6 +144,15 @@ app.get('/api/debug/test-mail', (req, res) => {
   res.json({ triggered: true });
 });
 
+app.get('/api/debug/test-mail-sync', async (req, res) => {
+  try {
+    await sendMailOnce('wooniroh@gmail.com', '[테스트] 동기 발송 점검', '동기 발송 테스트입니다.');
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message, code: e.code });
+  }
+});
+
 app.get('/api/debug/notification-logs', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM notification_logs ORDER BY created_at DESC LIMIT 30');
