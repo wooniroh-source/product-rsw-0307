@@ -120,6 +120,11 @@ app.get('/api/debug/egress-ip', (req, res) => {
   }).on('error', e => res.status(500).json({ error: e.message }));
 });
 
+app.get('/api/debug/test-mail', (req, res) => {
+  sendMail('[테스트] 알림 시스템 점검', '이메일 발송 테스트입니다. 이 메일이 보이면 정상입니다.');
+  res.json({ triggered: true });
+});
+
 app.get('/api/debug/notification-logs', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM notification_logs ORDER BY created_at DESC LIMIT 30');
