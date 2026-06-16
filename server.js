@@ -31,14 +31,30 @@ if (process.env.GMAIL_USER && process.env.GMAIL_PASS) {
   console.warn('[Mail] ⚠️ GMAIL_USER 또는 GMAIL_PASS 미설정');
 }
 
+const logNotification = (channel, recipient, subject, success, error) => {
+  pool.query(
+    'INSERT INTO notification_logs (channel, recipient, subject, success, error) VALUES (?, ?, ?, ?, ?)',
+    [channel, recipient, subject, success ? 1 : 0, error || null]
+  ).catch(err => console.error('[NotifyLog] ❌ 기록 실패:', err.message));
+};
+
+const sendMailOnce = (to, subject, text) =>
+  mailTransporter.sendMail({ from: `"클린앤파트너즈 알림" <${process.env.GMAIL_USER}>`, to, subject, text });
+
 const sendMail = (subject, text) => {
   if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) return;
   NOTIFY_EMAILS.forEach(to => {
-    mailTransporter.sendMail({
-      from: `"클린앤파트너즈 알림" <${process.env.GMAIL_USER}>`,
-      to, subject, text
-    }).then(() => console.log('[Mail] ✅ 발송 완료:', to))
-      .catch(err => console.error('[Mail] ❌ 발송 실패:', to, err.message));
+    sendMailOnce(to, subject, text)
+      .then(() => { console.log('[Mail] ✅ 발송 완료:', to); logNotification('mail', to, subject, true, null); })
+      .catch(err => {
+        console.warn('[Mail] ⚠️ 1차 발송 실패, 재시도:', to, err.message);
+        sendMailOnce(to, subject, text)
+          .then(() => { console.log('[Mail] ✅ 재시도 발송 완료:', to); logNotification('mail', to, subject, true, null); })
+          .catch(err2 => {
+            console.error('[Mail] ❌ 재시도까지 발송 실패:', to, err2.message);
+            logNotification('mail', to, subject, false, err2.message);
+          });
+      });
   });
 };
 
@@ -55,12 +71,12 @@ const sendWeb3Forms = (subject, message) => {
     res.on('end', () => {
       try {
         const parsed = JSON.parse(body);
-        if (parsed.success) console.log('[Web3Forms] ✅ 발송 완료');
-        else console.warn('[Web3Forms] ⚠️ 발송 실패:', parsed.message);
-      } catch(e) {}
+        if (parsed.success) { console.log('[Web3Forms] ✅ 발송 완료'); logNotification('web3forms', null, subject, true, null); }
+        else { console.warn('[Web3Forms] ⚠️ 발송 실패:', parsed.message); logNotification('web3forms', null, subject, false, parsed.message); }
+      } catch(e) { logNotification('web3forms', null, subject, false, e.message); }
     });
   });
-  req.on('error', err => console.error('[Web3Forms] ❌ 오류:', err.message));
+  req.on('error', err => { console.error('[Web3Forms] ❌ 오류:', err.message); logNotification('web3forms', null, subject, false, err.message); });
   req.write(data);
   req.end();
 };
@@ -479,6 +495,18 @@ async function initDB() {
       )
     `);
 
+    await runQuery('notification_logs', `
+      CREATE TABLE IF NOT EXISTS notification_logs (
+        id         INT AUTO_INCREMENT PRIMARY KEY,
+        channel    VARCHAR(20)  NOT NULL,
+        recipient  VARCHAR(200),
+        subject    VARCHAR(200),
+        success    TINYINT(1)   NOT NULL DEFAULT 0,
+        error      VARCHAR(500),
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // 3. 기본 데이터 채우기 (생략 가능 시 건너뜀)
     const [processRows] = await pool.query('SELECT id FROM process_steps LIMIT 1');
     if (!processRows.length) {
@@ -652,6 +680,13 @@ app.delete('/api/reservations/:id', auth, async (req, res) => {
   try {
     await pool.query('DELETE FROM reservations WHERE id = ?', [req.params.id]);
     res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/notification-logs', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM notification_logs ORDER BY created_at DESC LIMIT 100');
+    res.json(rows);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
