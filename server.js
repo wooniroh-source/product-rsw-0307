@@ -104,6 +104,16 @@ app.get('/api/debug/egress-ip', (req, res) => {
   }).on('error', e => res.status(500).json({ error: e.message }));
 });
 
+app.get('/api/debug/env-check', (req, res) => {
+  const keys = ['ALIGO_KEY', 'ALIGO_USER_ID', 'ALIGO_SENDER', 'ALIGO_RECEIVER'];
+  const result = {};
+  keys.forEach(k => {
+    const v = process.env[k];
+    result[k] = v ? { set: true, length: v.length } : { set: false };
+  });
+  res.json(result);
+});
+
 app.get('/api/debug/aligo-remain', (req, res) => {
   const { ALIGO_KEY, ALIGO_USER_ID } = process.env;
   const data = querystring.stringify({ key: ALIGO_KEY, user_id: ALIGO_USER_ID });
