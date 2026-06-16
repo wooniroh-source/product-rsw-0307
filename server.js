@@ -135,7 +135,7 @@ app.get('/api/debug/env-keys', (req, res) => {
 });
 
 app.get('/api/debug/env-check', (req, res) => {
-  const keys = ['ALIGO_KEY', 'ALIGO_USER_ID', 'ALIGO_SENDER', 'ALIGO_RECEIVER'];
+  const keys = ['ALIGO_KEY', 'ALIGO_USER_ID', 'ALIGO_SENDER', 'ALIGO_RECEIVER', 'GMAIL_USER', 'GMAIL_PASS'];
   const result = {};
   keys.forEach(k => {
     const v = process.env[k];
