@@ -120,6 +120,13 @@ app.get('/api/debug/egress-ip', (req, res) => {
   }).on('error', e => res.status(500).json({ error: e.message }));
 });
 
+app.get('/api/debug/notification-logs', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM notification_logs ORDER BY created_at DESC LIMIT 30');
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.get('/api/debug/env-keys', (req, res) => {
   const aligoKeys = Object.keys(process.env)
     .filter(k => k.toUpperCase().includes('ALIGO'))
