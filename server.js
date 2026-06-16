@@ -1,4 +1,5 @@
 require('dotenv').config();
+const dns        = require('dns');
 const express    = require('express');
 const jwt        = require('jsonwebtoken');
 const path       = require('path');
@@ -8,6 +9,10 @@ const pool       = require('./src/db');
 const auth       = require('./src/middleware/auth');
 const querystring = require('querystring');
 
+// Railway 컨테이너가 IPv6 아웃바운드를 지원하지 않아 smtp.gmail.com이
+// AAAA로 해석되면 ENETUNREACH로 실패함 → IPv4 우선 해석 강제
+dns.setDefaultResultOrder('ipv4first');
+
 const app = express();
 
 // 이메일 발송 설정
@@ -15,6 +20,7 @@ const mailTransporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   secure: false,
+  family: 4,
   auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
   tls: { rejectUnauthorized: false }
 });
