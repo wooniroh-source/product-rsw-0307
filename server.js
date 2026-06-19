@@ -1,54 +1,26 @@
 require('dotenv').config();
-const dns        = require('dns');
 const express    = require('express');
 const jwt        = require('jsonwebtoken');
 const path       = require('path');
 const https      = require('https');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const pool       = require('./src/db');
 const auth       = require('./src/middleware/auth');
 const querystring = require('querystring');
 
-// Railway 컨테이너가 IPv6 아웃바운드를 지원하지 않아 smtp.gmail.com이
-// AAAA로 해석되면 ENETUNREACH로 실패함 → IPv4 주소로 직접 연결
-dns.setDefaultResultOrder('ipv4first');
-
 const app = express();
 
-// 이메일 발송 설정 (smtp.gmail.com을 IPv4로 직접 resolve해서 연결 - nodemailer는 family 옵션을 지원하지 않음)
-let mailTransporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
-  tls: { rejectUnauthorized: false, servername: 'smtp.gmail.com' }
-});
-dns.resolve4('smtp.gmail.com', (err, addresses) => {
-  if (err || !addresses || !addresses.length) {
-    console.warn('[Mail] ⚠️ smtp.gmail.com IPv4 resolve 실패, 기본 호스트명 사용:', err && err.message);
-    return;
-  }
-  mailTransporter = nodemailer.createTransport({
-    host: addresses[0],
-    port: 587,
-    secure: false,
-    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
-    tls: { rejectUnauthorized: false, servername: 'smtp.gmail.com' }
-  });
-  console.log('[Mail] ✅ smtp.gmail.com IPv4 주소로 연결 설정:', addresses[0]);
-});
+// Resend 이메일 발송 설정 (HTTPS API - SMTP 네트워크 문제 없음)
+const resendClient = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const RESEND_FROM = process.env.RESEND_FROM || '클린앤파트너즈 알림 <onboarding@resend.dev>';
+
+if (resendClient) {
+  console.log('[Mail] ✅ Resend 이메일 클라이언트 초기화 완료');
+} else {
+  console.warn('[Mail] ⚠️ RESEND_API_KEY 미설정 - 이메일 발송 비활성화');
+}
 
 const NOTIFY_EMAILS = ['wooniroh@gmail.com', 'myzerobiz.co@gmail.com'];
-
-// 서버 시작 시 Gmail 연결 테스트
-if (process.env.GMAIL_USER && process.env.GMAIL_PASS) {
-  mailTransporter.verify((err) => {
-    if (err) console.error('[Mail] ❌ Gmail 연결 실패:', err.message, '→ 앱 비밀번호 확인 필요');
-    else     console.log('[Mail] ✅ Gmail 연결 성공:', process.env.GMAIL_USER);
-  });
-} else {
-  console.warn('[Mail] ⚠️ GMAIL_USER 또는 GMAIL_PASS 미설정');
-}
 
 const logNotification = (channel, recipient, subject, success, error) => {
   pool.query(
@@ -57,22 +29,25 @@ const logNotification = (channel, recipient, subject, success, error) => {
   ).catch(err => console.error('[NotifyLog] ❌ 기록 실패:', err.message));
 };
 
-const sendMailOnce = (to, subject, text) =>
-  mailTransporter.sendMail({ from: `"클린앤파트너즈 알림" <${process.env.GMAIL_USER}>`, to, subject, text });
+const sendMailOnce = async (to, subject, text) => {
+  if (!resendClient) throw new Error('RESEND_API_KEY 미설정');
+  const { error } = await resendClient.emails.send({
+    from: RESEND_FROM,
+    to,
+    subject,
+    text,
+  });
+  if (error) throw new Error(error.message);
+};
 
 const sendMail = (subject, text) => {
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) return;
+  if (!resendClient) return;
   NOTIFY_EMAILS.forEach(to => {
     sendMailOnce(to, subject, text)
       .then(() => { console.log('[Mail] ✅ 발송 완료:', to); logNotification('mail', to, subject, true, null); })
       .catch(err => {
-        console.warn('[Mail] ⚠️ 1차 발송 실패, 재시도:', to, err.message);
-        sendMailOnce(to, subject, text)
-          .then(() => { console.log('[Mail] ✅ 재시도 발송 완료:', to); logNotification('mail', to, subject, true, null); })
-          .catch(err2 => {
-            console.error('[Mail] ❌ 재시도까지 발송 실패:', to, err2.message);
-            logNotification('mail', to, subject, false, err2.message);
-          });
+        console.error('[Mail] ❌ 발송 실패:', to, err.message);
+        logNotification('mail', to, subject, false, err.message);
       });
   });
 };
@@ -141,15 +116,15 @@ app.get('/api/debug/egress-ip', (req, res) => {
 
 app.get('/api/debug/test-mail', (req, res) => {
   sendMail('[테스트] 알림 시스템 점검', '이메일 발송 테스트입니다. 이 메일이 보이면 정상입니다.');
-  res.json({ triggered: true });
+  res.json({ triggered: true, provider: 'resend' });
 });
 
 app.get('/api/debug/test-mail-sync', async (req, res) => {
   try {
-    await sendMailOnce('wooniroh@gmail.com', '[테스트] 동기 발송 점검', '동기 발송 테스트입니다.');
-    res.json({ ok: true });
+    await sendMailOnce('wooniroh@gmail.com', '[테스트] 동기 발송 점검', '동기 발송 테스트입니다. (Resend)');
+    res.json({ ok: true, provider: 'resend' });
   } catch (e) {
-    res.status(500).json({ ok: false, error: e.message, code: e.code });
+    res.status(500).json({ ok: false, error: e.message });
   }
 });
 
@@ -168,7 +143,7 @@ app.get('/api/debug/env-keys', (req, res) => {
 });
 
 app.get('/api/debug/env-check', (req, res) => {
-  const keys = ['ALIGO_KEY', 'ALIGO_USER_ID', 'ALIGO_SENDER', 'ALIGO_RECEIVER', 'GMAIL_USER', 'GMAIL_PASS'];
+  const keys = ['ALIGO_KEY', 'ALIGO_USER_ID', 'ALIGO_SENDER', 'ALIGO_RECEIVER', 'RESEND_API_KEY', 'RESEND_FROM'];
   const result = {};
   keys.forEach(k => {
     const v = process.env[k];
