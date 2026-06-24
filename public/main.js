@@ -848,6 +848,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     { id: 'hy-svc-banner-container',  type: 'hanyoung-svc', dots:'hy-svc-banner-dots',  prev:'hy-svc-banner-prev',  next:'hy-svc-banner-next' },
     { id: 'co-svc-banner-container',  type: 'com-svc',      dots:'co-svc-banner-dots',  prev:'co-svc-banner-prev',  next:'co-svc-banner-next' }
   ];
+  // 캐시된 메인 슬라이더 이미지 즉시 적용 (API 응답 전에 먼저 표시)
+  const HERO_CACHE_KEY = 'hero_first_img_url';
+  const MID_CACHE_KEY  = 'mid_first_img_url';
+  const heroContainer = document.getElementById('hero-slider-container');
+  const midContainer  = document.getElementById('mid-slider-container');
+  if (heroContainer) {
+    const cached = localStorage.getItem(HERO_CACHE_KEY);
+    if (cached) {
+      const firstSlide = heroContainer.querySelector('.slide.active');
+      if (firstSlide) firstSlide.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('${cached}')`;
+    }
+  }
+  if (midContainer) {
+    const cached = localStorage.getItem(MID_CACHE_KEY);
+    if (cached) {
+      const firstSlide = midContainer.querySelector('.slide.active');
+      if (firstSlide) firstSlide.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.58),rgba(0,0,0,0.58)),url('${cached}')`;
+    }
+  }
+
   // 캐시된 히어로 URL 즉시 적용 (API 응답 전에 먼저 표시)
   const hyHero = document.querySelector('.hy-hero');
   const HY_HERO_CACHE_KEY = 'hy_hero_img_url';
@@ -868,6 +888,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!document.getElementById(cfg.id)) return;
       const data = await api('GET', `/banners/${cfg.type}`) || [];
       renderBannerSlider(data, cfg.id, cfg.dots, cfg.prev, cfg.next);
+      if (cfg.type === 'hero' && data.length && data[0].image_url) {
+        try { localStorage.setItem(HERO_CACHE_KEY, optimizeImageUrl(data[0].image_url, 1200)); } catch(e) {}
+      }
+      if (cfg.type === 'mid' && data.length && data[0].image_url) {
+        try { localStorage.setItem(MID_CACHE_KEY, optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
+      }
       if (cfg.type === 'hanyoung-svc' && data.length && data[0].image_url) {
         try { localStorage.setItem('hy_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
       }
