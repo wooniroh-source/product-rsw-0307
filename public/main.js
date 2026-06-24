@@ -711,109 +711,123 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
   const nextBtn       = document.getElementById(nextId);
   if (!container) return;
 
-  container.innerHTML = '';
-  if (dotsContainer) dotsContainer.innerHTML = '';
   const isHero   = containerId === 'hero-slider-container';
   const isMid    = containerId === 'mid-slider-container';
   const isHySvc  = containerId === 'hy-svc-banner-container';
   const isCoSvc  = containerId === 'co-svc-banner-container';
   const imgWidth = isHero ? 1200 : 800;
 
-  items.forEach((item, index) => {
-    const slide = document.createElement('div');
-    slide.classList.add((isHero || isMid) ? 'slide' : 'res-banner-slide');
-    if (index === 0) slide.classList.add('active');
+  const build = () => {
+    container.innerHTML = '';
+    if (dotsContainer) dotsContainer.innerHTML = '';
 
-    // 첫 슬라이드만 즉시 로드, 나머지는 data-bg에 저장해 전환 시 로드
-    const imgUrl = optimizeImageUrl(item.image_url, imgWidth);
-    const gradient = isHero
-      ? 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5))'
-      : isMid
-        ? 'linear-gradient(rgba(0,0,0,0.58),rgba(0,0,0,0.58))'
-        : (isHySvc || isCoSvc)
-          ? null
-          : 'linear-gradient(to right,rgba(0,0,0,0.65) 40%,rgba(0,0,0,0.25))';
+    items.forEach((item, index) => {
+      const slide = document.createElement('div');
+      slide.classList.add((isHero || isMid) ? 'slide' : 'res-banner-slide');
+      if (index === 0) slide.classList.add('active');
 
-    if (index === 0) {
-      slide.style.backgroundImage = gradient ? `${gradient},url('${imgUrl}')` : `url('${imgUrl}')`;
-    } else {
-      slide.dataset.bgUrl = imgUrl;
-      if (gradient) slide.dataset.bgGradient = gradient;
-    }
+      const imgUrl = optimizeImageUrl(item.image_url, imgWidth);
+      const gradient = isHero
+        ? 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5))'
+        : isMid
+          ? 'linear-gradient(rgba(0,0,0,0.58),rgba(0,0,0,0.58))'
+          : (isHySvc || isCoSvc)
+            ? null
+            : 'linear-gradient(to right,rgba(0,0,0,0.65) 40%,rgba(0,0,0,0.25))';
 
-    if (isHero) {
-      slide.innerHTML = `<div class="hero-content"><h2>${item.title}</h2><p>${item.description||''}</p>${item.btn_text?`<div class="hero-btns"><a href="${item.btn_link||'#'}" class="btn">${item.btn_text}</a></div>`:''}</div>`;
-    } else if (isMid) {
-      const num = String(index + 1).padStart(2, '0');
-      slide.style.backgroundSize = 'cover';
-      slide.style.backgroundPosition = 'center';
-      const statsHtml = [
-        item.total_units   ? `<div class="mid-stat-item"><span class="mid-stat-label">총대수</span><span class="mid-stat-value">${item.total_units}</span></div>`   : '',
-        item.time_required ? `<div class="mid-stat-item"><span class="mid-stat-label">소요시간</span><span class="mid-stat-value">${item.time_required}</span></div>` : '',
-        item.manpower      ? `<div class="mid-stat-item"><span class="mid-stat-label">투입인원</span><span class="mid-stat-value">${item.manpower}</span></div>`      : '',
-        item.work_date     ? `<div class="mid-stat-item"><span class="mid-stat-label">소요일자</span><span class="mid-stat-value">${item.work_date}</span></div>`     : ''
-      ].join('');
-      slide.innerHTML = `
-        <div class="mid-slide-content">
-          <div class="mid-slide-info">
-            <div class="mid-slide-number">${num}</div>
-            ${item.company_name ? `<div class="mid-slide-company"><i class="fas fa-building"></i>${item.company_name}</div>` : ''}
-            <h2 class="mid-slide-title">${item.title}</h2>
-            ${item.description ? `<p class="mid-slide-desc">${item.description}</p>` : ''}
-            ${statsHtml ? `<div class="mid-slide-stats">${statsHtml}</div>` : ''}
-          </div>
-        </div>`;
-    } else if (!isCoSvc) {
-      slide.innerHTML = `<div class="res-banner-content">${item.badge?`<span class="res-banner-badge">${item.badge}</span>`:''}<h4>${item.title}</h4><p>${item.description||''}</p></div>`;
-    }
-    container.appendChild(slide);
+      if (index === 0) {
+        slide.style.backgroundImage = gradient ? `${gradient},url('${imgUrl}')` : `url('${imgUrl}')`;
+      } else {
+        slide.dataset.bgUrl = imgUrl;
+        if (gradient) slide.dataset.bgGradient = gradient;
+      }
 
-    if (dotsContainer) {
-      const dot = document.createElement('span');
-      dot.classList.add('dot');
-      if (index === 0) dot.classList.add('active');
-      dot.dataset.index = index;
-      dotsContainer.appendChild(dot);
-    }
-  });
+      if (isHero) {
+        slide.innerHTML = `<div class="hero-content"><h2>${item.title}</h2><p>${item.description||''}</p>${item.btn_text?`<div class="hero-btns"><a href="${item.btn_link||'#'}" class="btn">${item.btn_text}</a></div>`:''}</div>`;
+      } else if (isMid) {
+        const num = String(index + 1).padStart(2, '0');
+        slide.style.backgroundSize = 'cover';
+        slide.style.backgroundPosition = 'center';
+        const statsHtml = [
+          item.total_units   ? `<div class="mid-stat-item"><span class="mid-stat-label">총대수</span><span class="mid-stat-value">${item.total_units}</span></div>`   : '',
+          item.time_required ? `<div class="mid-stat-item"><span class="mid-stat-label">소요시간</span><span class="mid-stat-value">${item.time_required}</span></div>` : '',
+          item.manpower      ? `<div class="mid-stat-item"><span class="mid-stat-label">투입인원</span><span class="mid-stat-value">${item.manpower}</span></div>`      : '',
+          item.work_date     ? `<div class="mid-stat-item"><span class="mid-stat-label">소요일자</span><span class="mid-stat-value">${item.work_date}</span></div>`     : ''
+        ].join('');
+        slide.innerHTML = `
+          <div class="mid-slide-content">
+            <div class="mid-slide-info">
+              <div class="mid-slide-number">${num}</div>
+              ${item.company_name ? `<div class="mid-slide-company"><i class="fas fa-building"></i>${item.company_name}</div>` : ''}
+              <h2 class="mid-slide-title">${item.title}</h2>
+              ${item.description ? `<p class="mid-slide-desc">${item.description}</p>` : ''}
+              ${statsHtml ? `<div class="mid-slide-stats">${statsHtml}</div>` : ''}
+            </div>
+          </div>`;
+      } else if (!isCoSvc) {
+        slide.innerHTML = `<div class="res-banner-content">${item.badge?`<span class="res-banner-badge">${item.badge}</span>`:''}<h4>${item.title}</h4><p>${item.description||''}</p></div>`;
+      }
+      container.appendChild(slide);
 
-  const slides = container.querySelectorAll((isHero || isMid) ? '.slide' : '.res-banner-slide');
-  const dots   = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
-  let current  = 0, timer;
+      if (dotsContainer) {
+        const dot = document.createElement('span');
+        dot.classList.add('dot');
+        if (index === 0) dot.classList.add('active');
+        dot.dataset.index = index;
+        dotsContainer.appendChild(dot);
+      }
+    });
 
-  const loadSlideBg = (slide) => {
-    if (slide.dataset.bgUrl && !slide.dataset.bgLoaded) {
-      slide.style.backgroundImage = slide.dataset.bgGradient
-        ? `${slide.dataset.bgGradient},url('${slide.dataset.bgUrl}')`
-        : `url('${slide.dataset.bgUrl}')`;
-      slide.dataset.bgLoaded = '1';
-    }
+    const slides = container.querySelectorAll((isHero || isMid) ? '.slide' : '.res-banner-slide');
+    const dots   = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
+    let current  = 0, timer;
+
+    const loadSlideBg = (slide) => {
+      if (slide.dataset.bgUrl && !slide.dataset.bgLoaded) {
+        slide.style.backgroundImage = slide.dataset.bgGradient
+          ? `${slide.dataset.bgGradient},url('${slide.dataset.bgUrl}')`
+          : `url('${slide.dataset.bgUrl}')`;
+        slide.dataset.bgLoaded = '1';
+      }
+    };
+    const preloadNext = (idx) => {
+      const nextIdx = (idx + 1) % slides.length;
+      if (slides[nextIdx]) loadSlideBg(slides[nextIdx]);
+    };
+    const showSlide = (idx) => {
+      slides.forEach(s => s.classList.remove('active')); dots.forEach(d => d.classList.remove('active'));
+      if (slides[idx]) {
+        loadSlideBg(slides[idx]);
+        slides[idx].classList.add('active');
+        current = idx;
+        preloadNext(idx);
+      }
+      if (dots[idx]) dots[idx].classList.add('active');
+    };
+    const next  = () => showSlide((current + 1) % slides.length);
+    const prev  = () => showSlide((current - 1 + slides.length) % slides.length);
+    const start = () => { clearInterval(timer); if (slides.length > 1) timer = setInterval(next, isHero ? 5000 : isHySvc ? 10000 : 4000); };
+
+    if (nextBtn) nextBtn.addEventListener('click', () => { next(); start(); });
+    if (prevBtn) prevBtn.addEventListener('click', () => { prev(); start(); });
+    if (dotsContainer) dotsContainer.addEventListener('click', (e) => {
+      if (e.target.classList.contains('dot')) { showSlide(parseInt(e.target.dataset.index)); start(); }
+    });
+    start();
   };
-  // 다음 슬라이드 미리 로드
-  const preloadNext = (idx) => {
-    const nextIdx = (idx + 1) % slides.length;
-    if (slides[nextIdx]) loadSlideBg(slides[nextIdx]);
-  };
-  const showSlide = (idx) => {
-    slides.forEach(s => s.classList.remove('active')); dots.forEach(d => d.classList.remove('active'));
-    if (slides[idx]) {
-      loadSlideBg(slides[idx]);
-      slides[idx].classList.add('active');
-      current = idx;
-      preloadNext(idx);
-    }
-    if (dots[idx]) dots[idx].classList.add('active');
-  };
-  const next  = () => showSlide((current + 1) % slides.length);
-  const prev  = () => showSlide((current - 1 + slides.length) % slides.length);
-  const start = () => { clearInterval(timer); if (slides.length > 1) timer = setInterval(next, isHero ? 5000 : isHySvc ? 10000 : 4000); };
 
-  if (nextBtn) nextBtn.addEventListener('click', () => { next(); start(); });
-  if (prevBtn) prevBtn.addEventListener('click', () => { prev(); start(); });
-  if (dotsContainer) dotsContainer.addEventListener('click', (e) => {
-    if (e.target.classList.contains('dot')) { showSlide(parseInt(e.target.dataset.index)); start(); }
-  });
-  start();
+  // 첫 이미지를 미리 내려받은 뒤 DOM 교체 → placeholder가 이미지 준비 전까지 유지
+  const firstUrl = items.length && items[0].image_url
+    ? optimizeImageUrl(items[0].image_url, imgWidth)
+    : null;
+  if (firstUrl) {
+    const img = new Image();
+    img.onload = build;
+    img.onerror = build;
+    img.src = firstUrl;
+  } else {
+    build();
+  }
 };
 
 // =============================================

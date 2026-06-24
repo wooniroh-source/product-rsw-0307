@@ -58,6 +58,7 @@ section { padding: 6rem 5%; max-width: 1400px; margin: 0 auto; width: 100%; }
     min-height: 550px;
     overflow: hidden;
     margin-top: -1px;
+    background-color: #002244;
 }
 
 .slider-container { height: 100%; width: 100%; }
