@@ -18,6 +18,12 @@
                 pl.rel = 'preload'; pl.as = 'image'; pl.href = hu;
                 document.head.appendChild(pl);
             }
+            var su = localStorage.getItem('kids_svc_first_img_url');
+            if (su) {
+                var pl2 = document.createElement('link');
+                pl2.rel = 'preload'; pl2.as = 'image'; pl2.href = su;
+                document.head.appendChild(pl2);
+            }
         } catch(e) {}
     })();
     </script>
@@ -73,6 +79,44 @@
         }
         .kids-benefit-card h4 { font-size: 1rem; font-weight: 800; color: #1e293b; margin-bottom: 0.4rem; }
         .kids-benefit-card p  { font-size: 0.85rem; color: #64748b; line-height: 1.6; }
+
+        /* ── 서비스 이미지 배너 ── */
+        .kids-svc-banner-section {
+            max-width: 1920px; margin: 0 auto 2rem;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #e2e8f0;
+            aspect-ratio: 1920 / 900;
+        }
+        @media (max-width: 768px) { .kids-svc-banner-section { aspect-ratio: 16/9; } }
+        #kids-svc-banner-container {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+        .kids-svc-banner-section .res-banner-slide { background-position: center; background-size: contain; background-repeat: no-repeat; transition: none; }
+        .kids-svc-banner-section .res-banner-slide.active { opacity: 1; }
+        .kids-svc-banner-section .res-banner-slide:not(.active) { opacity: 0; }
+        .kids-svc-banner-section .banner-dots,
+        .kids-svc-banner-section .banner-btn { position: absolute; z-index: 10; }
+        .kids-svc-banner-section .banner-dots {
+            bottom: 10px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 6px;
+        }
+        .kids-svc-banner-section .banner-dots .dot {
+            width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer;
+        }
+        .kids-svc-banner-section .banner-dots .dot.active { background: #fff; }
+        .kids-svc-banner-section .banner-btn {
+            top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.25); color: #fff; border: none;
+            width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .kids-svc-banner-section .banner-btn:hover { background: rgba(0,0,0,0.45); }
+        .kids-svc-banner-section .banner-btn-prev { left: 12px; }
+        .kids-svc-banner-section .banner-btn-next { right: 12px; }
 
         .kids-section { padding: 4rem 5%; }
         .kids-section-alt { background: #f0fdfa; }
@@ -344,6 +388,21 @@
         </div>
     </section>
 
+    <!-- ── 서비스 이미지 ── -->
+    <section class="kids-section" style="background:#f0fdfa;">
+        <div class="kids-section-title">
+            <span class="kids-kicker">SERVICE</span>
+            <h2>서비스 안내</h2>
+            <p>어린이집·유치원 전용 키즈케어 서비스입니다.</p>
+        </div>
+        <div class="kids-svc-banner-section">
+            <div id="kids-svc-banner-container" class="banner-slider-container"></div>
+            <div id="kids-svc-banner-dots" class="banner-dots"></div>
+            <button id="kids-svc-banner-prev" class="banner-btn banner-btn-prev"><i class="fas fa-chevron-left"></i></button>
+            <button id="kids-svc-banner-next" class="banner-btn banner-btn-next"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </section>
+
     <!-- ── 기종 대응 ── -->
     <section class="kids-section kids-section-alt">
         <div class="kids-section-title">
@@ -481,6 +540,6 @@
         <p style="margin-top:0.8rem;">&copy; 2026 클린앤파트너즈. All rights reserved.</p>
     </footer>
 
-    <script src="main.js?v=31"></script>
+    <script src="main.js?v=32"></script>
 </body>
 </html>

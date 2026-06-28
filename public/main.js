@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','ad-protection','security','hanyoung','hanyoung-hero','hanyoung-svc-banners','com','com-hero','com-svc-banners','kids','kids-hero'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','ad-protection','security','hanyoung','hanyoung-hero','hanyoung-svc-banners','com','com-hero','com-svc-banners','kids','kids-hero','kids-svc-banners'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -116,6 +116,7 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'hanyoung')      renderHanyoungTable();
   else if (sectionId === 'kids')          renderKidsTable();
   else if (sectionId === 'kids-hero')     renderKidsHeroSection();
+  else if (sectionId === 'kids-svc-banners') renderBannerTable('kids-svc', 'kidsSvcBannerTableBody');
   else if (sectionId === 'closed-dates')   renderClosedDateTable();
   else if (sectionId === 'ad-protection') { renderAdClickTable(); renderBlockedIpTable(); }
 };
@@ -411,7 +412,8 @@ const bannerFormMap = {
   svc:         { form:'svcBannerForm',       editId:'svcBannerEditId',        badge:'svcBannerBadge',      title:'svcBannerTitle',        desc:'svcBannerDesc',        url:'svcBannerUrl',        btnText:'',                    btnLink:'',                    submitBtn:'svcBannerSubmitBtn',        cancelBtn:'svcBannerCancelBtn',        tableBody:'svcBannerTableBody' },
   about:       { form:'aboutBannerForm',     editId:'aboutBannerEditId',      badge:'aboutBannerBadge',    title:'aboutBannerTitle',      desc:'aboutBannerDesc',      url:'aboutBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'aboutBannerSubmitBtn',      cancelBtn:'aboutBannerCancelBtn',      tableBody:'aboutBannerTableBody' },
   'hanyoung-svc': { form:'hySvcBannerForm',  editId:'hySvcBannerEditId',      badge:'',                    title:'hySvcBannerTitle',      desc:'hySvcBannerDesc',      url:'hySvcBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'hySvcBannerSubmitBtn',      cancelBtn:'hySvcBannerCancelBtn',      tableBody:'hySvcBannerTableBody' },
-  'com-svc':      { form:'coSvcBannerForm',  editId:'coSvcBannerEditId',      badge:'',                    title:'coSvcBannerTitle',      desc:'coSvcBannerDesc',      url:'coSvcBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'coSvcBannerSubmitBtn',      cancelBtn:'coSvcBannerCancelBtn',      tableBody:'coSvcBannerTableBody' }
+  'com-svc':      { form:'coSvcBannerForm',  editId:'coSvcBannerEditId',      badge:'',                    title:'coSvcBannerTitle',      desc:'coSvcBannerDesc',      url:'coSvcBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'coSvcBannerSubmitBtn',      cancelBtn:'coSvcBannerCancelBtn',      tableBody:'coSvcBannerTableBody' },
+  'kids-svc':     { form:'kidsSvcBannerForm', editId:'kidsSvcBannerEditId',   badge:'',                    title:'kidsSvcBannerTitle',    desc:'kidsSvcBannerDesc',    url:'kidsSvcBannerUrl',    btnText:'',                    btnLink:'',                    submitBtn:'kidsSvcBannerSubmitBtn',    cancelBtn:'kidsSvcBannerCancelBtn',    tableBody:'kidsSvcBannerTableBody' }
 };
 
 const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
@@ -479,11 +481,13 @@ window.handleSvcBannerSubmit      = (e) => handleBannerSubmit(e, 'svc');
 window.handleAboutBannerSubmit    = (e) => handleBannerSubmit(e, 'about');
 window.handleHySvcBannerSubmit    = (e) => handleBannerSubmit(e, 'hanyoung-svc');
 window.handleCoSvcBannerSubmit    = (e) => handleBannerSubmit(e, 'com-svc');
+window.handleKidsSvcBannerSubmit  = (e) => handleBannerSubmit(e, 'kids-svc');
 window.cancelResBannerEdit        = () => cancelBannerEdit('res');
 window.cancelSvcBannerEdit        = () => cancelBannerEdit('svc');
 window.cancelAboutBannerEdit      = () => cancelBannerEdit('about');
 window.cancelHySvcBannerEdit      = () => cancelBannerEdit('hanyoung-svc');
 window.cancelCoSvcBannerEdit      = () => cancelBannerEdit('com-svc');
+window.cancelKidsSvcBannerEdit    = () => cancelBannerEdit('kids-svc');
 window.editResBanner      = (id) => editBanner('res',          id);
 window.editSvcBanner      = (id) => editBanner('svc',          id);
 window.editAboutBanner    = (id) => editBanner('about',        id);
@@ -494,6 +498,8 @@ window.deleteSvcBanner    = (id) => deleteBanner('svc',          id);
 window.deleteAboutBanner  = (id) => deleteBanner('about',        id);
 window.deleteHySvcBanner  = (id) => deleteBanner('hanyoung-svc', id);
 window.deleteCoSvcBanner  = (id) => deleteBanner('com-svc', id);
+window.editKidsSvcBanner  = (id) => editBanner('kids-svc', id);
+window.deleteKidsSvcBanner = (id) => deleteBanner('kids-svc', id);
 
 // =============================================
 // 4. 상담 문의
@@ -799,8 +805,9 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
 
   const isHero   = containerId === 'hero-slider-container';
   const isMid    = containerId === 'mid-slider-container';
-  const isHySvc  = containerId === 'hy-svc-banner-container';
-  const isCoSvc  = containerId === 'co-svc-banner-container';
+  const isHySvc    = containerId === 'hy-svc-banner-container';
+  const isCoSvc    = containerId === 'co-svc-banner-container';
+  const isKidsSvc  = containerId === 'kids-svc-banner-container';
   const imgWidth = isHero ? 1200 : 800;
 
   const build = () => {
@@ -817,7 +824,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
         ? 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5))'
         : isMid
           ? 'linear-gradient(rgba(0,0,0,0.58),rgba(0,0,0,0.58))'
-          : (isHySvc || isCoSvc)
+          : (isHySvc || isCoSvc || isKidsSvc)
             ? null
             : 'linear-gradient(to right,rgba(0,0,0,0.65) 40%,rgba(0,0,0,0.25))';
 
@@ -850,7 +857,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
               ${statsHtml ? `<div class="mid-slide-stats">${statsHtml}</div>` : ''}
             </div>
           </div>`;
-      } else if (!isCoSvc) {
+      } else if (!isCoSvc && !isKidsSvc) {
         slide.innerHTML = `<div class="res-banner-content">${item.badge?`<span class="res-banner-badge">${item.badge}</span>`:''}<h4>${item.title}</h4><p>${item.description||''}</p></div>`;
       }
       container.appendChild(slide);
@@ -892,7 +899,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
     };
     const next  = () => showSlide((current + 1) % slides.length);
     const prev  = () => showSlide((current - 1 + slides.length) % slides.length);
-    const start = () => { clearInterval(timer); if (slides.length > 1) timer = setInterval(next, isHero ? 5000 : isHySvc ? 10000 : 4000); };
+    const start = () => { clearInterval(timer); if (slides.length > 1) timer = setInterval(next, isHero ? 5000 : (isHySvc || isKidsSvc) ? 10000 : 4000); };
 
     if (nextBtn) nextBtn.addEventListener('click', () => { next(); start(); });
     if (prevBtn) prevBtn.addEventListener('click', () => { prev(); start(); });
@@ -946,7 +953,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     { id: 'svc-banner-container',     type: 'svc',          dots:'svc-banner-dots',     prev:'svc-banner-prev',     next:'svc-banner-next' },
     { id: 'about-banner-container',   type: 'about',        dots:'about-banner-dots',   prev:'about-banner-prev',   next:'about-banner-next' },
     { id: 'hy-svc-banner-container',  type: 'hanyoung-svc', dots:'hy-svc-banner-dots',  prev:'hy-svc-banner-prev',  next:'hy-svc-banner-next' },
-    { id: 'co-svc-banner-container',  type: 'com-svc',      dots:'co-svc-banner-dots',  prev:'co-svc-banner-prev',  next:'co-svc-banner-next' }
+    { id: 'co-svc-banner-container',   type: 'com-svc',      dots:'co-svc-banner-dots',   prev:'co-svc-banner-prev',   next:'co-svc-banner-next' },
+    { id: 'kids-svc-banner-container', type: 'kids-svc',     dots:'kids-svc-banner-dots', prev:'kids-svc-banner-prev', next:'kids-svc-banner-next' }
   ];
   // 캐시된 메인 슬라이더 이미지 즉시 적용 (API 응답 전에 먼저 표시)
   const HERO_CACHE_KEY = 'hero_first_img_url';
@@ -1005,6 +1013,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       if (cfg.type === 'com-svc' && data.length && data[0].image_url) {
         try { localStorage.setItem('co_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
+      }
+      if (cfg.type === 'kids-svc' && data.length && data[0].image_url) {
+        try { localStorage.setItem('kids_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
       }
     })),
     hyHero

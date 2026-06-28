@@ -177,6 +177,11 @@
                         <i class="fas fa-image"></i> <span>키즈케어 히어로 이미지</span>
                     </a>
                 </li>
+                <li id="menu-kids-svc-banners">
+                    <a href="javascript:void(0)" onclick="showSection('kids-svc-banners')">
+                        <i class="fas fa-photo-video"></i> <span>키즈케어 서비스이미지</span>
+                    </a>
+                </li>
                 <li class="menu-divider"></li>
                 <li>
                     <a href="/">
@@ -494,6 +499,47 @@
                         </table>
                     </div>
                     <div id="kidsNoDataMessage" class="no-data" style="display:none;">접수된 신청이 없습니다.</div>
+                </div>
+            </div>
+
+            <!-- 키즈케어 서비스이미지 관리 섹션 -->
+            <div id="section-kids-svc-banners" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1><i class="fas fa-photo-video" style="color:#0d9488;margin-right:0.5rem;"></i>키즈케어 서비스 이미지 관리</h1>
+                </header>
+                <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+                    <h3>새 이미지 추가 / 수정</h3>
+                    <form id="kidsSvcBannerForm" class="admin-form" onsubmit="handleKidsSvcBannerSubmit(event)">
+                        <input type="hidden" id="kidsSvcBannerEditId" value="">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>이미지 제목 <small style="color:#888;">(관리용)</small></label>
+                                <input type="text" id="kidsSvcBannerTitle" placeholder="이미지 제목" required>
+                            </div>
+                            <div class="input-group">
+                                <label>이미지 URL</label>
+                                <input type="url" id="kidsSvcBannerUrl" placeholder="https://..." required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>이미지 설명 <small style="color:#888;">(선택)</small></label>
+                            <input type="text" id="kidsSvcBannerDesc" placeholder="이미지 설명 (선택사항)">
+                        </div>
+                        <div style="display:flex; gap:1rem; align-items:center;">
+                            <button type="submit" id="kidsSvcBannerSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">이미지 등록하기</button>
+                            <button type="button" id="kidsSvcBannerCancelBtn" onclick="cancelKidsSvcBannerEdit()" style="display:none;padding:0.8rem 1.5rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">취소</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="admin-table-wrapper">
+                    <h3>현재 등록된 이미지 목록</h3>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead><tr><th>미리보기</th><th>내용</th><th>관리</th></tr></thead>
+                            <tbody id="kidsSvcBannerTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="noKidsSvcBannerMessage" class="no-data" style="display:none;">등록된 이미지가 없습니다.</div>
                 </div>
             </div>
 
@@ -1298,7 +1344,7 @@
             </div>
         </main>
     </div>
-    <script src="main.js?v=30"></script>
+    <script src="main.js?v=32"></script>
 </div><!-- /admin-main-container -->
 </body>
 </html>
