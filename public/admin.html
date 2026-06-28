@@ -167,6 +167,17 @@
                     </a>
                 </li>
                 <li class="menu-divider"></li>
+                <li id="menu-kids">
+                    <a href="javascript:void(0)" onclick="showSection('kids')">
+                        <i class="fas fa-child"></i> <span>키즈케어 예약현황</span>
+                    </a>
+                </li>
+                <li id="menu-kids-hero">
+                    <a href="javascript:void(0)" onclick="showSection('kids-hero')">
+                        <i class="fas fa-image"></i> <span>키즈케어 히어로 이미지</span>
+                    </a>
+                </li>
+                <li class="menu-divider"></li>
                 <li>
                     <a href="/">
                         <i class="fas fa-home"></i> <span>홈페이지로</span>
@@ -452,6 +463,58 @@
                         </table>
                     </div>
                     <div id="noHySvcBannerMessage" class="no-data" style="display:none;">등록된 이미지가 없습니다.</div>
+                </div>
+            </div>
+
+            <!-- 키즈케어 예약현황 섹션 -->
+            <div id="section-kids" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1><i class="fas fa-child" style="color:#0d9488;margin-right:0.5rem;"></i>키즈케어 예약현황</h1>
+                    <div class="admin-user"><span>어린이집·유치원 방문 진단 신청 관리</span></div>
+                </header>
+                <div class="dashboard-stats">
+                    <div class="stat-card"><h3>전체 신청</h3><p id="kidsTotalCount">0건</p></div>
+                    <div class="stat-card pending"><h3>대기중</h3><p id="kidsPendingCount">0건</p></div>
+                    <div class="stat-card confirmed"><h3>확정</h3><p id="kidsConfirmedCount">0건</p></div>
+                </div>
+                <div class="admin-table-wrapper">
+                    <div class="table-header">
+                        <h3>키즈케어 신청 목록</h3>
+                        <button class="btn-sm" onclick="renderKidsTable()"><i class="fas fa-sync-alt"></i> 새로고침</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>신청일</th><th>희망일시</th><th>담당자</th>
+                                    <th>연락처</th><th>기관주소</th><th>기종</th><th>상태</th><th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kidsTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="kidsNoDataMessage" class="no-data" style="display:none;">접수된 신청이 없습니다.</div>
+                </div>
+            </div>
+
+            <!-- 키즈케어 히어로 이미지 관리 섹션 -->
+            <div id="section-kids-hero" class="admin-section" style="display: none;">
+                <header class="admin-header">
+                    <h1><i class="fas fa-image" style="color:#0d9488;margin-right:0.5rem;"></i>키즈케어 히어로 배경 이미지</h1>
+                    <div class="admin-user"><span>히어로 섹션 배경 이미지를 변경합니다.</span></div>
+                </header>
+                <div class="admin-table-wrapper" style="max-width:640px;">
+                    <h3>현재 배경 이미지</h3>
+                    <div id="kidsHeroPreview" style="width:100%;height:200px;border-radius:12px;background:#e2e8f0;margin:1rem 0 1.5rem;background-size:cover;background-position:center;border:1px solid #e2e8f0;"></div>
+                    <h3>이미지 변경</h3>
+                    <form id="kidsHeroForm" class="admin-form" onsubmit="saveKidsHeroImage(event)" style="margin-top:1rem;">
+                        <div class="input-group">
+                            <label>이미지 URL <small style="color:#e00;">*</small></label>
+                            <input type="url" id="kidsHeroImageUrl" placeholder="https://..." required>
+                        </div>
+                        <div id="kidsHeroMsg" style="display:none;padding:0.7rem 1rem;border-radius:8px;font-size:0.9rem;margin-bottom:1rem;"></div>
+                        <button type="submit" id="kidsHeroSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">저장하기</button>
+                    </form>
                 </div>
             </div>
 

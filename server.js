@@ -221,7 +221,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   const p = req.path;
   if (p === '/main.js' || p === '/sw.js' || p.endsWith('.html') ||
-      ['/reservation','/hanyoung','/com','/services','/estimate','/gallery','/about','/contact','/privacy','/care','/admin','/'].includes(p)) {
+      ['/reservation','/hanyoung','/com','/kids','/services','/estimate','/gallery','/about','/contact','/privacy','/care','/admin','/'].includes(p)) {
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.set('Pragma', 'no-cache');
     res.set('Expires', '0');
@@ -341,6 +341,20 @@ async function initDB() {
       await pool.query(`ALTER TABLE hanyoung_reservations ADD COLUMN address VARCHAR(200) DEFAULT NULL AFTER phone`);
       console.log('✅ hanyoung_reservations.address 컬럼 추가 완료');
     }
+
+    await runQuery('kids_reservations', `
+      CREATE TABLE IF NOT EXISTS kids_reservations (
+        id         INT AUTO_INCREMENT PRIMARY KEY,
+        name       VARCHAR(50)  NOT NULL,
+        phone      VARCHAR(20)  NOT NULL,
+        address    VARCHAR(200) DEFAULT NULL,
+        service    VARCHAR(30)  NOT NULL,
+        date       VARCHAR(20)  NOT NULL,
+        time       VARCHAR(20)  NOT NULL,
+        status     ENUM('pending','confirmed','cancelled') DEFAULT 'pending',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
     await runQuery('com_reservations', `
       CREATE TABLE IF NOT EXISTS com_reservations (
@@ -1153,6 +1167,87 @@ app.delete('/api/com/reservations/:id', auth, async (req, res) => {
 });
 
 // =============================================
+// KIDS (어린이집·유치원) RESERVATIONS
+// =============================================
+app.get('/api/kids/reservations/booked-slots', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT date, time FROM kids_reservations WHERE date >= CURDATE() AND status != 'cancelled'"
+    );
+    const slots = {};
+    rows.forEach(({ date, time }) => {
+      const key = date instanceof Date ? date.toISOString().slice(0,10) : String(date).slice(0,10);
+      if (!slots[key]) slots[key] = [];
+      slots[key].push(time);
+    });
+    res.json(slots);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/kids/reservations', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM kids_reservations ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/kids/reservations', async (req, res) => {
+  try {
+    const { name, phone, address, service, date, time } = req.body;
+    if (!name || !phone || !service || !date || !time)
+      return res.status(400).json({ error: '필수 항목을 모두 입력해주세요.' });
+
+    const [[closedRow]] = await pool.query(
+      'SELECT id FROM closed_dates WHERE close_date = ?', [date]
+    );
+    if (closedRow)
+      return res.status(409).json({ error: '해당 날짜는 예약 마감일입니다.' });
+
+    const [[takenRow]] = await pool.query(
+      "SELECT id FROM kids_reservations WHERE date = ? AND time = ? AND status != 'cancelled'",
+      [date, time]
+    );
+    if (takenRow)
+      return res.status(409).json({ error: '해당 시간대는 이미 예약이 완료되었습니다.' });
+
+    const [result] = await pool.query(
+      'INSERT INTO kids_reservations (name, phone, address, service, date, time) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, phone, address || null, service, date, time]
+    );
+    const svcNames = { wall:'벽걸이형', stand:'스탠드형', system:'천장형 시스템', mixed:'복합(혼합 기종)' };
+    const addressLine = address ? `\n기관주소   : ${address}` : '';
+    const body = `📋 키즈케어 방문 진단 신청이 접수되었습니다\n` +
+      `──────────────────────\n` +
+      `담당자   : ${name}\n` +
+      `연락처   : ${phone}` +
+      `${addressLine}\n` +
+      `기종     : ${svcNames[service] || service}\n` +
+      `희망일자 : ${date}\n` +
+      `희망시간 : ${time}\n` +
+      `──────────────────────`;
+    sendMail(`[키즈케어] 방문진단 신청 - ${name} (${date})`, body);
+    sendWeb3Forms(`[키즈케어] 방문진단 신청 - ${name} (${date})`, body);
+    const sms = `[키즈케어] 방문진단신청\n${name} ${phone}\n${date} ${time}`;
+    sendSMS(sms, 'SMS');
+    res.json({ id: result.insertId });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/kids/reservations/:id/status', auth, async (req, res) => {
+  try {
+    await pool.query('UPDATE kids_reservations SET status = ? WHERE id = ?', [req.body.status, req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/kids/reservations/:id', auth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM kids_reservations WHERE id = ?', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================
 // REVIEWS
 // =============================================
 app.get('/api/reviews', async (req, res) => {
@@ -1368,6 +1463,7 @@ const cleanRoutes = {
   '/admin':       'admin.html',
   '/hanyoung':    'hanyoung.html',
   '/com':         'com.html',
+  '/kids':        'kids.html',
 };
 Object.entries(cleanRoutes).forEach(([route, file]) => {
   app.get(route, (req, res) => {

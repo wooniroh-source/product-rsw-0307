@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','ad-protection','security','hanyoung','hanyoung-hero','hanyoung-svc-banners','com','com-hero','com-svc-banners'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','ad-protection','security','hanyoung','hanyoung-hero','hanyoung-svc-banners','com','com-hero','com-svc-banners','kids','kids-hero'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
@@ -114,7 +114,8 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'checklists')    renderChecklistTable();
   else if (sectionId === 'reviews')       loadReviewsAdmin();
   else if (sectionId === 'hanyoung')      renderHanyoungTable();
-  // com은 위에서 이미 처리됨
+  else if (sectionId === 'kids')          renderKidsTable();
+  else if (sectionId === 'kids-hero')     renderKidsHeroSection();
   else if (sectionId === 'closed-dates')   renderClosedDateTable();
   else if (sectionId === 'ad-protection') { renderAdClickTable(); renderBlockedIpTable(); }
 };
@@ -269,6 +270,91 @@ window.deleteHanyoungReservation = async (id) => {
   if (!confirm('정말 삭제하시겠습니까?')) return;
   await api('DELETE', `/hanyoung/reservations/${id}`);
   renderHanyoungTable();
+};
+
+// =============================================
+// 키즈케어 Admin
+// =============================================
+window.renderKidsTable = async () => {
+  const body    = document.getElementById('kidsTableBody');
+  const total   = document.getElementById('kidsTotalCount');
+  const pending = document.getElementById('kidsPendingCount');
+  const confirmed = document.getElementById('kidsConfirmedCount');
+  const noData  = document.getElementById('kidsNoDataMessage');
+  if (!body) return;
+  const rows = await api('GET', '/kids/reservations') || [];
+  if (total)     total.textContent     = rows.length + '건';
+  if (pending)   pending.textContent   = rows.filter(r => r.status === 'pending').length + '건';
+  if (confirmed) confirmed.textContent = rows.filter(r => r.status === 'confirmed').length + '건';
+  if (!rows.length) {
+    body.innerHTML = ''; if (noData) noData.style.display = 'block'; return;
+  }
+  if (noData) noData.style.display = 'none';
+  const svcMap = { wall:'벽걸이형', stand:'스탠드형', system:'천장형 시스템', mixed:'복합(혼합 기종)' };
+  body.innerHTML = rows.map(res => {
+    const d = res.created_at ? String(res.created_at).slice(0,10) : '-';
+    const statusBadge = res.status === 'confirmed' ? '<span class="status-badge confirmed">확정</span>'
+      : res.status === 'cancelled' ? '<span class="status-badge cancelled">취소</span>'
+      : '<span class="status-badge pending">대기중</span>';
+    return `<tr>
+      <td>${d}</td>
+      <td>${res.date || '-'} ${res.time || ''}</td>
+      <td>${res.name}</td>
+      <td>${res.phone}</td>
+      <td style="font-size:0.82rem;">${res.address || '-'}</td>
+      <td>${svcMap[res.service] || res.service}</td>
+      <td>${statusBadge}</td>
+      <td>
+        ${res.status==='pending'?`<button class="btn-action btn-approve" onclick="updateKidsStatus(${res.id},'confirmed')" title="확정"><i class="fas fa-check"></i></button>`:''}
+        ${res.status!=='cancelled'?`<button class="btn-action btn-cancel" onclick="updateKidsStatus(${res.id},'cancelled')" title="취소"><i class="fas fa-times"></i></button>`:''}
+        <button class="btn-action btn-delete" onclick="deleteKidsReservation(${res.id})" title="삭제"><i class="fas fa-trash"></i></button>
+      </td></tr>`;
+  }).join('');
+};
+window.updateKidsStatus = async (id, status) => {
+  await api('PUT', `/kids/reservations/${id}/status`, { status });
+  renderKidsTable();
+};
+window.deleteKidsReservation = async (id) => {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  await api('DELETE', `/kids/reservations/${id}`);
+  renderKidsTable();
+};
+window.renderKidsHeroSection = async () => {
+  const preview = document.getElementById('kidsHeroPreview');
+  const urlInput = document.getElementById('kidsHeroImageUrl');
+  const data = await api('GET', '/banners/kids-hero') || [];
+  if (data.length && data[0].image_url) {
+    if (preview) preview.style.backgroundImage = `url('${data[0].image_url}')`;
+    if (urlInput) urlInput.value = data[0].image_url;
+  }
+};
+window.saveKidsHeroImage = async (e) => {
+  e.preventDefault();
+  const imageUrl = document.getElementById('kidsHeroImageUrl').value.trim();
+  const msgEl    = document.getElementById('kidsHeroMsg');
+  const btn      = document.getElementById('kidsHeroSubmitBtn');
+  if (!imageUrl) return;
+  btn.disabled = true; btn.textContent = '저장 중...';
+  const existing = await api('GET', '/banners/kids-hero') || [];
+  let ok;
+  if (existing.length) {
+    ok = await api('PUT', `/banners/kids-hero/${existing[0].id}`, { title: 'hero', image_url: imageUrl });
+  } else {
+    ok = await api('POST', '/banners/kids-hero', { title: 'hero', image_url: imageUrl });
+  }
+  btn.disabled = false; btn.textContent = '저장하기';
+  if (msgEl) {
+    msgEl.style.display = 'block';
+    msgEl.style.background = ok ? '#e6f9f2' : '#fdecea';
+    msgEl.style.color = ok ? '#065f46' : '#9b1c1c';
+    msgEl.textContent = ok ? '✅ 저장되었습니다.' : '❌ 저장 실패. 다시 시도해주세요.';
+  }
+  if (ok) {
+    const preview = document.getElementById('kidsHeroPreview');
+    if (preview) preview.style.backgroundImage = `url('${imageUrl}')`;
+    try { localStorage.setItem('kids_hero_img_url', imageUrl); } catch(err) {}
+  }
 };
 
 // =============================================
@@ -895,9 +981,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cached = localStorage.getItem(CO_HERO_CACHE_KEY);
     if (cached) coHero.style.setProperty('--co-hero-bg', `url('${cached}')`);
   }
+  const kidsHero = document.querySelector('.kids-hero');
+  const KIDS_HERO_CACHE_KEY = 'kids_hero_img_url';
+  if (kidsHero) {
+    const cached = localStorage.getItem(KIDS_HERO_CACHE_KEY);
+    if (cached) kidsHero.style.setProperty('--kids-hero-bg', `url('${cached}')`);
+  }
 
   // 슬라이더 + 히어로 데이터를 병렬로 fetch
-  const [, heroData, coHeroData] = await Promise.all([
+  const [, heroData, coHeroData, kidsHeroData] = await Promise.all([
     Promise.all(sliderConfigs.map(async cfg => {
       if (!document.getElementById(cfg.id)) return;
       const data = await api('GET', `/banners/${cfg.type}`) || [];
@@ -920,6 +1012,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       : Promise.resolve([]),
     coHero
       ? fetch('/api/banners/com-hero').then(r => r.ok ? r.json() : []).catch(() => [])
+      : Promise.resolve([]),
+    kidsHero
+      ? fetch('/api/banners/kids-hero').then(r => r.ok ? r.json() : []).catch(() => [])
       : Promise.resolve([])
   ]);
 
@@ -933,6 +1028,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const url = coHeroData[0].image_url;
     localStorage.setItem(CO_HERO_CACHE_KEY, url);
     coHero.style.setProperty('--co-hero-bg', `url('${url}')`);
+  }
+  if (kidsHero && kidsHeroData && kidsHeroData.length && kidsHeroData[0].image_url) {
+    const url = kidsHeroData[0].image_url;
+    localStorage.setItem(KIDS_HERO_CACHE_KEY, url);
+    kidsHero.style.setProperty('--kids-hero-bg', `url('${url}')`);
   }
 
   // 6단계 공정 (index.html)
@@ -1352,6 +1452,127 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (coFormSec) coFormSec.style.display = 'none';
         await coLoadSlots();
         coRenderCalendar();
+        window.scrollTo({ top:0, behavior:'smooth' });
+      });
+    }
+  }
+
+  // 키즈케어 예약 달력 + 폼
+  const kidsCalendarDays = document.getElementById('kidsCalendarDays');
+  if (kidsCalendarDays) {
+    const kidsTitle   = document.getElementById('kidsCalendarTitle');
+    const kidsPrev    = document.getElementById('kidsPrevMonthBtn');
+    const kidsNext    = document.getElementById('kidsNextMonthBtn');
+    const kidsFormSec = document.getElementById('kidsBookingFormSection');
+    const kidsDisplay = document.getElementById('kidsDisplaySelectedDate');
+    const kidsInput   = document.getElementById('kidsInputSelectedDate');
+    const ALL_SLOTS_KIDS = ['09:00','11:00','14:00','16:00'];
+    let kidsView      = new Date();
+    const todayKids   = new Date(); todayKids.setHours(0,0,0,0);
+    let kidsBooked    = {};
+    let kidsManualClosedDates = new Set();
+
+    const kidsLoadSlots = async () => {
+      const [bookedResult, closedResult] = await Promise.allSettled([
+        api('GET', '/kids/reservations/booked-slots'),
+        fetch('/api/closed-dates').then(r => r.ok ? r.json() : []).catch(() => [])
+      ]);
+      kidsBooked = (bookedResult.status === 'fulfilled' ? bookedResult.value : null) || {};
+      const closed = (closedResult.status === 'fulfilled' ? closedResult.value : null) || [];
+      kidsManualClosedDates = new Set(closed.map(c => String(c.close_date).slice(0, 10)));
+    };
+
+    const kidsRenderCalendar = () => {
+      kidsCalendarDays.innerHTML = '';
+      const year = kidsView.getFullYear(), month = kidsView.getMonth();
+      if (kidsTitle) kidsTitle.textContent = `${year}년 ${month+1}월`;
+      const firstDay = new Date(year, month, 1).getDay();
+      const lastDay  = new Date(year, month+1, 0).getDate();
+      for (let i = 0; i < firstDay; i++) {
+        const e = document.createElement('div'); e.classList.add('day-cell','empty'); kidsCalendarDays.appendChild(e);
+      }
+      for (let day = 1; day <= lastDay; day++) {
+        const cell    = document.createElement('div');
+        cell.classList.add('day-cell');
+        const date    = new Date(year, month, day);
+        const isPast  = date < todayKids;
+        const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const taken   = kidsBooked[dateKey] || [];
+        const isClosed = kidsManualClosedDates.has(dateKey);
+        const isFull  = !isPast && (isClosed || ALL_SLOTS_KIDS.every(s => taken.includes(s)));
+
+        let statusClass, statusText;
+        if (isPast)      { statusClass='past';  statusText='종료'; }
+        else if (isFull) { statusClass='full';  statusText='예약마감'; }
+        else             { statusClass='avail'; statusText='가능'; }
+
+        cell.innerHTML = `<span class="day-num">${day}</span><span class="day-status ${statusClass}">${statusText}</span>`;
+        if (date.getTime()===todayKids.getTime()) cell.classList.add('today');
+        if (isFull) cell.classList.add('full');
+        if (isPast || isFull) { cell.classList.add('disabled'); }
+        else {
+          cell.addEventListener('click', () => {
+            document.querySelectorAll('#kidsCalendarDays .day-cell').forEach(c=>c.classList.remove('active'));
+            cell.classList.add('active');
+            if (kidsDisplay) kidsDisplay.textContent = `${year}년 ${month+1}월 ${day}일`;
+            if (kidsInput)   kidsInput.value = dateKey;
+            const timeSelect = document.getElementById('kidsBookingTime');
+            if (timeSelect) {
+              const timeLabels = {'09:00':'오전 09:00','11:00':'오전 11:00','14:00':'오후 02:00','16:00':'오후 04:00'};
+              Array.from(timeSelect.options).forEach(opt => {
+                if (!opt.value) return;
+                const isBooked = taken.includes(opt.value);
+                opt.disabled = isBooked;
+                opt.textContent = isBooked ? `${timeLabels[opt.value]} (마감)` : timeLabels[opt.value];
+              });
+              timeSelect.value = '';
+            }
+            if (kidsFormSec) { kidsFormSec.style.display='block'; kidsFormSec.scrollIntoView({behavior:'smooth'}); }
+          });
+        }
+        kidsCalendarDays.appendChild(cell);
+      }
+    };
+
+    await kidsLoadSlots();
+    kidsRenderCalendar();
+    if (kidsPrev) kidsPrev.addEventListener('click', async () => { kidsView.setMonth(kidsView.getMonth()-1); if(kidsFormSec) kidsFormSec.style.display='none'; await kidsLoadSlots(); kidsRenderCalendar(); });
+    if (kidsNext) kidsNext.addEventListener('click', async () => { kidsView.setMonth(kidsView.getMonth()+1); if(kidsFormSec) kidsFormSec.style.display='none'; await kidsLoadSlots(); kidsRenderCalendar(); });
+
+    const kidsForm = document.getElementById('kidsBookingForm');
+    if (kidsForm) {
+      kidsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(kidsForm);
+        const d  = Object.fromEntries(fd.entries());
+        const res = await fetch('/api/kids/reservations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name:d.user_name, phone:d.user_phone, address:d.user_address||'', service:d.service_type, date:d.selected_date, time:d.booking_time })
+        }).catch(() => null);
+        if (!res || !res.ok) {
+          const errData = res ? await res.json().catch(() => ({})) : {};
+          return alert(errData.error || '예약 접수 중 오류가 발생했습니다.');
+        }
+        const svcNames = { wall:'벽걸이형', stand:'스탠드형', system:'천장형 시스템', mixed:'복합(혼합 기종)' };
+        const addressLine = d.user_address ? `\n기관주소   : ${d.user_address}` : '';
+        sendEmailNotification(
+          `[키즈케어] 방문진단 신청 - ${d.user_name} (${d.selected_date})`,
+          `📋 키즈케어 방문 진단 신청이 접수되었습니다\n` +
+          `──────────────────────\n` +
+          `담당자   : ${d.user_name}\n` +
+          `연락처   : ${d.user_phone}` +
+          `${addressLine}\n` +
+          `기종     : ${svcNames[d.service_type] || d.service_type}\n` +
+          `희망일자 : ${d.selected_date}\n` +
+          `희망시간 : ${d.booking_time}\n` +
+          `──────────────────────`
+        );
+        alert('방문 진단 신청이 성공적으로 접수되었습니다!\n담당자가 개별 연락드리겠습니다.');
+        kidsForm.reset();
+        if (kidsFormSec) kidsFormSec.style.display = 'none';
+        await kidsLoadSlots();
+        kidsRenderCalendar();
         window.scrollTo({ top:0, behavior:'smooth' });
       });
     }
