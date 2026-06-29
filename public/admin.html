@@ -302,21 +302,41 @@
             <!-- 한영 히어로 이미지 관리 섹션 -->
             <div id="section-hanyoung-hero" class="admin-section" style="display: none;">
                 <header class="admin-header">
-                    <h1><i class="fas fa-image" style="color:#1a56db;margin-right:0.5rem;"></i>한영 히어로 배경 이미지</h1>
-                    <div class="admin-user"><span>히어로 섹션 배경 이미지를 변경합니다.</span></div>
+                    <h1><i class="fas fa-image" style="color:#1a56db;margin-right:0.5rem;"></i>한영 히어로 이미지 관리</h1>
                 </header>
-                <div class="admin-table-wrapper" style="max-width:640px;">
-                    <h3>현재 배경 이미지</h3>
-                    <div id="hyHeroPreview" style="width:100%;height:200px;border-radius:12px;background:#e2e8f0;margin:1rem 0 1.5rem;background-size:cover;background-position:center;border:1px solid #e2e8f0;"></div>
-                    <h3>이미지 변경</h3>
-                    <form id="hyHeroForm" class="admin-form" onsubmit="saveHyHeroImage(event)" style="margin-top:1rem;">
-                        <div class="input-group">
-                            <label>이미지 URL <small style="color:#e00;">*</small></label>
-                            <input type="url" id="hyHeroImageUrl" placeholder="https://..." required>
+                <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+                    <h3>새 이미지 추가 / 수정</h3>
+                    <form id="hyHeroBannerForm" class="admin-form" onsubmit="handleHyHeroBannerSubmit(event)">
+                        <input type="hidden" id="hyHeroBannerEditId" value="">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>이미지 제목 <small style="color:#888;">(관리용)</small></label>
+                                <input type="text" id="hyHeroBannerTitle" placeholder="이미지 제목" required>
+                            </div>
+                            <div class="input-group">
+                                <label>이미지 URL</label>
+                                <input type="url" id="hyHeroBannerUrl" placeholder="https://..." required>
+                            </div>
                         </div>
-                        <div id="hyHeroMsg" style="display:none;padding:0.7rem 1rem;border-radius:8px;font-size:0.9rem;margin-bottom:1rem;"></div>
-                        <button type="submit" id="hyHeroSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">저장하기</button>
+                        <div class="input-group">
+                            <label>설명 <small style="color:#888;">(선택)</small></label>
+                            <input type="text" id="hyHeroBannerDesc" placeholder="설명 (선택사항)">
+                        </div>
+                        <div style="display:flex; gap:1rem; align-items:center;">
+                            <button type="submit" id="hyHeroBannerSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">이미지 등록하기</button>
+                            <button type="button" id="hyHeroBannerCancelBtn" onclick="cancelHyHeroBannerEdit()" style="display:none;padding:0.8rem 1.5rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">취소</button>
+                        </div>
                     </form>
+                </div>
+                <div class="admin-table-wrapper">
+                    <h3>현재 등록된 이미지 목록</h3>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead><tr><th>미리보기</th><th>내용</th><th>관리</th></tr></thead>
+                            <tbody id="hyHeroBannerTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="noHyHeroBannerMessage" class="no-data" style="display:none;">등록된 이미지가 없습니다.</div>
                 </div>
             </div>
 
@@ -371,21 +391,41 @@
             <!-- COM 히어로 이미지 관리 섹션 -->
             <div id="section-com-hero" class="admin-section" style="display: none;">
                 <header class="admin-header">
-                    <h1><i class="fas fa-image" style="color:#047857;margin-right:0.5rem;"></i>COM 히어로 배경 이미지</h1>
-                    <div class="admin-user"><span>히어로 섹션 배경 이미지를 변경합니다.</span></div>
+                    <h1><i class="fas fa-image" style="color:#047857;margin-right:0.5rem;"></i>COM 히어로 이미지 관리</h1>
                 </header>
-                <div class="admin-table-wrapper" style="max-width:640px;">
-                    <h3>현재 배경 이미지</h3>
-                    <div id="coHeroPreview" style="width:100%;height:200px;border-radius:12px;background:#e2e8f0;margin:1rem 0 1.5rem;background-size:cover;background-position:center;border:1px solid #e2e8f0;"></div>
-                    <h3>이미지 변경</h3>
-                    <form id="coHeroForm" class="admin-form" onsubmit="saveCoHeroImage(event)" style="margin-top:1rem;">
-                        <div class="input-group">
-                            <label>이미지 URL <small style="color:#e00;">*</small></label>
-                            <input type="url" id="coHeroImageUrl" placeholder="https://..." required>
+                <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+                    <h3>새 이미지 추가 / 수정</h3>
+                    <form id="coHeroBannerForm" class="admin-form" onsubmit="handleCoHeroBannerSubmit(event)">
+                        <input type="hidden" id="coHeroBannerEditId" value="">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>이미지 제목 <small style="color:#888;">(관리용)</small></label>
+                                <input type="text" id="coHeroBannerTitle" placeholder="이미지 제목" required>
+                            </div>
+                            <div class="input-group">
+                                <label>이미지 URL</label>
+                                <input type="url" id="coHeroBannerUrl" placeholder="https://..." required>
+                            </div>
                         </div>
-                        <div id="coHeroMsg" style="display:none;padding:0.7rem 1rem;border-radius:8px;font-size:0.9rem;margin-bottom:1rem;"></div>
-                        <button type="submit" id="coHeroSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">저장하기</button>
+                        <div class="input-group">
+                            <label>설명 <small style="color:#888;">(선택)</small></label>
+                            <input type="text" id="coHeroBannerDesc" placeholder="설명 (선택사항)">
+                        </div>
+                        <div style="display:flex; gap:1rem; align-items:center;">
+                            <button type="submit" id="coHeroBannerSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">이미지 등록하기</button>
+                            <button type="button" id="coHeroBannerCancelBtn" onclick="cancelCoHeroBannerEdit()" style="display:none;padding:0.8rem 1.5rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">취소</button>
+                        </div>
                     </form>
+                </div>
+                <div class="admin-table-wrapper">
+                    <h3>현재 등록된 이미지 목록</h3>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead><tr><th>미리보기</th><th>내용</th><th>관리</th></tr></thead>
+                            <tbody id="coHeroBannerTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="noCoHeroBannerMessage" class="no-data" style="display:none;">등록된 이미지가 없습니다.</div>
                 </div>
             </div>
 
@@ -546,21 +586,41 @@
             <!-- 키즈케어 히어로 이미지 관리 섹션 -->
             <div id="section-kids-hero" class="admin-section" style="display: none;">
                 <header class="admin-header">
-                    <h1><i class="fas fa-image" style="color:#0d9488;margin-right:0.5rem;"></i>키즈케어 히어로 배경 이미지</h1>
-                    <div class="admin-user"><span>히어로 섹션 배경 이미지를 변경합니다.</span></div>
+                    <h1><i class="fas fa-image" style="color:#0d9488;margin-right:0.5rem;"></i>키즈케어 히어로 이미지 관리</h1>
                 </header>
-                <div class="admin-table-wrapper" style="max-width:640px;">
-                    <h3>현재 배경 이미지</h3>
-                    <div id="kidsHeroPreview" style="width:100%;height:200px;border-radius:12px;background:#e2e8f0;margin:1rem 0 1.5rem;background-size:cover;background-position:center;border:1px solid #e2e8f0;"></div>
-                    <h3>이미지 변경</h3>
-                    <form id="kidsHeroForm" class="admin-form" onsubmit="saveKidsHeroImage(event)" style="margin-top:1rem;">
-                        <div class="input-group">
-                            <label>이미지 URL <small style="color:#e00;">*</small></label>
-                            <input type="url" id="kidsHeroImageUrl" placeholder="https://..." required>
+                <div class="admin-table-wrapper" style="margin-bottom: 2rem;">
+                    <h3>새 이미지 추가 / 수정</h3>
+                    <form id="kidsHeroBannerForm" class="admin-form" onsubmit="handleKidsHeroBannerSubmit(event)">
+                        <input type="hidden" id="kidsHeroBannerEditId" value="">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>이미지 제목 <small style="color:#888;">(관리용)</small></label>
+                                <input type="text" id="kidsHeroBannerTitle" placeholder="이미지 제목" required>
+                            </div>
+                            <div class="input-group">
+                                <label>이미지 URL</label>
+                                <input type="url" id="kidsHeroBannerUrl" placeholder="https://..." required>
+                            </div>
                         </div>
-                        <div id="kidsHeroMsg" style="display:none;padding:0.7rem 1rem;border-radius:8px;font-size:0.9rem;margin-bottom:1rem;"></div>
-                        <button type="submit" id="kidsHeroSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">저장하기</button>
+                        <div class="input-group">
+                            <label>설명 <small style="color:#888;">(선택)</small></label>
+                            <input type="text" id="kidsHeroBannerDesc" placeholder="설명 (선택사항)">
+                        </div>
+                        <div style="display:flex; gap:1rem; align-items:center;">
+                            <button type="submit" id="kidsHeroBannerSubmitBtn" class="submit-booking-btn" style="width:auto;padding:0.8rem 2rem;">이미지 등록하기</button>
+                            <button type="button" id="kidsHeroBannerCancelBtn" onclick="cancelKidsHeroBannerEdit()" style="display:none;padding:0.8rem 1.5rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">취소</button>
+                        </div>
                     </form>
+                </div>
+                <div class="admin-table-wrapper">
+                    <h3>현재 등록된 이미지 목록</h3>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead><tr><th>미리보기</th><th>내용</th><th>관리</th></tr></thead>
+                            <tbody id="kidsHeroBannerTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="noKidsHeroBannerMessage" class="no-data" style="display:none;">등록된 이미지가 없습니다.</div>
                 </div>
             </div>
 
@@ -1344,7 +1404,7 @@
             </div>
         </main>
     </div>
-    <script src="main.js?v=32"></script>
+    <script src="main.js?v=33"></script>
 </div><!-- /admin-main-container -->
 </body>
 </html>

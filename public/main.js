@@ -103,10 +103,10 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'res-banners')   renderBannerTable('res',   'resBannerTableBody');
   else if (sectionId === 'svc-banners')   renderBannerTable('svc',   'svcBannerTableBody');
   else if (sectionId === 'about-banners')        renderBannerTable('about',        'aboutBannerTableBody');
-  else if (sectionId === 'hanyoung-hero')         renderHyHeroSection();
+  else if (sectionId === 'hanyoung-hero')         renderBannerTable('hanyoung-hero', 'hyHeroBannerTableBody');
   else if (sectionId === 'hanyoung-svc-banners') renderBannerTable('hanyoung-svc', 'hySvcBannerTableBody');
   else if (sectionId === 'com')              renderComTable();
-  else if (sectionId === 'com-hero')         renderCoHeroSection();
+  else if (sectionId === 'com-hero')         renderBannerTable('com-hero', 'coHeroBannerTableBody');
   else if (sectionId === 'com-svc-banners')  renderBannerTable('com-svc', 'coSvcBannerTableBody');
   else if (sectionId === 'gallery')       renderGalleryTable();
   else if (sectionId === 'process')       renderProcessEditForm();
@@ -115,7 +115,7 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'reviews')       loadReviewsAdmin();
   else if (sectionId === 'hanyoung')      renderHanyoungTable();
   else if (sectionId === 'kids')          renderKidsTable();
-  else if (sectionId === 'kids-hero')     renderKidsHeroSection();
+  else if (sectionId === 'kids-hero')     renderBannerTable('kids-hero', 'kidsHeroBannerTableBody');
   else if (sectionId === 'kids-svc-banners') renderBannerTable('kids-svc', 'kidsSvcBannerTableBody');
   else if (sectionId === 'closed-dates')   renderClosedDateTable();
   else if (sectionId === 'ad-protection') { renderAdClickTable(); renderBlockedIpTable(); }
@@ -413,7 +413,10 @@ const bannerFormMap = {
   about:       { form:'aboutBannerForm',     editId:'aboutBannerEditId',      badge:'aboutBannerBadge',    title:'aboutBannerTitle',      desc:'aboutBannerDesc',      url:'aboutBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'aboutBannerSubmitBtn',      cancelBtn:'aboutBannerCancelBtn',      tableBody:'aboutBannerTableBody' },
   'hanyoung-svc': { form:'hySvcBannerForm',  editId:'hySvcBannerEditId',      badge:'',                    title:'hySvcBannerTitle',      desc:'hySvcBannerDesc',      url:'hySvcBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'hySvcBannerSubmitBtn',      cancelBtn:'hySvcBannerCancelBtn',      tableBody:'hySvcBannerTableBody' },
   'com-svc':      { form:'coSvcBannerForm',  editId:'coSvcBannerEditId',      badge:'',                    title:'coSvcBannerTitle',      desc:'coSvcBannerDesc',      url:'coSvcBannerUrl',      btnText:'',                    btnLink:'',                    submitBtn:'coSvcBannerSubmitBtn',      cancelBtn:'coSvcBannerCancelBtn',      tableBody:'coSvcBannerTableBody' },
-  'kids-svc':     { form:'kidsSvcBannerForm', editId:'kidsSvcBannerEditId',   badge:'',                    title:'kidsSvcBannerTitle',    desc:'kidsSvcBannerDesc',    url:'kidsSvcBannerUrl',    btnText:'',                    btnLink:'',                    submitBtn:'kidsSvcBannerSubmitBtn',    cancelBtn:'kidsSvcBannerCancelBtn',    tableBody:'kidsSvcBannerTableBody' }
+  'kids-svc':     { form:'kidsSvcBannerForm',  editId:'kidsSvcBannerEditId',  badge:'', title:'kidsSvcBannerTitle',   desc:'kidsSvcBannerDesc',   url:'kidsSvcBannerUrl',   btnText:'', btnLink:'', submitBtn:'kidsSvcBannerSubmitBtn',  cancelBtn:'kidsSvcBannerCancelBtn',  tableBody:'kidsSvcBannerTableBody' },
+  'kids-hero':    { form:'kidsHeroBannerForm', editId:'kidsHeroBannerEditId', badge:'', title:'kidsHeroBannerTitle',  desc:'kidsHeroBannerDesc',  url:'kidsHeroBannerUrl',  btnText:'', btnLink:'', submitBtn:'kidsHeroBannerSubmitBtn', cancelBtn:'kidsHeroBannerCancelBtn', tableBody:'kidsHeroBannerTableBody' },
+  'com-hero':     { form:'coHeroBannerForm',   editId:'coHeroBannerEditId',   badge:'', title:'coHeroBannerTitle',    desc:'coHeroBannerDesc',    url:'coHeroBannerUrl',    btnText:'', btnLink:'', submitBtn:'coHeroBannerSubmitBtn',   cancelBtn:'coHeroBannerCancelBtn',   tableBody:'coHeroBannerTableBody' },
+  'hanyoung-hero':{ form:'hyHeroBannerForm',   editId:'hyHeroBannerEditId',   badge:'', title:'hyHeroBannerTitle',   desc:'hyHeroBannerDesc',   url:'hyHeroBannerUrl',   btnText:'', btnLink:'', submitBtn:'hyHeroBannerSubmitBtn',   cancelBtn:'hyHeroBannerCancelBtn',   tableBody:'hyHeroBannerTableBody' }
 };
 
 const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
@@ -481,13 +484,19 @@ window.handleSvcBannerSubmit      = (e) => handleBannerSubmit(e, 'svc');
 window.handleAboutBannerSubmit    = (e) => handleBannerSubmit(e, 'about');
 window.handleHySvcBannerSubmit    = (e) => handleBannerSubmit(e, 'hanyoung-svc');
 window.handleCoSvcBannerSubmit    = (e) => handleBannerSubmit(e, 'com-svc');
-window.handleKidsSvcBannerSubmit  = (e) => handleBannerSubmit(e, 'kids-svc');
+window.handleKidsSvcBannerSubmit   = (e) => handleBannerSubmit(e, 'kids-svc');
+window.handleKidsHeroBannerSubmit  = (e) => handleBannerSubmit(e, 'kids-hero');
+window.handleCoHeroBannerSubmit    = (e) => handleBannerSubmit(e, 'com-hero');
+window.handleHyHeroBannerSubmit    = (e) => handleBannerSubmit(e, 'hanyoung-hero');
 window.cancelResBannerEdit        = () => cancelBannerEdit('res');
 window.cancelSvcBannerEdit        = () => cancelBannerEdit('svc');
 window.cancelAboutBannerEdit      = () => cancelBannerEdit('about');
 window.cancelHySvcBannerEdit      = () => cancelBannerEdit('hanyoung-svc');
 window.cancelCoSvcBannerEdit      = () => cancelBannerEdit('com-svc');
-window.cancelKidsSvcBannerEdit    = () => cancelBannerEdit('kids-svc');
+window.cancelKidsSvcBannerEdit     = () => cancelBannerEdit('kids-svc');
+window.cancelKidsHeroBannerEdit    = () => cancelBannerEdit('kids-hero');
+window.cancelCoHeroBannerEdit      = () => cancelBannerEdit('com-hero');
+window.cancelHyHeroBannerEdit      = () => cancelBannerEdit('hanyoung-hero');
 window.editResBanner      = (id) => editBanner('res',          id);
 window.editSvcBanner      = (id) => editBanner('svc',          id);
 window.editAboutBanner    = (id) => editBanner('about',        id);
@@ -805,9 +814,10 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
 
   const isHero   = containerId === 'hero-slider-container';
   const isMid    = containerId === 'mid-slider-container';
-  const isHySvc    = containerId === 'hy-svc-banner-container';
-  const isCoSvc    = containerId === 'co-svc-banner-container';
-  const isKidsSvc  = containerId === 'kids-svc-banner-container';
+  const isHySvc      = containerId === 'hy-svc-banner-container';
+  const isCoSvc      = containerId === 'co-svc-banner-container';
+  const isKidsSvc    = containerId === 'kids-svc-banner-container';
+  const isCustomHero = ['kids-hero-slider', 'co-hero-slider', 'hy-hero-slider'].includes(containerId);
   const imgWidth = isHero ? 1200 : 800;
 
   const build = () => {
@@ -824,7 +834,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
         ? 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5))'
         : isMid
           ? 'linear-gradient(rgba(0,0,0,0.58),rgba(0,0,0,0.58))'
-          : (isHySvc || isCoSvc || isKidsSvc)
+          : (isHySvc || isCoSvc || isKidsSvc || isCustomHero)
             ? null
             : 'linear-gradient(to right,rgba(0,0,0,0.65) 40%,rgba(0,0,0,0.25))';
 
@@ -857,7 +867,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
               ${statsHtml ? `<div class="mid-slide-stats">${statsHtml}</div>` : ''}
             </div>
           </div>`;
-      } else if (!isCoSvc && !isKidsSvc) {
+      } else if (!isCoSvc && !isKidsSvc && !isCustomHero) {
         slide.innerHTML = `<div class="res-banner-content">${item.badge?`<span class="res-banner-badge">${item.badge}</span>`:''}<h4>${item.title}</h4><p>${item.description||''}</p></div>`;
       }
       container.appendChild(slide);
@@ -899,7 +909,7 @@ const renderBannerSlider = (items, containerId, dotsId, prevId, nextId) => {
     };
     const next  = () => showSlide((current + 1) % slides.length);
     const prev  = () => showSlide((current - 1 + slides.length) % slides.length);
-    const start = () => { clearInterval(timer); if (slides.length > 1) timer = setInterval(next, isHero ? 5000 : (isHySvc || isKidsSvc) ? 10000 : 4000); };
+    const start = () => { clearInterval(timer); if (slides.length > 1) timer = setInterval(next, isHero ? 5000 : (isHySvc || isKidsSvc) ? 10000 : isCustomHero ? 5000 : 4000); };
 
     if (nextBtn) nextBtn.addEventListener('click', () => { next(); start(); });
     if (prevBtn) prevBtn.addEventListener('click', () => { prev(); start(); });
@@ -954,7 +964,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     { id: 'about-banner-container',   type: 'about',        dots:'about-banner-dots',   prev:'about-banner-prev',   next:'about-banner-next' },
     { id: 'hy-svc-banner-container',  type: 'hanyoung-svc', dots:'hy-svc-banner-dots',  prev:'hy-svc-banner-prev',  next:'hy-svc-banner-next' },
     { id: 'co-svc-banner-container',   type: 'com-svc',      dots:'co-svc-banner-dots',   prev:'co-svc-banner-prev',   next:'co-svc-banner-next' },
-    { id: 'kids-svc-banner-container', type: 'kids-svc',     dots:'kids-svc-banner-dots', prev:'kids-svc-banner-prev', next:'kids-svc-banner-next' }
+    { id: 'kids-svc-banner-container', type: 'kids-svc',     dots:'kids-svc-banner-dots', prev:'kids-svc-banner-prev', next:'kids-svc-banner-next' },
+    { id: 'kids-hero-slider', type: 'kids-hero',     dots:'kids-hero-slider-dots', prev:'kids-hero-slider-prev', next:'kids-hero-slider-next' },
+    { id: 'co-hero-slider',   type: 'com-hero',      dots:'co-hero-slider-dots',   prev:'co-hero-slider-prev',   next:'co-hero-slider-next' },
+    { id: 'hy-hero-slider',   type: 'hanyoung-hero', dots:'hy-hero-slider-dots',   prev:'hy-hero-slider-prev',   next:'hy-hero-slider-next' }
   ];
   // 캐시된 메인 슬라이더 이미지 즉시 적용 (API 응답 전에 먼저 표시)
   const HERO_CACHE_KEY = 'hero_first_img_url';
@@ -976,75 +989,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 캐시된 히어로 URL 즉시 적용 (API 응답 전에 먼저 표시)
-  const hyHero = document.querySelector('.hy-hero');
-  const HY_HERO_CACHE_KEY = 'hy_hero_img_url';
-  if (hyHero) {
-    const cached = localStorage.getItem(HY_HERO_CACHE_KEY);
-    if (cached) hyHero.style.setProperty('--hy-hero-bg', `url('${cached}')`);
-  }
-  const coHero = document.querySelector('.co-hero');
-  const CO_HERO_CACHE_KEY = 'co_hero_img_url';
-  if (coHero) {
-    const cached = localStorage.getItem(CO_HERO_CACHE_KEY);
-    if (cached) coHero.style.setProperty('--co-hero-bg', `url('${cached}')`);
-  }
-  const kidsHero = document.querySelector('.kids-hero');
-  const KIDS_HERO_CACHE_KEY = 'kids_hero_img_url';
-  if (kidsHero) {
-    const cached = localStorage.getItem(KIDS_HERO_CACHE_KEY);
-    if (cached) kidsHero.style.setProperty('--kids-hero-bg', `url('${cached}')`);
-  }
-
-  // 슬라이더 + 히어로 데이터를 병렬로 fetch
-  const [, heroData, coHeroData, kidsHeroData] = await Promise.all([
-    Promise.all(sliderConfigs.map(async cfg => {
-      if (!document.getElementById(cfg.id)) return;
-      const data = await api('GET', `/banners/${cfg.type}`) || [];
-      renderBannerSlider(data, cfg.id, cfg.dots, cfg.prev, cfg.next);
-      if (cfg.type === 'hero' && data.length && data[0].image_url) {
-        try { localStorage.setItem(HERO_CACHE_KEY, optimizeImageUrl(data[0].image_url, 1200)); } catch(e) {}
-      }
-      if (cfg.type === 'mid' && data.length && data[0].image_url) {
-        try { localStorage.setItem(MID_CACHE_KEY, optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
-      }
-      if (cfg.type === 'hanyoung-svc' && data.length && data[0].image_url) {
-        try { localStorage.setItem('hy_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
-      }
-      if (cfg.type === 'com-svc' && data.length && data[0].image_url) {
-        try { localStorage.setItem('co_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
-      }
-      if (cfg.type === 'kids-svc' && data.length && data[0].image_url) {
-        try { localStorage.setItem('kids_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
-      }
-    })),
-    hyHero
-      ? fetch('/api/banners/hanyoung-hero').then(r => r.ok ? r.json() : []).catch(() => [])
-      : Promise.resolve([]),
-    coHero
-      ? fetch('/api/banners/com-hero').then(r => r.ok ? r.json() : []).catch(() => [])
-      : Promise.resolve([]),
-    kidsHero
-      ? fetch('/api/banners/kids-hero').then(r => r.ok ? r.json() : []).catch(() => [])
-      : Promise.resolve([])
-  ]);
-
-  // 히어로 배경 이미지 적용 및 캐시 갱신
-  if (hyHero && heroData.length && heroData[0].image_url) {
-    const url = heroData[0].image_url;
-    localStorage.setItem(HY_HERO_CACHE_KEY, url);
-    hyHero.style.setProperty('--hy-hero-bg', `url('${url}')`);
-  }
-  if (coHero && coHeroData.length && coHeroData[0].image_url) {
-    const url = coHeroData[0].image_url;
-    localStorage.setItem(CO_HERO_CACHE_KEY, url);
-    coHero.style.setProperty('--co-hero-bg', `url('${url}')`);
-  }
-  if (kidsHero && kidsHeroData && kidsHeroData.length && kidsHeroData[0].image_url) {
-    const url = kidsHeroData[0].image_url;
-    localStorage.setItem(KIDS_HERO_CACHE_KEY, url);
-    kidsHero.style.setProperty('--kids-hero-bg', `url('${url}')`);
-  }
+  // 슬라이더 데이터를 병렬로 fetch (히어로 슬라이더 포함)
+  await Promise.all(sliderConfigs.map(async cfg => {
+    if (!document.getElementById(cfg.id)) return;
+    const data = await api('GET', `/banners/${cfg.type}`) || [];
+    renderBannerSlider(data, cfg.id, cfg.dots, cfg.prev, cfg.next);
+    if (cfg.type === 'hero' && data.length && data[0].image_url) {
+      try { localStorage.setItem(HERO_CACHE_KEY, optimizeImageUrl(data[0].image_url, 1200)); } catch(e) {}
+    }
+    if (cfg.type === 'mid' && data.length && data[0].image_url) {
+      try { localStorage.setItem(MID_CACHE_KEY, optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
+    }
+    if (cfg.type === 'hanyoung-svc' && data.length && data[0].image_url) {
+      try { localStorage.setItem('hy_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
+    }
+    if (cfg.type === 'com-svc' && data.length && data[0].image_url) {
+      try { localStorage.setItem('co_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
+    }
+    if (cfg.type === 'kids-svc' && data.length && data[0].image_url) {
+      try { localStorage.setItem('kids_svc_first_img_url', optimizeImageUrl(data[0].image_url, 800)); } catch(e) {}
+    }
+  }));
 
   // 6단계 공정 (index.html)
   const processDisplay = document.getElementById('process-display-container');

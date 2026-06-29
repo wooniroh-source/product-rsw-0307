@@ -11,13 +11,6 @@
     <script>
     (function(){
         try {
-            var hu = localStorage.getItem('kids_hero_img_url');
-            if (hu) {
-                document.documentElement.style.setProperty('--kids-hero-bg', 'url("' + hu + '")');
-                var pl = document.createElement('link');
-                pl.rel = 'preload'; pl.as = 'image'; pl.href = hu;
-                document.head.appendChild(pl);
-            }
             var su = localStorage.getItem('kids_svc_first_img_url');
             if (su) {
                 var pl2 = document.createElement('link');
@@ -40,16 +33,32 @@
             text-align: center; color: #fff;
             position: relative; overflow: hidden;
         }
-        .kids-hero::before {
-            content: '';
-            position: absolute; top: 0; right: 0; bottom: 0; left: 0;
-            background-image: var(--kids-hero-bg, none);
-            background-position: center; background-size: cover; background-repeat: no-repeat;
+        #kids-hero-slider {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;
         }
         .kids-hero-inner {
             position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
-            z-index: 1; text-align: center; width: 100%;
+            z-index: 2; text-align: center; width: 100%;
         }
+        .kids-hero .banner-btn {
+            position: absolute; z-index: 2; top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.25); color: #fff; border: none;
+            width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+            font-size: 0.9rem; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .kids-hero .banner-btn:hover { background: rgba(0,0,0,0.45); }
+        .kids-hero .banner-btn-prev { left: 12px; }
+        .kids-hero .banner-btn-next { right: 12px; }
+        .kids-hero .banner-dots {
+            position: absolute; z-index: 2;
+            bottom: 70px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 6px;
+        }
+        .kids-hero .banner-dots .dot {
+            width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer;
+        }
+        .kids-hero .banner-dots .dot.active { background: #fff; }
         .kids-badge {
             display: inline-block; background: var(--kids-gold); color: #1a1a1a;
             font-size: 0.8rem; font-weight: 800; padding: 0.25rem 0.9rem;
@@ -271,6 +280,10 @@
 
     <!-- ── 히어로 ── -->
     <section class="kids-hero">
+        <div id="kids-hero-slider" class="banner-slider-container"></div>
+        <div id="kids-hero-slider-dots" class="banner-dots"></div>
+        <button id="kids-hero-slider-prev" class="banner-btn banner-btn-prev"><i class="fas fa-chevron-left"></i></button>
+        <button id="kids-hero-slider-next" class="banner-btn banner-btn-next"><i class="fas fa-chevron-right"></i></button>
         <div class="kids-hero-inner">
             <div class="kids-badge"><i class="fas fa-leaf"></i> 어린이집·유치원 전용</div>
             <a href="#kids-booking" class="kids-hero-cta">
@@ -540,6 +553,6 @@
         <p style="margin-top:0.8rem;">&copy; 2026 클린앤파트너즈. All rights reserved.</p>
     </footer>
 
-    <script src="main.js?v=32"></script>
+    <script src="main.js?v=33"></script>
 </body>
 </html>

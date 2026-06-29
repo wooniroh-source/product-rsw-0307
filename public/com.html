@@ -11,13 +11,6 @@
     <script>
     (function(){
         try {
-            var hu = localStorage.getItem('co_hero_img_url');
-            if (hu) {
-                document.documentElement.style.setProperty('--co-hero-bg', 'url("' + hu + '")');
-                var pl = document.createElement('link');
-                pl.rel = 'preload'; pl.as = 'image'; pl.href = hu;
-                document.head.appendChild(pl);
-            }
             var su = localStorage.getItem('co_svc_first_img_url');
             if (su) {
                 var pl2 = document.createElement('link');
@@ -51,17 +44,30 @@
             position: relative;
             overflow: hidden;
         }
-        .co-hero::before {
-            content: '';
-            position: absolute; top: 0; right: 0; bottom: 0; left: 0;
-            background-image: var(--co-hero-bg, url('https://images.unsplash.com/photo-1581094288338-2314dddb7bc3?auto=format&fit=crop&w=1400&q=80'));
-            background-position: center;
-            background-size: contain;
-            background-repeat: no-repeat;
-            opacity: 1;
+        #co-hero-slider {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;
         }
-        .co-hero::after { display: none; }
-        .co-hero-inner { position: relative; max-width: 720px; margin: 0 auto; z-index: 1; }
+        #co-hero-slider .res-banner-slide { background-size: contain; }
+        .co-hero-inner { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 2; text-align: center; width: 100%; }
+        .co-hero .banner-btn {
+            position: absolute; z-index: 2; top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.25); color: #fff; border: none;
+            width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+            font-size: 0.9rem; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .co-hero .banner-btn:hover { background: rgba(0,0,0,0.45); }
+        .co-hero .banner-btn-prev { left: 12px; }
+        .co-hero .banner-btn-next { right: 12px; }
+        .co-hero .banner-dots {
+            position: absolute; z-index: 2;
+            bottom: 70px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 6px;
+        }
+        .co-hero .banner-dots .dot {
+            width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer;
+        }
+        .co-hero .banner-dots .dot.active { background: #fff; }
         .co-badge {
             display: inline-block;
             background: var(--co-gold);
@@ -277,7 +283,11 @@
 
     <!-- ── 히어로 ── -->
     <section class="co-hero">
-        <div class="co-hero-inner" style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:1;text-align:center;width:100%;">
+        <div id="co-hero-slider" class="banner-slider-container"></div>
+        <div id="co-hero-slider-dots" class="banner-dots"></div>
+        <button id="co-hero-slider-prev" class="banner-btn banner-btn-prev"><i class="fas fa-chevron-left"></i></button>
+        <button id="co-hero-slider-next" class="banner-btn banner-btn-next"><i class="fas fa-chevron-right"></i></button>
+        <div class="co-hero-inner">
             <div class="co-discount-tag">
                 <i class="fas fa-tag"></i> 할인혜택 <strong>20% OFF</strong>
             </div>
@@ -436,6 +446,6 @@
         <p style="margin-top:0.8rem;">&copy; 2026 클린앤파트너즈. All rights reserved.</p>
     </footer>
 
-    <script src="main.js?v=30"></script>
+    <script src="main.js?v=33"></script>
 </body>
 </html>
