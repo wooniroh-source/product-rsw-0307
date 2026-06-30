@@ -647,6 +647,11 @@
                 <p>서명이 완료된 계약서입니다.</p>
                 <small id="ct-signed-at-label"></small>
             </div>
+            <!-- 근로자 서명 이미지 -->
+            <div style="margin: 0 1.2rem 0.8rem; border: 1.5px solid #0066cc; border-radius: 10px; background: #f9fbff; padding: 0.7rem 1rem;">
+                <div style="font-size:0.7rem;font-weight:700;color:#0066cc;margin-bottom:0.4rem;"><i class="fas fa-pen-nib" style="margin-right:0.3rem;"></i>근로자(을) 서명</div>
+                <img id="signed-card-sig-img" src="" alt="서명" style="display:none;width:100%;max-height:80px;object-fit:contain;background:#fff;border-radius:6px;">
+            </div>
             <div style="padding: 0 1.2rem 1.5rem;">
                 <button class="btn-pdf" id="btn-pdf-signed" onclick="downloadPDF()">
                     <i class="fas fa-file-pdf"></i> PDF 저장
@@ -772,6 +777,8 @@ function renderContract(data) {
             const wp = document.getElementById('worker-sig-preview');
             const wi = document.getElementById('worker-sig-img');
             if (wp && wi) { wi.src = data.worker_signature; wp.style.display = 'block'; }
+            const ci = document.getElementById('signed-card-sig-img');
+            if (ci) { ci.src = data.worker_signature; ci.style.display = 'block'; }
         }
     } else {
         setTimeout(resizeCanvas, 50);
@@ -896,7 +903,13 @@ document.getElementById('ct-btn-submit').addEventListener('click', async () => {
         document.getElementById('progressBar').style.width = '100%';
         document.getElementById('progressLabel').textContent = '서명 완료';
 
-        // 근로자 서명 footer에 표시
+        // 근로자 서명 저장 (PDF 및 재방문 시 사용)
+        if (contractData) {
+            contractData.signed_at       = new Date().toISOString();
+            contractData.worker_signature = signature;
+        }
+
+        // footer 서명 이미지 표시
         const workerSigPreview = document.getElementById('worker-sig-preview');
         const workerSigImg     = document.getElementById('worker-sig-img');
         if (workerSigPreview && workerSigImg) {
@@ -904,8 +917,9 @@ document.getElementById('ct-btn-submit').addEventListener('click', async () => {
             workerSigPreview.style.display = 'block';
         }
 
-        // contractData 업데이트
-        if (contractData) contractData.signed_at = new Date().toISOString();
+        // 완료 카드에 서명 이미지 표시
+        const sigCardImg = document.getElementById('signed-card-sig-img');
+        if (sigCardImg) { sigCardImg.src = signature; sigCardImg.style.display = 'block'; }
 
         signedCard.scrollIntoView({ behavior: 'smooth' });
     } catch (e) {
@@ -925,10 +939,11 @@ async function downloadPDF() {
         const today = new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit' });
         const todayFile = today.replace(/\. /g,'-').replace('.','');
         const d = contractData || {};
-        const sigDataUrl  = canvas.toDataURL('image/png');
-        const sigPixels   = ctx.getImageData(0,0,canvas.width,canvas.height).data;
-        const hasSig      = sigPixels.some((v,i) => i%4===3 && v>0);
-        const empSig      = d.employer_signature || null;
+        // 저장된 서명 우선 사용 (재방문 or 제출 직후 모두 동작)
+        const sigDataUrl = d.worker_signature || canvas.toDataURL('image/png');
+        const hasSig     = !!(d.worker_signature) ||
+                           ctx.getImageData(0,0,canvas.width,canvas.height).data.some((v,i) => i%4===3 && v>0);
+        const empSig     = d.employer_signature || null;
 
         const el = document.createElement('div');
         el.style.cssText = 'position:fixed;top:-9999px;left:0;width:700px;padding:44px;background:#fff;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;color:#1a2540;line-height:1.8;box-sizing:border-box;';
@@ -1049,7 +1064,14 @@ async function downloadPDF() {
         }
 
         const workerName = (d.worker_name || '근로자').replace(/\s+/g, '_');
-        pdf.save(`근로계약서_${workerName}_${todayFile}.pdf`);
+        const filename   = `근로계약서_${workerName}_${todayFile}.pdf`;
+        const isMobile   = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        if (isMobile) {
+            // iOS Safari는 download 속성 미지원 → 새 탭에서 열기
+            window.open(pdf.output('bloburl'), '_blank');
+        } else {
+            pdf.save(filename);
+        }
 
     } catch (e) {
         alert('PDF 생성 중 오류가 발생했습니다.\n' + e.message);
