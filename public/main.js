@@ -691,17 +691,23 @@ window.renderContractTable = async () => {
 
   items.forEach(item => {
     const tr = document.createElement('tr');
-    const createdAt = item.created_at ? String(item.created_at).replace('T',' ').slice(0,16) : '-';
-    const signedAt  = item.signed_at  ? String(item.signed_at).replace('T',' ').slice(0,16)  : null;
+    const createdAt       = item.created_at        ? String(item.created_at).replace('T',' ').slice(0,16)       : '-';
+    const signedAt        = item.signed_at         ? String(item.signed_at).replace('T',' ').slice(0,16)        : null;
+    const employerSigned  = item.employer_signed_at ? String(item.employer_signed_at).replace('T',' ').slice(0,16) : null;
     tr.innerHTML = `
       <td><strong>${item.worker_name}</strong></td>
       <td>${item.worker_phone}</td>
       <td style="font-size:0.8rem;">${item.contract_period}</td>
       <td style="white-space:nowrap;">${fmtWage(item.daily_wage)}</td>
       <td>
+        <div style="font-size:0.72rem;color:#94a3b8;font-weight:600;margin-bottom:2px;">사업주</div>
+        ${employerSigned
+          ? `<span class="badge confirmed" style="font-size:0.68rem;"><i class="fas fa-check" style="margin-right:2px;"></i>서명완료</span>`
+          : `<button class="badge pending" onclick="openEmployerSigModal(${item.id})" style="cursor:pointer;border:none;background:#fef9c3;color:#92400e;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:700;">서명하기</button>`}
+        <div style="font-size:0.72rem;color:#94a3b8;font-weight:600;margin-top:6px;margin-bottom:2px;">근로자</div>
         ${signedAt
-          ? `<span class="badge confirmed"><i class="fas fa-signature" style="margin-right:3px;"></i>서명완료</span><br><small style="color:#64748b;font-size:0.72rem;">${signedAt}</small>`
-          : `<span class="badge pending">미서명</span>`}
+          ? `<span class="badge confirmed" style="font-size:0.68rem;"><i class="fas fa-check" style="margin-right:2px;"></i>서명완료</span><br><small style="color:#64748b;font-size:0.68rem;">${signedAt}</small>`
+          : `<span class="badge pending" style="font-size:0.68rem;">미서명</span>`}
       </td>
       <td style="white-space:nowrap;font-size:0.8rem;color:#64748b;">${createdAt}</td>
       <td><div class="btn-group">
@@ -710,6 +716,90 @@ window.renderContractTable = async () => {
       </div></td>`;
     body.appendChild(tr);
   });
+};
+
+// ── 사업주 서명 모달 ──
+let _employerSigCtx = null, _employerSigDrawing = false, _employerSigLX = 0, _employerSigLY = 0, _employerSigContractId = null;
+
+window.openEmployerSigModal = (id) => {
+  _employerSigContractId = id;
+  const modal  = document.getElementById('employer-sig-modal');
+  const canvas = document.getElementById('employer-sig-canvas');
+  modal.style.display = 'flex';
+  document.getElementById('employer-sig-err').style.display = 'none';
+
+  _employerSigCtx = canvas.getContext('2d');
+
+  setTimeout(() => {
+    const ratio = window.devicePixelRatio || 1;
+    const rect  = canvas.getBoundingClientRect();
+    canvas.width  = Math.floor(rect.width  * ratio);
+    canvas.height = Math.floor(rect.height * ratio);
+    _employerSigCtx.scale(ratio, ratio);
+    _employerSigCtx.lineWidth = 2.2; _employerSigCtx.lineCap = 'round';
+    _employerSigCtx.lineJoin  = 'round'; _employerSigCtx.strokeStyle = '#1a2540';
+    _employerSigCtx.fillStyle = '#1a2540';
+
+    canvas.onmousedown  = e => { e.preventDefault(); _employerSigDrawing=true; const p=_esPos(e,canvas); _employerSigLX=p.x; _employerSigLY=p.y; _employerSigCtx.beginPath(); _employerSigCtx.arc(p.x,p.y,1.1,0,Math.PI*2); _employerSigCtx.fill(); };
+    canvas.onmousemove  = e => { if(!_employerSigDrawing)return; e.preventDefault(); const p=_esPos(e,canvas); _employerSigCtx.beginPath(); _employerSigCtx.moveTo(_employerSigLX,_employerSigLY); _employerSigCtx.lineTo(p.x,p.y); _employerSigCtx.stroke(); _employerSigLX=p.x; _employerSigLY=p.y; };
+    canvas.onmouseup    = () => { _employerSigDrawing=false; };
+    canvas.onmouseleave = () => { _employerSigDrawing=false; };
+    canvas.ontouchstart = e => { e.preventDefault(); _employerSigDrawing=true; const p=_esPos(e,canvas); _employerSigLX=p.x; _employerSigLY=p.y; _employerSigCtx.beginPath(); _employerSigCtx.arc(p.x,p.y,1.1,0,Math.PI*2); _employerSigCtx.fill(); };
+    canvas.ontouchmove  = e => { if(!_employerSigDrawing)return; e.preventDefault(); const p=_esPos(e,canvas); _employerSigCtx.beginPath(); _employerSigCtx.moveTo(_employerSigLX,_employerSigLY); _employerSigCtx.lineTo(p.x,p.y); _employerSigCtx.stroke(); _employerSigLX=p.x; _employerSigLY=p.y; };
+    canvas.ontouchend   = () => { _employerSigDrawing=false; };
+  }, 50);
+};
+
+function _esPos(e, canvas) {
+  const r = canvas.getBoundingClientRect();
+  const sx = canvas.width  / (window.devicePixelRatio||1) / r.width;
+  const sy = canvas.height / (window.devicePixelRatio||1) / r.height;
+  if (e.touches) return { x:(e.touches[0].clientX-r.left)*sx, y:(e.touches[0].clientY-r.top)*sy };
+  return { x:(e.clientX-r.left)*sx, y:(e.clientY-r.top)*sy };
+}
+
+window.clearEmployerSig = () => {
+  const canvas = document.getElementById('employer-sig-canvas');
+  if (_employerSigCtx) _employerSigCtx.clearRect(0, 0, canvas.width, canvas.height);
+};
+
+window.closeEmployerSigModal = () => {
+  document.getElementById('employer-sig-modal').style.display = 'none';
+  _employerSigContractId = null;
+};
+
+window.submitEmployerSig = async () => {
+  const canvas = document.getElementById('employer-sig-canvas');
+  const errEl  = document.getElementById('employer-sig-err');
+  const btn    = document.getElementById('employer-sig-submit-btn');
+  if (!_employerSigCtx || !_employerSigContractId) return;
+
+  const pixels = _employerSigCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+  const hasSig = pixels.some((v, i) => i % 4 !== 3 && v < 200);
+  if (!hasSig) {
+    errEl.textContent = '서명란에 서명을 먼저 해주세요.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 저장 중...';
+
+  const result = await api('PATCH', `/contracts/${_employerSigContractId}/employer-sign`, {
+    signature: canvas.toDataURL('image/png')
+  });
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-save" style="margin-right:0.25rem;"></i>서명 저장';
+
+  if (result?.ok) {
+    closeEmployerSigModal();
+    renderContractTable();
+    alert('사업주 서명이 저장되었습니다.');
+  } else {
+    errEl.textContent = '저장에 실패했습니다. 다시 시도해 주세요.';
+    errEl.style.display = 'block';
+  }
 };
 
 window.handleContractSubmit = async (e) => {

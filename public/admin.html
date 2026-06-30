@@ -1504,7 +1504,32 @@
             </div>
         </main>
     </div>
-    <script src="main.js?v=35"></script>
+    <script src="main.js?v=36"></script>
 </div><!-- /admin-main-container -->
+
+<!-- 사업주 서명 모달 -->
+<div id="employer-sig-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9000;align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:#fff;border-radius:16px;padding:1.8rem;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+            <h3 style="font-size:1.1rem;font-weight:800;color:#1a2540;"><i class="fas fa-pen-nib" style="color:#0066cc;margin-right:0.5rem;"></i>사업주(갑) 서명</h3>
+            <button onclick="closeEmployerSigModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#94a3b8;">×</button>
+        </div>
+        <p style="font-size:0.82rem;color:#64748b;margin-bottom:1rem;">아래 서명란에 사업주 서명을 해주세요.</p>
+        <div style="border:1.5px dashed #0066cc;border-radius:10px;background:#f9fbff;padding:0.5rem;margin-bottom:0.8rem;">
+            <span style="font-size:0.68rem;font-weight:700;color:#0066cc;display:block;margin-bottom:0.3rem;">손가락 또는 마우스로 서명</span>
+            <canvas id="employer-sig-canvas" style="display:block;width:100%;height:130px;cursor:crosshair;touch-action:none;border-radius:6px;background:#fff;"></canvas>
+        </div>
+        <div style="display:flex;gap:0.6rem;margin-bottom:0.8rem;">
+            <button onclick="clearEmployerSig()" style="flex:1;padding:0.6rem;background:#f1f5f9;color:#64748b;border:1px solid #cbd5e1;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;">
+                <i class="fas fa-eraser" style="margin-right:0.25rem;"></i>지우기
+            </button>
+            <button onclick="submitEmployerSig()" id="employer-sig-submit-btn" style="flex:2;padding:0.6rem;background:#0066cc;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;">
+                <i class="fas fa-save" style="margin-right:0.25rem;"></i>서명 저장
+            </button>
+        </div>
+        <p id="employer-sig-err" style="display:none;font-size:0.78rem;color:#e53e3e;text-align:center;"></p>
+    </div>
+</div>
+
 </body>
 </html>

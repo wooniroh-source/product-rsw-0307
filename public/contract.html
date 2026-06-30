@@ -617,13 +617,24 @@
             <!-- 계약 체결일 및 서명 -->
             <div class="contract-footer">
                 <div class="footer-date" id="disp-contract-date"></div>
-                <div class="signer-row">
-                    <span class="signer-label">사업주(갑)</span>
-                    <span class="signer-value">(주)클린앤파트너즈 &nbsp; [서명]</span>
+                <div class="signer-row" style="align-items:flex-start;">
+                    <span class="signer-label" style="padding-top:0.4rem;">사업주(갑)</span>
+                    <div style="text-align:right;">
+                        <div style="font-size:0.8rem;font-weight:700;color:#1a2540;">(주)클린앤파트너즈</div>
+                        <div id="employer-sig-area" style="margin-top:0.4rem;">
+                            <span id="employer-sig-pending" style="font-size:0.72rem;color:#94a3b8;">서명 대기 중</span>
+                            <img id="employer-sig-img" src="" alt="사업주 서명" style="display:none;height:52px;max-width:160px;object-fit:contain;background:#f9fbff;border:1px solid #dce8f5;border-radius:6px;padding:2px;">
+                        </div>
+                    </div>
                 </div>
-                <div class="signer-row">
-                    <span class="signer-label">근로자(을)</span>
-                    <span class="signer-value" id="disp-worker-name-footer">-</span>
+                <div class="signer-row" style="align-items:flex-start;">
+                    <span class="signer-label" style="padding-top:0.4rem;">근로자(을)</span>
+                    <div style="text-align:right;">
+                        <div class="signer-value" id="disp-worker-name-footer">-</div>
+                        <div id="worker-sig-preview" style="display:none;margin-top:0.4rem;">
+                            <img id="worker-sig-img" src="" alt="근로자 서명" style="height:52px;max-width:160px;object-fit:contain;background:#f9fbff;border:1px solid #dce8f5;border-radius:6px;padding:2px;">
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -733,6 +744,14 @@ function renderContract(data) {
     const dateEl = document.getElementById('disp-contract-date');
     if (dateEl) dateEl.textContent = data.contract_date ? `날 짜 : ${data.contract_date}` : '';
 
+    // 사업주 서명 표시
+    const empSigPending = document.getElementById('employer-sig-pending');
+    const empSigImg     = document.getElementById('employer-sig-img');
+    if (data.employer_signature) {
+        if (empSigPending) empSigPending.style.display = 'none';
+        if (empSigImg)     { empSigImg.src = data.employer_signature; empSigImg.style.display = 'block'; }
+    }
+
     // 진행 바 표시
     document.getElementById('progressBarWrap').style.display = 'block';
     document.getElementById('progressLabel').style.display = 'block';
@@ -748,6 +767,12 @@ function renderContract(data) {
         document.getElementById('ct-done-date').textContent = `서명일시: ${dt}`;
         document.getElementById('progressBar').style.width = '100%';
         document.getElementById('progressLabel').textContent = '계약 완료';
+        // 근로자 서명 이미지 표시
+        if (data.worker_signature) {
+            const wp = document.getElementById('worker-sig-preview');
+            const wi = document.getElementById('worker-sig-img');
+            if (wp && wi) { wi.src = data.worker_signature; wp.style.display = 'block'; }
+        }
     } else {
         setTimeout(resizeCanvas, 50);
         updateProgress();
@@ -871,6 +896,14 @@ document.getElementById('ct-btn-submit').addEventListener('click', async () => {
         document.getElementById('progressBar').style.width = '100%';
         document.getElementById('progressLabel').textContent = '서명 완료';
 
+        // 근로자 서명 footer에 표시
+        const workerSigPreview = document.getElementById('worker-sig-preview');
+        const workerSigImg     = document.getElementById('worker-sig-img');
+        if (workerSigPreview && workerSigImg) {
+            workerSigImg.src = signature;
+            workerSigPreview.style.display = 'block';
+        }
+
         // contractData 업데이트
         if (contractData) contractData.signed_at = new Date().toISOString();
 
@@ -895,6 +928,7 @@ async function downloadPDF() {
         const sigDataUrl  = canvas.toDataURL('image/png');
         const sigPixels   = ctx.getImageData(0,0,canvas.width,canvas.height).data;
         const hasSig      = sigPixels.some((v,i) => i%4!==3 && v<200);
+        const empSig      = d.employer_signature || null;
 
         const el = document.createElement('div');
         el.style.cssText = 'position:fixed;top:-9999px;left:0;width:700px;padding:44px;background:#fff;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;color:#1a2540;line-height:1.8;box-sizing:border-box;';
@@ -965,12 +999,17 @@ async function downloadPDF() {
 
           <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:18px;">
             <tr>
-              <td style="background:#f0f4f8;padding:10px 14px;font-weight:800;width:35%;border:1px solid #e2e8f0;">사업주(갑)</td>
-              <td style="padding:10px 14px;border:1px solid #e2e8f0;">(주)클린앤파트너즈 &nbsp;&nbsp; 서명: ___________</td>
+              <td style="background:#f0f4f8;padding:10px 14px;font-weight:800;width:35%;border:1px solid #e2e8f0;vertical-align:top;">사업주(갑)</td>
+              <td style="padding:10px 14px;border:1px solid #e2e8f0;">
+                (주)클린앤파트너즈<br>
+                ${empSig
+                  ? `<img src="${empSig}" style="height:60px;max-width:180px;object-fit:contain;display:block;margin-top:6px;">`
+                  : `<span style="color:#94a3b8;font-size:12px;">서명 없음</span>`}
+              </td>
             </tr>
             <tr>
-              <td style="background:#f0f4f8;padding:10px 14px;font-weight:800;border:1px solid #e2e8f0;">근로자(을) 성명</td>
-              <td style="padding:10px 14px;border:1px solid #e2e8f0;font-weight:700;">${d.worker_name||'-'}</td>
+              <td style="background:#f0f4f8;padding:10px 14px;font-weight:800;border:1px solid #e2e8f0;vertical-align:top;">근로자(을) 성명</td>
+              <td style="padding:10px 14px;border:1px solid #e2e8f0;font-weight:700;vertical-align:top;">${d.worker_name||'-'}</td>
             </tr>
           </table>
 

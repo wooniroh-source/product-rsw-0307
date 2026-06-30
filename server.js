@@ -478,19 +478,29 @@ async function initDB() {
 
     await runQuery('employment_contracts', `
       CREATE TABLE IF NOT EXISTS employment_contracts (
-        id               INT AUTO_INCREMENT PRIMARY KEY,
-        worker_name      VARCHAR(50)  NOT NULL,
-        worker_phone     VARCHAR(20)  NOT NULL,
-        contract_period  VARCHAR(100) NOT NULL,
-        daily_wage       VARCHAR(50)  NOT NULL,
-        bank_name        VARCHAR(50)  NOT NULL,
-        bank_account     VARCHAR(100) NOT NULL,
-        contract_date    VARCHAR(30)  NOT NULL,
-        worker_signature MEDIUMTEXT,
-        signed_at        DATETIME,
-        created_at       DATETIME DEFAULT CURRENT_TIMESTAMP
+        id                  INT AUTO_INCREMENT PRIMARY KEY,
+        worker_name         VARCHAR(50)  NOT NULL,
+        worker_phone        VARCHAR(20)  NOT NULL,
+        contract_period     VARCHAR(100) NOT NULL,
+        daily_wage          VARCHAR(50)  NOT NULL,
+        bank_name           VARCHAR(50)  NOT NULL,
+        bank_account        VARCHAR(100) NOT NULL,
+        contract_date       VARCHAR(30)  NOT NULL,
+        employer_signature  MEDIUMTEXT,
+        employer_signed_at  DATETIME,
+        worker_signature    MEDIUMTEXT,
+        signed_at           DATETIME,
+        created_at          DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    // 기존 테이블에 사업주 서명 컬럼 추가 (없는 경우)
+    try {
+      await pool.query('ALTER TABLE employment_contracts ADD COLUMN employer_signature MEDIUMTEXT AFTER contract_date');
+      await pool.query('ALTER TABLE employment_contracts ADD COLUMN employer_signed_at DATETIME AFTER employer_signature');
+      console.log('✅ employer_signature 컬럼 추가 완료');
+    } catch (e) {
+      if (!e.message.includes('Duplicate column')) console.log('ℹ️ employer_signature 컬럼 이미 존재');
+    }
 
     await runQuery('reviews', `
       CREATE TABLE IF NOT EXISTS reviews (
@@ -1038,6 +1048,20 @@ app.post('/api/contracts', auth, async (req, res) => {
 app.delete('/api/contracts/:id', auth, async (req, res) => {
   try {
     await pool.query('DELETE FROM employment_contracts WHERE id = ?', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.patch('/api/contracts/:id/employer-sign', auth, async (req, res) => {
+  try {
+    const { signature } = req.body;
+    if (!signature) return res.status(400).json({ error: '서명 데이터가 없습니다.' });
+    const [rows] = await pool.query('SELECT id FROM employment_contracts WHERE id = ?', [req.params.id]);
+    if (!rows.length) return res.status(404).json({ error: 'not found' });
+    await pool.query(
+      'UPDATE employment_contracts SET employer_signature=?, employer_signed_at=NOW() WHERE id=?',
+      [signature, req.params.id]
+    );
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
