@@ -940,10 +940,10 @@ function showKakaoGuide() {
         <div style="text-align:center;font-size:2rem;margin-bottom:0.6rem;">🌐</div>
         <h3 style="text-align:center;margin:0 0 0.6rem;font-size:1rem;color:#1a2540;">외부 브라우저에서 열어주세요</h3>
         <p style="font-size:0.78rem;color:#475569;margin:0 0 0.9rem;line-height:1.7;text-align:center;">카카오톡 내에서는 파일 저장이 제한됩니다.<br>아래 순서로 외부 브라우저를 열어주세요.</p>
-        <div style="background:#f0f4ff;border-radius:10px;padding:0.85rem 1rem;font-size:0.8rem;color:#1e3a5f;line-height:2.1;margin-bottom:1.1rem;">
+        <div style="background:#f0f4ff;border-radius:10px;padding:0.85rem 1rem;font-size:0.8rem;color:#1e3a5f;line-height:2.3;margin-bottom:1.1rem;">
           ${isIOS
-            ? `① 화면 하단 <b>···</b> 버튼 탭<br>② <b>"Safari로 열기"</b> 선택<br>③ Safari에서 PDF 저장 버튼 탭`
-            : `① 우측 상단 <b>⋮</b> 버튼 탭<br>② <b>"다른 브라우저로 열기"</b> 선택<br>③ 열린 브라우저에서 PDF 저장 버튼 탭`}
+            ? `① 화면 <b>하단 툴바</b>에서 <b>···</b> 탭<br>② <b>"Safari로 열기"</b> 선택<br>③ Safari에서 PDF 저장 버튼 탭`
+            : `① 화면 <b>하단 툴바</b>에서 <b>⋮</b> 탭<br>② <b>"다른 브라우저로 열기"</b> 선택<br>③ 열린 브라우저에서 PDF 저장 버튼 탭<br><br><span style="color:#64748b;font-size:0.74rem;">* 하단 툴바가 안 보이면 화면을 위로 스크롤하세요</span>`}
         </div>
         <button onclick="this.closest('div').parentNode.remove()"
           style="width:100%;padding:0.75rem;background:#0066cc;color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;">확인</button>
