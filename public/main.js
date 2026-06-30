@@ -90,7 +90,7 @@ window.changeAdminPassword = async (e) => {
 // 1. Admin 섹션 전환
 // =============================================
 window.showSection = (sectionId) => {
-  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','reviews','closed-dates','ad-protection','security','hanyoung','hanyoung-hero','hanyoung-svc-banners','com','com-hero','com-svc-banners','kids','kids-hero','kids-svc-banners'];
+  const sections = ['reservations','banners','mid-banners','res-banners','svc-banners','about-banners','gallery','process','contacts','checklists','contracts','reviews','closed-dates','ad-protection','security','hanyoung','hanyoung-hero','hanyoung-svc-banners','com','com-hero','com-svc-banners','kids','kids-hero','kids-svc-banners'];
   sections.forEach(s => {
     const el = document.getElementById(`section-${s}`);
     const menu = document.getElementById(`menu-${s}`);
