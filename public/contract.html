@@ -1027,36 +1027,35 @@ async function downloadPDF() {
             <div style="font-size:11px;opacity:.8;margin-top:6px;">에어컨 분해·세척 업무 &nbsp;|&nbsp; 발급일: ${today}</div>
           </div>
 
-          <table style="width:100%;border-collapse:collapse;margin-bottom:14px;font-size:13px;border-radius:8px;overflow:hidden;">
+          <table style="width:100%;border-collapse:collapse;margin-bottom:18px;font-size:13px;">
             <tr>
-              <td style="background:#e8edf5;padding:8px 12px;font-weight:800;width:28%;">사업주(갑)</td>
-              <td style="background:#fff;padding:8px 12px;">(주)클린앤파트너즈</td>
-              <td style="background:#e8edf5;padding:8px 12px;font-weight:800;width:22%;">근로자(을)</td>
-              <td style="background:#fff;padding:8px 12px;font-weight:700;">${d.worker_name||'-'}</td>
+              <td style="background:#f0f4f8;padding:8px 12px;font-weight:800;width:30%;border:1px solid #e2e8f0;">사업주(갑)</td>
+              <td style="padding:8px 12px;border:1px solid #e2e8f0;">(주)클린앤파트너즈</td>
+              <td style="background:#f0f4f8;padding:8px 12px;font-weight:800;width:20%;border:1px solid #e2e8f0;">근로자(을)</td>
+              <td style="padding:8px 12px;border:1px solid #e2e8f0;font-weight:700;">${d.worker_name||'-'}</td>
             </tr>
-            <tr><td colspan="4" style="height:2px;background:#f0f4f8;padding:0;"></td></tr>
             <tr>
-              <td style="background:#e8edf5;padding:8px 12px;font-weight:800;">연락처</td>
-              <td style="background:#fff;padding:8px 12px;" colspan="3">${d.worker_phone||'-'}</td>
+              <td style="background:#f0f4f8;padding:8px 12px;font-weight:800;border:1px solid #e2e8f0;">연락처</td>
+              <td style="padding:8px 12px;border:1px solid #e2e8f0;" colspan="3">${d.worker_phone||'-'}</td>
             </tr>
           </table>
 
-          <div style="border-radius:8px;overflow:hidden;margin-bottom:10px;">
-            <div style="background:#e8edf5;padding:8px 14px;font-weight:800;font-size:13px;">2. 근로계약기간 및 근무장소</div>
-            <div style="background:#fff;padding:10px 14px;font-size:13px;">
+          <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+            <div style="background:#f0f4f8;padding:8px 14px;font-weight:800;font-size:13px;border-bottom:1px solid #e2e8f0;">2. 근로계약기간 및 근무장소</div>
+            <div style="padding:10px 14px;font-size:13px;">
               <b>근로계약기간:</b> ${d.contract_period||'-'}<br>
               <b>근무장소:</b> 작업 현장 주소 또는 '갑'이 지정하는 장소
             </div>
           </div>
 
-          <div style="border-radius:8px;overflow:hidden;margin-bottom:10px;">
-            <div style="background:#e8edf5;padding:8px 14px;font-weight:800;font-size:13px;">3. 업무의 내용</div>
-            <div style="background:#fff;padding:10px 14px;font-size:13px;">에어컨 분해, 세척, 건조, 조립, 시운전 및 작업 후 주변 정리 등 사업주가 지시하는 에어컨 청소 관련 업무 일체</div>
+          <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+            <div style="background:#f0f4f8;padding:8px 14px;font-weight:800;font-size:13px;border-bottom:1px solid #e2e8f0;">3. 업무의 내용</div>
+            <div style="padding:10px 14px;font-size:13px;">에어컨 분해, 세척, 건조, 조립, 시운전 및 작업 후 주변 정리 등 사업주가 지시하는 에어컨 청소 관련 업무 일체</div>
           </div>
 
-          <div style="border-radius:8px;overflow:hidden;margin-bottom:10px;">
-            <div style="background:#e8edf5;padding:8px 14px;font-weight:800;font-size:13px;">4. 임금 및 근로조건 (5인 미만 사업장 기준)</div>
-            <div style="background:#fff;padding:10px 14px;font-size:13px;">
+          <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+            <div style="background:#f0f4f8;padding:8px 14px;font-weight:800;font-size:13px;border-bottom:1px solid #e2e8f0;">4. 임금 및 근로조건 (5인 미만 사업장 기준)</div>
+            <div style="padding:10px 14px;font-size:13px;">
               <b>일급:</b> <span style="color:#0066cc;font-weight:800;">${fmtWage(d.daily_wage)}</span><br>
               <b>지급조건:</b> 본 사업장은 상시 근로자 5인 미만 사업장으로, 연장·야간·휴일 가산수당(1.5배) 미적용. 주말·공휴일도 합의된 일급으로 지급.<br>
               <b>지급방법:</b> 근로자 명의 예금계좌 이체 &nbsp; (${d.bank_name||'-'} ${d.bank_account||'-'})<br>
@@ -1064,55 +1063,52 @@ async function downloadPDF() {
             </div>
           </div>
 
-          <div style="border-radius:8px;overflow:hidden;margin-bottom:10px;">
-            <div style="background:#e8edf5;padding:8px 14px;font-weight:800;font-size:13px;">5. 사회보험</div>
-            <div style="background:#fff;padding:10px 14px;font-size:13px;">
+          <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+            <div style="background:#f0f4f8;padding:8px 14px;font-weight:800;font-size:13px;border-bottom:1px solid #e2e8f0;">5. 사회보험</div>
+            <div style="padding:10px 14px;font-size:13px;">
               <b>산재보험:</b> 관련 법령에 따라 사업주(갑)가 의무 가입 및 전액 부담<br>
               <b>고용보험 등:</b> 일용직 근로자 법적 가입 기준에 따라 처리
             </div>
           </div>
 
-          <div style="border-radius:8px;overflow:hidden;margin-bottom:18px;">
-            <div style="background:#e8edf5;padding:8px 14px;font-weight:800;font-size:13px;">6. 안전 및 기타 사항</div>
-            <div style="background:#fff;padding:10px 14px;font-size:13px;">
+          <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:18px;">
+            <div style="background:#f0f4f8;padding:8px 14px;font-weight:800;font-size:13px;border-bottom:1px solid #e2e8f0;">6. 안전 및 기타 사항</div>
+            <div style="padding:10px 14px;font-size:13px;">
               · '을'은 사다리 작업, 고압 세척기 사용 등 위험이 동반되는 업무 특성을 인지하고, 안전 수칙을 엄격히 준수해야 합니다.<br>
               · 작업 중 고객의 기물 파손이나 훼손이 발생하지 않도록 각별히 주의하여야 합니다.<br>
               · 본 계약서에 명시되지 않은 사항은 근로기준법 등 관련 노동 관계 법령에 따릅니다.
             </div>
           </div>
 
-          <div style="text-align:center;font-size:14px;font-weight:700;margin-bottom:16px;">
+          <div style="text-align:center;font-size:14px;font-weight:700;margin-bottom:18px;">
             날 짜 : ${d.contract_date||today}
           </div>
 
-          <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;border-radius:8px;overflow:hidden;">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:18px;">
             <tr>
-              <td style="background:#e8edf5;padding:10px 14px;font-weight:800;width:33%;vertical-align:top;">사업주(갑)</td>
-              <td style="background:#fff;padding:10px 14px;vertical-align:top;">
+              <td style="background:#f0f4f8;padding:10px 14px;font-weight:800;width:35%;border:1px solid #e2e8f0;vertical-align:top;">사업주(갑)</td>
+              <td style="padding:10px 14px;border:1px solid #e2e8f0;">
                 (주)클린앤파트너즈<br>
                 ${empSig
                   ? `<img src="${empSig}" style="height:60px;max-width:180px;object-fit:contain;display:block;margin-top:6px;">`
                   : `<span style="color:#94a3b8;font-size:12px;">서명 없음</span>`}
               </td>
             </tr>
-            <tr><td colspan="2" style="height:2px;background:#f0f4f8;padding:0;"></td></tr>
             <tr>
-              <td style="background:#e8edf5;padding:10px 14px;font-weight:800;vertical-align:top;">근로자(을) 성명</td>
-              <td style="background:#fff;padding:10px 14px;font-weight:700;vertical-align:top;">${d.worker_name||'-'}</td>
+              <td style="background:#f0f4f8;padding:10px 14px;font-weight:800;border:1px solid #e2e8f0;vertical-align:top;">근로자(을) 성명</td>
+              <td style="padding:10px 14px;border:1px solid #e2e8f0;font-weight:700;vertical-align:top;">${d.worker_name||'-'}</td>
             </tr>
           </table>
 
-          <div style="border-radius:8px;overflow:hidden;background:#f0f6ff;margin-bottom:20px;">
-            <div style="background:#0066cc;padding:8px 14px;font-size:11px;font-weight:700;color:#fff;">근로자(을) 서명</div>
-            <div style="padding:10px;background:#fff;">
+          <div style="border:1.5px solid #0066cc;border-radius:8px;padding:12px 16px;background:#f9fbff;margin-bottom:20px;">
+            <div style="font-size:11px;font-weight:700;color:#0066cc;margin-bottom:8px;">근로자(을) 서명</div>
             ${hasSig
-              ? `<img src="${sigDataUrl}" style="width:100%;height:100px;object-fit:contain;background:#fff;display:block;">`
-              : `<div style="height:100px;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:13px;">(서명 없음)</div>`
+              ? `<img src="${sigDataUrl}" style="width:100%;height:100px;object-fit:contain;background:#fff;border-radius:4px;display:block;">`
+              : `<div style="height:100px;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:13px;background:#fff;border-radius:4px;">(서명 없음)</div>`
             }
-            </div>
           </div>
 
-          <div style="padding-top:12px;font-size:11px;color:#94a3b8;text-align:center;">
+          <div style="border-top:1px solid #e8eef4;padding-top:12px;font-size:11px;color:#94a3b8;text-align:center;">
             클린앤파트너즈 &nbsp;|&nbsp; 문의: 010-9115-2343
           </div>
         `;
@@ -1126,22 +1122,13 @@ async function downloadPDF() {
         const imgData = captured.toDataURL('image/jpeg', jpegQuality);
 
         const { jsPDF } = window.jspdf;
-        const pdf   = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        const pageW = pdf.internal.pageSize.getWidth();
-        const pageH = pdf.internal.pageSize.getHeight();
-        const imgW  = pageW;
-        const imgH  = (captured.height / captured.width) * imgW;
+        const pdfW = 210; // A4 너비(mm)
+        const imgW = pdfW;
+        const imgH = (captured.height / captured.width) * imgW;
 
-        if (imgH <= pageH) {
-            pdf.addImage(imgData, 'JPEG', 0, 0, imgW, imgH);
-        } else {
-            let offsetY = 0;
-            while (offsetY < imgH) {
-                if (offsetY > 0) pdf.addPage();
-                pdf.addImage(imgData, 'JPEG', 0, -offsetY, imgW, imgH);
-                offsetY += pageH;
-            }
-        }
+        // 내용 높이에 맞는 단일 페이지 → 페이지 분할 없이 회색 경계선 제거
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pdfW, imgH] });
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgW, imgH);
 
         const workerName = (d.worker_name || '근로자').replace(/\s+/g, '_');
         const filename   = `근로계약서_${workerName}_${todayFile}.pdf`;
