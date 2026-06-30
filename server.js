@@ -221,7 +221,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   const p = req.path;
   if (p === '/main.js' || p === '/sw.js' || p.endsWith('.html') ||
-      ['/reservation','/hanyoung','/com','/kids','/services','/estimate','/gallery','/about','/contact','/privacy','/care','/admin','/'].includes(p)) {
+      ['/reservation','/hanyoung','/com','/kids','/services','/estimate','/gallery','/about','/contact','/privacy','/care','/admin','/contract','/'].includes(p)) {
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.set('Pragma', 'no-cache');
     res.set('Expires', '0');
@@ -473,6 +473,22 @@ async function initDB() {
         customer_signature  MEDIUMTEXT,
         signed_at           DATETIME,
         created_at          DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await runQuery('employment_contracts', `
+      CREATE TABLE IF NOT EXISTS employment_contracts (
+        id               INT AUTO_INCREMENT PRIMARY KEY,
+        worker_name      VARCHAR(50)  NOT NULL,
+        worker_phone     VARCHAR(20)  NOT NULL,
+        contract_period  VARCHAR(100) NOT NULL,
+        daily_wage       VARCHAR(50)  NOT NULL,
+        bank_name        VARCHAR(50)  NOT NULL,
+        bank_account     VARCHAR(100) NOT NULL,
+        contract_date    VARCHAR(30)  NOT NULL,
+        worker_signature MEDIUMTEXT,
+        signed_at        DATETIME,
+        created_at       DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
@@ -987,6 +1003,61 @@ app.delete('/api/checklists/:id', auth, async (req, res) => {
 });
 
 // =============================================
+// 근로계약서 (EMPLOYMENT CONTRACTS)
+// =============================================
+app.get('/api/contracts', auth, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM employment_contracts ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/contracts/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM employment_contracts WHERE id = ?', [req.params.id]);
+    if (!rows.length) return res.status(404).json({ error: 'not found' });
+    res.json(rows[0]);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/contracts', auth, async (req, res) => {
+  try {
+    const { worker_name, worker_phone, contract_period, daily_wage, bank_name, bank_account, contract_date } = req.body;
+    if (!worker_name || !worker_phone || !contract_period || !daily_wage || !bank_name || !bank_account || !contract_date) {
+      return res.status(400).json({ error: '필수 항목을 모두 입력해 주세요.' });
+    }
+    const [result] = await pool.query(
+      `INSERT INTO employment_contracts (worker_name, worker_phone, contract_period, daily_wage, bank_name, bank_account, contract_date)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [worker_name.trim(), worker_phone.trim(), contract_period.trim(), daily_wage.trim(), bank_name.trim(), bank_account.trim(), contract_date.trim()]
+    );
+    res.json({ id: result.insertId });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/contracts/:id', auth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM employment_contracts WHERE id = ?', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.patch('/api/contracts/:id/sign', async (req, res) => {
+  try {
+    const { signature } = req.body;
+    if (!signature) return res.status(400).json({ error: '서명 데이터가 없습니다.' });
+    const [rows] = await pool.query('SELECT id, signed_at FROM employment_contracts WHERE id = ?', [req.params.id]);
+    if (!rows.length) return res.status(404).json({ error: 'not found' });
+    if (rows[0].signed_at) return res.status(409).json({ error: '이미 서명된 계약서입니다.' });
+    await pool.query(
+      'UPDATE employment_contracts SET worker_signature=?, signed_at=NOW() WHERE id=?',
+      [signature, req.params.id]
+    );
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================
 // HANYOUNG RESERVATIONS
 // =============================================
 app.get('/api/hanyoung/reservations/booked-slots', async (req, res) => {
@@ -1464,6 +1535,7 @@ const cleanRoutes = {
   '/hanyoung':    'hanyoung.html',
   '/com':         'com.html',
   '/kids':        'kids.html',
+  '/contract':    'contract.html',
 };
 Object.entries(cleanRoutes).forEach(([route, file]) => {
   app.get(route, (req, res) => {

@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>일용직 근로계약서 - 클린앤파트너즈</title>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            color: #1a2540;
+            min-height: 100vh;
+        }
+
+        .popup-wrap {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 40px rgba(0,0,0,0.12);
+        }
+
+        /* 헤더 */
+        .popup-header {
+            background: linear-gradient(135deg, #0055b3 0%, #0099d8 100%);
+            padding: 1.4rem 1.4rem 1.2rem;
+            text-align: center;
+        }
+        .popup-header .logo-line {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.75);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+        .popup-header h1 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+        .popup-header p {
+            font-size: 0.76rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 0.25rem;
+        }
+        .header-badge {
+            display: inline-block;
+            margin-top: 0.5rem;
+            background: rgba(255,255,255,0.18);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* 상태 화면 */
+        .state-screen {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+        }
+        .state-screen.active { display: flex; }
+        .state-screen .state-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+        .state-screen .state-icon.success { color: #10b981; }
+        .state-screen p { font-size: 0.88rem; color: #64748b; line-height: 1.7; }
+        .state-screen strong { color: #1a2540; }
+
+        /* 계약서 본문 영역 */
+        #ct-main { display: none; flex: 1; flex-direction: column; }
+        #ct-main.active { display: flex; }
+
+        /* 진행 표시 */
+        .progress-bar-wrap {
+            background: #e8eef4;
+            height: 4px;
+        }
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #0066cc, #00a8e8);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .progress-label {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-align: right;
+            padding: 0.35rem 1.2rem 0;
+        }
+
+        /* 계약서 문서 */
+        .contract-doc {
+            padding: 1.2rem;
+            flex: 1;
+        }
+
+        /* 계약서 제목 */
+        .doc-title {
+            text-align: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #1a2540;
+        }
+        .doc-title h2 {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #1a2540;
+            letter-spacing: 0.5px;
+        }
+        .doc-title p {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.3rem;
+        }
+
+        /* 섹션 */
+        .ct-section {
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .ct-section-head {
+            background: #f0f4f8;
+            padding: 0.6rem 1rem;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #1a2540;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .ct-section-head i { color: #0066cc; font-size: 0.85rem; }
+        .ct-section-body {
+            padding: 0.9rem 1rem;
+            font-size: 0.82rem;
+            color: #2d3748;
+            line-height: 1.75;
+        }
+
+        /* 강조 필드 (어드민이 채운 값) */
+        .ct-field {
+            display: inline-block;
+            background: #fef9c3;
+            border: 1px solid #fde68a;
+            border-radius: 4px;
+            padding: 0 0.35rem;
+            font-weight: 700;
+            color: #1a2540;
+        }
+
+        /* 근로조건 그리드 */
+        .ct-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+        }
+        .ct-info-row {
+            background: #f7fafd;
+            border-radius: 8px;
+            padding: 0.6rem 0.8rem;
+        }
+        .ct-info-row .lbl {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+        .ct-info-row .val {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #1a2540;
+        }
+        .ct-info-row.full { grid-column: 1 / -1; }
+        .ct-info-row .val.highlight {
+            color: #0066cc;
+            font-size: 1rem;
+        }
+
+        /* 주의 박스 */
+        .ct-note {
+            background: #fffbf0;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.78rem;
+            color: #713f12;
+            line-height: 1.7;
+            margin-top: 0.5rem;
+        }
+        .ct-note i { margin-right: 0.3rem; color: #d97706; }
+
+        /* 안전 항목 */
+        .ct-safety-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 0.3rem;
+        }
+        .ct-safety-list li {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+            padding: 0.35rem 0;
+            font-size: 0.8rem;
+            color: #2d3748;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .ct-safety-list li:last-child { border-bottom: none; }
+        .ct-safety-list li::before {
+            content: "·";
+            color: #0066cc;
+            font-size: 1.2rem;
+            line-height: 1.2;
+            flex-shrink: 0;
+        }
+
+        /* 날짜 및 서명자 */
+        .contract-footer {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+        .contract-footer .footer-date {
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #1a2540;
+            margin-bottom: 1rem;
+        }
+        .signer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .signer-row:last-child { border-bottom: none; }
+        .signer-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .signer-value {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #1a2540;
+            text-align: right;
+        }
+
+        /* 구분선 */
+        .doc-divider {
+            height: 1px;
+            background: #e8eef4;
+            margin: 1rem 0;
+        }
+
+        /* 동의 섹션 */
+        .ack-wrap {
+            background: #e8f4ff;
+            border: 1.5px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 1.2rem;
+        }
+        .ack-wrap p {
+            font-size: 0.8rem;
+            color: #1e40af;
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+        .ack-checkbox-wrap {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            cursor: pointer;
+        }
+        .ack-checkbox-wrap input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            accent-color: #0066cc;
+            cursor: pointer;
+            margin-top: 1px;
+        }
+        .ack-checkbox-wrap label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #1a2540;
+            cursor: pointer;
+            line-height: 1.5;
+        }
+
+        /* 서명 */
+        .sig-section {
+            padding: 0 1.2rem 1.5rem;
+        }
+        .sig-label-head {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #1a2540;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .sig-label-head i { color: #0066cc; }
+        .sig-wrap {
+            border: 1.5px dashed #0066cc;
+            border-radius: 10px;
+            background: #f9fbff;
+            padding: 0.5rem;
+            margin-bottom: 0.6rem;
+        }
+        .sig-wrap .sig-hint {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+        #ct-canvas {
+            display: block;
+            width: 100%;
+            height: 120px;
+            cursor: crosshair;
+            touch-action: none;
+            border-radius: 6px;
+            background: #fff;
+        }
+        .sig-btns {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+        .btn-clear {
+            flex: 1;
+            padding: 0.6rem;
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-clear:hover { background: #e2e8f0; }
+        .btn-submit {
+            flex: 2;
+            padding: 0.6rem;
+            background: #059669;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover:not(:disabled) { background: #047857; }
+        .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        /* 완료 후 액션 버튼 */
+        .btn-pdf {
+            width: 100%;
+            padding: 0.85rem;
+            background: #c0392b;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            transition: background 0.2s;
+            margin-top: 1rem;
+        }
+        .btn-pdf:hover { background: #a93226; }
+        .btn-pdf:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        /* 이미 서명 완료 */
+        .signed-card {
+            background: #e6f9f2;
+            border: 1px solid #6ee7b7;
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            margin: 1rem 1.2rem 0.5rem;
+        }
+        .signed-card i { color: #059669; font-size: 1.6rem; margin-bottom: 0.5rem; display: block; }
+        .signed-card p { font-size: 0.85rem; color: #065f46; font-weight: 700; }
+        .signed-card small { font-size: 0.75rem; color: #047857; display: block; margin-top: 0.2rem; }
+
+        /* PC 레이아웃 */
+        @media (min-width: 769px) {
+            body { padding: 2rem 1rem; }
+            .popup-wrap {
+                max-width: 700px;
+                min-height: auto;
+                border-radius: 18px;
+                overflow: hidden;
+                margin: 0 auto;
+            }
+            .popup-header { padding: 2rem 2.5rem; text-align: left; }
+            .popup-header h1 { font-size: 1.5rem; }
+            .contract-doc { padding: 2rem 2.5rem; }
+            .ack-wrap { margin: 1rem 2.5rem; }
+            .sig-section { padding: 0 2.5rem 2rem; }
+            #ct-canvas { height: 140px; }
+            .ct-section-body { font-size: 0.88rem; }
+        }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .popup-wrap { box-shadow: none; max-width: 100%; }
+            .progress-bar-wrap, .progress-label,
+            .ack-wrap, .sig-section,
+            .btn-pdf, .popup-header .logo-line { /* keep header */ }
+            .ack-wrap, .sig-btns { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="popup-wrap">
+
+    <!-- 헤더 -->
+    <div class="popup-header">
+        <div class="logo-line">Clean &amp; Partners</div>
+        <h1><i class="fas fa-file-contract" style="margin-right:0.4rem;opacity:0.9;"></i>일용직 근로계약서</h1>
+        <p>에어컨 청소 업무 / (주)클린앤파트너즈</p>
+        <span class="header-badge"><i class="fas fa-lock" style="margin-right:0.3rem;font-size:0.6rem;"></i>전자 계약서</span>
+    </div>
+
+    <!-- 진행 바 -->
+    <div class="progress-bar-wrap" id="progressBarWrap" style="display:none;">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <p class="progress-label" id="progressLabel" style="display:none;"></p>
+
+    <!-- 로딩 -->
+    <div class="state-screen active" id="ct-loading">
+        <div class="state-icon"><i class="fas fa-spinner fa-spin"></i></div>
+        <p>계약서를 불러오는 중입니다...</p>
+    </div>
+
+    <!-- 링크 없음 -->
+    <div class="state-screen" id="ct-empty">
+        <div class="state-icon"><i class="fas fa-file-times"></i></div>
+        <p><strong>계약서를 찾을 수 없습니다.</strong><br>관리자로부터 전달받은 링크로 접근해 주세요.</p>
+    </div>
+
+    <!-- 서명 완료 (이미 서명한 경우) -->
+    <div class="state-screen" id="ct-done-state">
+        <div class="state-icon success"><i class="fas fa-check-circle"></i></div>
+        <p><strong>서명이 완료된 계약서입니다.</strong><br><span id="ct-done-date" style="font-size:0.8rem;"></span></p>
+        <button class="btn-pdf" id="btn-pdf-done" onclick="downloadPDF()" style="margin-top:1.5rem;max-width:300px;">
+            <i class="fas fa-file-pdf"></i> PDF 저장
+        </button>
+    </div>
+
+    <!-- 계약서 본문 -->
+    <div id="ct-main">
+
+        <div class="contract-doc" id="contract-document">
+
+            <div class="doc-title">
+                <h2>일용직 근로계약서</h2>
+                <p>에어컨 분해·세척 업무</p>
+            </div>
+
+            <!-- 1. 양 당사자 -->
+            <div class="ct-section">
+                <div class="ct-section-head">
+                    <i class="fas fa-users"></i> 1. 양 당사자
+                </div>
+                <div class="ct-section-body">
+                    <div class="ct-grid">
+                        <div class="ct-info-row full">
+                            <div class="lbl">사업주(갑)</div>
+                            <div class="val">(주)클린앤파트너즈</div>
+                        </div>
+                        <div class="ct-info-row">
+                            <div class="lbl">근로자(을)</div>
+                            <div class="val" id="disp-worker-name">-</div>
+                        </div>
+                        <div class="ct-info-row">
+                            <div class="lbl">연락처</div>
+                            <div class="val" id="disp-worker-phone">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 근로계약기간 및 근무장소 -->
+            <div class="ct-section">
+                <div class="ct-section-head">
+                    <i class="fas fa-calendar-alt"></i> 2. 근로계약기간 및 근무장소
+                </div>
+                <div class="ct-section-body">
+                    <div class="ct-grid">
+                        <div class="ct-info-row full">
+                            <div class="lbl">근로계약기간</div>
+                            <div class="val" id="disp-contract-period">-</div>
+                        </div>
+                        <div class="ct-info-row full">
+                            <div class="lbl">근무장소</div>
+                            <div class="val">작업 현장 주소 또는 '갑'이 지정하는 장소</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 업무의 내용 -->
+            <div class="ct-section">
+                <div class="ct-section-head">
+                    <i class="fas fa-tools"></i> 3. 업무의 내용
+                </div>
+                <div class="ct-section-body">
+                    에어컨 분해, 세척, 건조, 조립, 시운전 및 작업 후 주변 정리 등 사업주가 지시하는 에어컨 청소 관련 업무 일체
+                </div>
+            </div>
+
+            <!-- 4. 임금 및 근로조건 -->
+            <div class="ct-section">
+                <div class="ct-section-head">
+                    <i class="fas fa-won-sign"></i> 4. 임금 및 근로조건
+                </div>
+                <div class="ct-section-body">
+                    <div class="ct-grid">
+                        <div class="ct-info-row full">
+                            <div class="lbl">일급</div>
+                            <div class="val highlight" id="disp-daily-wage">-</div>
+                        </div>
+                        <div class="ct-info-row">
+                            <div class="lbl">은행명</div>
+                            <div class="val" id="disp-bank-name">-</div>
+                        </div>
+                        <div class="ct-info-row">
+                            <div class="lbl">계좌번호</div>
+                            <div class="val" id="disp-bank-account">-</div>
+                        </div>
+                        <div class="ct-info-row full">
+                            <div class="lbl">지급방법</div>
+                            <div class="val">근로자 명의 예금계좌 이체</div>
+                        </div>
+                        <div class="ct-info-row full">
+                            <div class="lbl">지급시기</div>
+                            <div class="val">매주 금요일 / 지정된 날짜 지급</div>
+                        </div>
+                    </div>
+                    <div class="ct-note">
+                        <i class="fas fa-exclamation-circle"></i>
+                        본 사업장은 상시 근로자 <strong>5인 미만 사업장</strong>으로, 연장·야간·휴일 근로에 대한 가산수당(1.5배)이 적용되지 않습니다. 주말 및 공휴일 근로 시에도 별도 특근 수당 없이 합의된 일급으로 지급합니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. 사회보험 -->
+            <div class="ct-section">
+                <div class="ct-section-head">
+                    <i class="fas fa-shield-alt"></i> 5. 사회보험
+                </div>
+                <div class="ct-section-body">
+                    <div class="ct-grid">
+                        <div class="ct-info-row full">
+                            <div class="lbl">산재보험</div>
+                            <div class="val">사업주(갑)가 의무 가입 및 전액 부담. 업무상 재해 발생 시 처리</div>
+                        </div>
+                        <div class="ct-info-row full">
+                            <div class="lbl">고용보험 등</div>
+                            <div class="val">일용직 근로자 법적 가입 기준(근로내용확인신고 등)에 따라 처리</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. 안전 및 기타 사항 -->
+            <div class="ct-section">
+                <div class="ct-section-head">
+                    <i class="fas fa-hard-hat"></i> 6. 안전 및 기타 사항
+                </div>
+                <div class="ct-section-body">
+                    <ul class="ct-safety-list">
+                        <li>'을'은 사다리 작업, 고압 세척기 사용 등 위험이 동반되는 업무 특성을 인지하고, 안전 수칙을 엄격히 준수해야 합니다.</li>
+                        <li>작업 중 고객의 기물 파손이나 훼손이 발생하지 않도록 각별히 주의하여야 합니다.</li>
+                        <li>본 계약서에 명시되지 않은 사항은 근로기준법 등 관련 노동 관계 법령에 따릅니다.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 계약 체결일 및 서명 -->
+            <div class="contract-footer">
+                <div class="footer-date" id="disp-contract-date"></div>
+                <div class="signer-row">
+                    <span class="signer-label">사업주(갑)</span>
+                    <span class="signer-value">(주)클린앤파트너즈 &nbsp; [서명]</span>
+                </div>
+                <div class="signer-row">
+                    <span class="signer-label">근로자(을)</span>
+                    <span class="signer-value" id="disp-worker-name-footer">-</span>
+                </div>
+            </div>
+
+        </div><!-- /contract-doc -->
+
+        <!-- 서명 완료 상태 (이미 서명한 경우, 계약서 아래에 표시) -->
+        <div id="ct-already-signed" style="display:none;">
+            <div class="signed-card">
+                <i class="fas fa-check-circle"></i>
+                <p>서명이 완료된 계약서입니다.</p>
+                <small id="ct-signed-at-label"></small>
+            </div>
+            <div style="padding: 0 1.2rem 1.5rem;">
+                <button class="btn-pdf" id="btn-pdf-signed" onclick="downloadPDF()">
+                    <i class="fas fa-file-pdf"></i> PDF 저장
+                </button>
+            </div>
+        </div>
+
+        <!-- 서명 입력 영역 -->
+        <div id="ct-sign-area">
+            <div class="doc-divider" style="margin: 0;"></div>
+
+            <!-- 동의 체크박스 -->
+            <div class="ack-wrap">
+                <p>위 계약서의 모든 내용을 충분히 읽고 확인하였습니까?<br>서명 전 계약 내용을 반드시 검토해 주세요.</p>
+                <div class="ack-checkbox-wrap">
+                    <input type="checkbox" id="ack-check">
+                    <label for="ack-check">본 계약서의 내용을 충분히 읽고 이해하였으며, 이에 동의합니다.</label>
+                </div>
+            </div>
+
+            <!-- 서명 -->
+            <div class="sig-section">
+                <div class="sig-label-head">
+                    <i class="fas fa-pen-nib"></i> 근로자(을) 서명
+                </div>
+                <div class="sig-wrap">
+                    <span class="sig-hint">손가락 또는 마우스로 서명해 주세요</span>
+                    <canvas id="ct-canvas"></canvas>
+                </div>
+                <div class="sig-btns">
+                    <button class="btn-clear" id="ct-btn-clear">
+                        <i class="fas fa-eraser" style="margin-right:0.25rem;"></i>지우기
+                    </button>
+                    <button class="btn-submit" id="ct-btn-submit" disabled>
+                        <i class="fas fa-check" style="margin-right:0.25rem;"></i>서명 완료 및 제출
+                    </button>
+                </div>
+                <p id="ct-submit-err" style="display:none;font-size:0.78rem;color:#e53e3e;text-align:center;margin-top:0.3rem;"></p>
+            </div>
+        </div>
+
+    </div><!-- /#ct-main -->
+
+</div><!-- /.popup-wrap -->
+
+<script>
+// ── URL 파라미터 ──
+const urlParams   = new URLSearchParams(location.search);
+const contractId  = urlParams.get('id');
+
+let contractData = null;
+
+// ── 화면 전환 ──
+function showOnly(id) {
+    ['ct-loading','ct-empty','ct-done-state','ct-main'].forEach(s => {
+        const el = document.getElementById(s);
+        if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+    });
+    const target = document.getElementById(id);
+    if (!target) return;
+    if (['ct-loading','ct-empty','ct-done-state'].includes(id)) {
+        target.classList.add('active');
+        target.style.display = 'flex';
+    } else {
+        target.style.display = 'flex';
+        target.classList.add('active');
+    }
+}
+
+// ── 숫자 통화 포맷 ──
+function fmtWage(val) {
+    if (!val) return '-';
+    const n = parseInt(String(val).replace(/[^0-9]/g, ''));
+    if (isNaN(n)) return val;
+    return '금 ' + n.toLocaleString('ko-KR') + ' 원';
+}
+
+// ── 데이터 렌더링 ──
+function renderContract(data) {
+    contractData = data;
+
+    const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val || '-';
+    };
+
+    set('disp-worker-name',    data.worker_name);
+    set('disp-worker-phone',   data.worker_phone);
+    set('disp-contract-period', data.contract_period);
+    set('disp-daily-wage',     fmtWage(data.daily_wage));
+    set('disp-bank-name',      data.bank_name);
+    set('disp-bank-account',   data.bank_account);
+    set('disp-worker-name-footer', data.worker_name);
+
+    const dateEl = document.getElementById('disp-contract-date');
+    if (dateEl) dateEl.textContent = data.contract_date ? `날 짜 : ${data.contract_date}` : '';
+
+    // 진행 바 표시
+    document.getElementById('progressBarWrap').style.display = 'block';
+    document.getElementById('progressLabel').style.display = 'block';
+
+    showOnly('ct-main');
+
+    if (data.signed_at) {
+        document.getElementById('ct-sign-area').style.display = 'none';
+        document.getElementById('ct-already-signed').style.display = 'block';
+        const dt = String(data.signed_at).replace('T',' ').slice(0,16);
+        document.getElementById('ct-signed-at-label').textContent = `서명일시: ${dt}`;
+        // done state용
+        document.getElementById('ct-done-date').textContent = `서명일시: ${dt}`;
+        document.getElementById('progressBar').style.width = '100%';
+        document.getElementById('progressLabel').textContent = '계약 완료';
+    } else {
+        setTimeout(resizeCanvas, 50);
+        updateProgress();
+    }
+}
+
+// ── 스크롤 진행 표시 ──
+function updateProgress() {
+    const doc = document.getElementById('contract-document');
+    if (!doc) return;
+    const rect = doc.getBoundingClientRect();
+    const docBottom = rect.bottom;
+    const winH = window.innerHeight;
+    const pct = Math.min(100, Math.max(0, Math.round(((winH - rect.top) / (docBottom - rect.top)) * 100)));
+    document.getElementById('progressBar').style.width = pct + '%';
+    const label = document.getElementById('progressLabel');
+    if (label) label.textContent = pct >= 100 ? '계약서 확인 완료 — 아래에 서명해 주세요' : `계약서 읽기 ${pct}%`;
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+
+// ── 계약서 로드 ──
+async function loadContract(id) {
+    try {
+        const res = await fetch(`/api/contracts/${id}`);
+        if (!res.ok) throw new Error('not found');
+        const data = await res.json();
+        renderContract(data);
+    } catch (e) {
+        showOnly('ct-empty');
+    }
+}
+
+if (contractId) {
+    loadContract(contractId);
+} else {
+    showOnly('ct-empty');
+}
+
+// ── 동의 체크박스 → 제출 버튼 활성화 ──
+document.getElementById('ack-check').addEventListener('change', function () {
+    document.getElementById('ct-btn-submit').disabled = !this.checked;
+});
+
+// ── 서명 캔버스 ──
+const canvas = document.getElementById('ct-canvas');
+const ctx    = canvas.getContext('2d');
+let drawing  = false, lastX = 0, lastY = 0;
+
+function resizeCanvas() {
+    const ratio = window.devicePixelRatio || 1;
+    const rect  = canvas.getBoundingClientRect();
+    if (rect.width === 0) return;
+    const tmp = document.createElement('canvas');
+    tmp.width  = canvas.width;
+    tmp.height = canvas.height;
+    tmp.getContext('2d').drawImage(canvas, 0, 0);
+    canvas.width  = Math.floor(rect.width  * ratio);
+    canvas.height = Math.floor(rect.height * ratio);
+    ctx.scale(ratio, ratio);
+    ctx.lineWidth   = 2.2;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+    ctx.strokeStyle = '#1a2540';
+    ctx.fillStyle   = '#1a2540';
+    ctx.drawImage(tmp, 0, 0, rect.width, rect.height);
+}
+
+function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    const sx = canvas.width  / (window.devicePixelRatio || 1) / r.width;
+    const sy = canvas.height / (window.devicePixelRatio || 1) / r.height;
+    if (e.touches) return { x: (e.touches[0].clientX - r.left) * sx, y: (e.touches[0].clientY - r.top) * sy };
+    return { x: (e.clientX - r.left) * sx, y: (e.clientY - r.top) * sy };
+}
+
+canvas.addEventListener('mousedown',  e => { e.preventDefault(); drawing=true; const p=pos(e); lastX=p.x; lastY=p.y; ctx.beginPath(); ctx.arc(p.x,p.y,1.1,0,Math.PI*2); ctx.fill(); });
+canvas.addEventListener('mousemove',  e => { if(!drawing)return; e.preventDefault(); const p=pos(e); ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; });
+canvas.addEventListener('mouseup',    () => { drawing=false; });
+canvas.addEventListener('mouseleave', () => { drawing=false; });
+canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing=true; const p=pos(e); lastX=p.x; lastY=p.y; ctx.beginPath(); ctx.arc(p.x,p.y,1.1,0,Math.PI*2); ctx.fill(); }, {passive:false});
+canvas.addEventListener('touchmove',  e => { if(!drawing)return; e.preventDefault(); const p=pos(e); ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; }, {passive:false});
+canvas.addEventListener('touchend',   () => { drawing=false; });
+window.addEventListener('resize', resizeCanvas);
+
+document.getElementById('ct-btn-clear').addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+// ── 서명 제출 ──
+document.getElementById('ct-btn-submit').addEventListener('click', async () => {
+    if (!contractId) return;
+    const errEl = document.getElementById('ct-submit-err');
+    const btn   = document.getElementById('ct-btn-submit');
+
+    const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    const hasSig    = pixelData.some((v, i) => i % 4 !== 3 && v < 200);
+    if (!hasSig) {
+        errEl.textContent = '서명란에 서명을 먼저 해주세요.';
+        errEl.style.display = 'block';
+        return;
+    }
+    errEl.style.display = 'none';
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 제출 중...';
+
+    try {
+        const signature = canvas.toDataURL('image/png');
+        const res = await fetch(`/api/contracts/${contractId}/sign`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ signature })
+        });
+        if (!res.ok) throw new Error('서버 오류');
+
+        // 성공 처리
+        const now = new Date().toLocaleString('ko-KR');
+        document.getElementById('ct-sign-area').style.display = 'none';
+        const signedCard = document.getElementById('ct-already-signed');
+        signedCard.style.display = 'block';
+        document.getElementById('ct-signed-at-label').textContent = `서명일시: ${now}`;
+        document.getElementById('progressBar').style.width = '100%';
+        document.getElementById('progressLabel').textContent = '서명 완료';
+
+        // contractData 업데이트
+        if (contractData) contractData.signed_at = new Date().toISOString();
+
+        signedCard.scrollIntoView({ behavior: 'smooth' });
+    } catch (e) {
+        errEl.textContent = '제출 중 오류가 발생했습니다. 다시 시도해 주세요.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check" style="margin-right:0.25rem;"></i>서명 완료 및 제출';
+    }
+});
+
+// ── PDF 다운로드 ──
+async function downloadPDF() {
+    const pdfBtns = document.querySelectorAll('[id^="btn-pdf"]');
+    pdfBtns.forEach(b => { b.disabled = true; b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 생성 중...'; });
+
+    try {
+        const today = new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit' });
+        const todayFile = today.replace(/\. /g,'-').replace('.','');
+        const d = contractData || {};
+        const sigDataUrl  = canvas.toDataURL('image/png');
+        const sigPixels   = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+        const hasSig      = sigPixels.some((v,i) => i%4!==3 && v<200);
+
+        const el = document.createElement('div');
+        el.style.cssText = 'position:fixed;top:-9999px;left:0;width:700px;padding:44px;background:#fff;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;color:#1a2540;line-height:1.8;box-sizing:border-box;';
+
+        el.innerHTML = `
+          <div style="background:linear-gradient(135deg,#0055b3,#0099d8);color:#fff;padding:24px 32px;border-radius:10px;margin-bottom:28px;">
+            <div style="font-size:10px;opacity:.75;letter-spacing:1px;margin-bottom:4px;">CLEAN &amp; PARTNERS</div>
+            <div style="font-size:22px;font-weight:900;">일용직 근로계약서</div>
+            <div style="font-size:11px;opacity:.8;margin-top:6px;">에어컨 분해·세척 업무 &nbsp;|&nbsp; 발급일: ${today}</div>
+          </div>
+
+          <table style="width:100%;border-collapse:collapse;margin-bottom:18px;font-size:13px;">
+            <tr>
+              <td style="background:#f0f4f8;padding:8px 12px;font-weight:800;width:30%;border:1px solid #e2e8f0;">사업주(갑)</td>
+              <td style="padding:8px 12px;border:1px solid #e2e8f0;">(주)클린앤파트너즈</td>
+              <td style="background:#f0f4f8;padding:8px 12px;font-weight:800;width:20%;border:1px solid #e2e8f0;">근로자(을)</td>
+              <td style="padding:8px 12px;border:1px solid #e2e8f0;font-weight:700;">${d.worker_name||'-'}</td>
+            </tr>
+            <tr>
+              <td style="background:#f0f4f8;padding:8px 12px;font-weight:800;border:1px solid #e2e8f0;">연락처</td>
+              <td style="padding:8px 12px;border:1px solid #e2e8f0;" colspan="3">${d.worker_phone||'-'}</td>
+            </tr>
+          </table>
+
+          <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+            <div style="background:#f0f4f8;padding:8px 14px;font-weight:800;font-size:13px;border-bottom:1px solid #e2e8f0;">2. 근로계약기간 및 근무장소</div>
+            <div style="padding:10px 14px;font-size:13px;">
+              <b>근로계약기간:</b> ${d.contract_period||'-'}<br>
+              <b>근무장소:</b> 작업 현장 주소 또는 '갑'이 지정하는 장소
+            </div>
+          </div>
+
+          <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+            <div style="background:#f0f4f8;padding:8px 14px;font-weight:800;font-size:13px;border-bottom:1px solid #e2e8f0;">3. 업무의 내용</div>
+            <div style="padding:10px 14px;font-size:13px;">에어컨 분해, 세척, 건조, 조립, 시운전 및 작업 후 주변 정리 등 사업주가 지시하는 에어컨 청소 관련 업무 일체</div>
+          </div>
+
+          <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+            <div style="background:#f0f4f8;padding:8px 14px;font-weight:800;font-size:13px;border-bottom:1px solid #e2e8f0;">4. 임금 및 근로조건 (5인 미만 사업장 기준)</div>
+            <div style="padding:10px 14px;font-size:13px;">
+              <b>일급:</b> <span style="color:#0066cc;font-weight:800;">${fmtWage(d.daily_wage)}</span><br>
+              <b>지급조건:</b> 본 사업장은 상시 근로자 5인 미만 사업장으로, 연장·야간·휴일 가산수당(1.5배) 미적용. 주말·공휴일도 합의된 일급으로 지급.<br>
+              <b>지급방법:</b> 근로자 명의 예금계좌 이체 &nbsp; (${d.bank_name||'-'} ${d.bank_account||'-'})<br>
+              <b>지급시기:</b> 매주 금요일 / 지정된 날짜 지급
+            </div>
+          </div>
+
+          <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+            <div style="background:#f0f4f8;padding:8px 14px;font-weight:800;font-size:13px;border-bottom:1px solid #e2e8f0;">5. 사회보험</div>
+            <div style="padding:10px 14px;font-size:13px;">
+              <b>산재보험:</b> 관련 법령에 따라 사업주(갑)가 의무 가입 및 전액 부담<br>
+              <b>고용보험 등:</b> 일용직 근로자 법적 가입 기준에 따라 처리
+            </div>
+          </div>
+
+          <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:18px;">
+            <div style="background:#f0f4f8;padding:8px 14px;font-weight:800;font-size:13px;border-bottom:1px solid #e2e8f0;">6. 안전 및 기타 사항</div>
+            <div style="padding:10px 14px;font-size:13px;">
+              · '을'은 사다리 작업, 고압 세척기 사용 등 위험이 동반되는 업무 특성을 인지하고, 안전 수칙을 엄격히 준수해야 합니다.<br>
+              · 작업 중 고객의 기물 파손이나 훼손이 발생하지 않도록 각별히 주의하여야 합니다.<br>
+              · 본 계약서에 명시되지 않은 사항은 근로기준법 등 관련 노동 관계 법령에 따릅니다.
+            </div>
+          </div>
+
+          <div style="text-align:center;font-size:14px;font-weight:700;margin-bottom:18px;">
+            날 짜 : ${d.contract_date||today}
+          </div>
+
+          <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:18px;">
+            <tr>
+              <td style="background:#f0f4f8;padding:10px 14px;font-weight:800;width:35%;border:1px solid #e2e8f0;">사업주(갑)</td>
+              <td style="padding:10px 14px;border:1px solid #e2e8f0;">(주)클린앤파트너즈 &nbsp;&nbsp; 서명: ___________</td>
+            </tr>
+            <tr>
+              <td style="background:#f0f4f8;padding:10px 14px;font-weight:800;border:1px solid #e2e8f0;">근로자(을) 성명</td>
+              <td style="padding:10px 14px;border:1px solid #e2e8f0;font-weight:700;">${d.worker_name||'-'}</td>
+            </tr>
+          </table>
+
+          <div style="border:1.5px solid #0066cc;border-radius:8px;padding:12px 16px;background:#f9fbff;margin-bottom:20px;">
+            <div style="font-size:11px;font-weight:700;color:#0066cc;margin-bottom:8px;">근로자(을) 서명</div>
+            ${hasSig
+              ? `<img src="${sigDataUrl}" style="width:100%;height:100px;object-fit:contain;background:#fff;border-radius:4px;display:block;">`
+              : `<div style="height:100px;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:13px;background:#fff;border-radius:4px;">(서명 없음)</div>`
+            }
+          </div>
+
+          <div style="border-top:1px solid #e8eef4;padding-top:12px;font-size:11px;color:#94a3b8;text-align:center;">
+            클린앤파트너즈 &nbsp;|&nbsp; 문의: 010-9115-2343
+          </div>
+        `;
+
+        document.body.appendChild(el);
+        const captured = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+        document.body.removeChild(el);
+
+        const { jsPDF } = window.jspdf;
+        const pdf  = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const imgW  = pageW;
+        const imgH  = (captured.height / captured.width) * imgW;
+
+        if (imgH <= pageH) {
+            pdf.addImage(captured.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, imgH);
+        } else {
+            let offsetY = 0;
+            while (offsetY < imgH) {
+                if (offsetY > 0) pdf.addPage();
+                pdf.addImage(captured.toDataURL('image/jpeg', 0.95), 'JPEG', 0, -offsetY, imgW, imgH);
+                offsetY += pageH;
+            }
+        }
+
+        const workerName = (d.worker_name || '근로자').replace(/\s+/g, '_');
+        pdf.save(`근로계약서_${workerName}_${todayFile}.pdf`);
+
+    } catch (e) {
+        alert('PDF 생성 중 오류가 발생했습니다.\n' + e.message);
+    } finally {
+        pdfBtns.forEach(b => {
+            b.disabled = false;
+            b.innerHTML = '<i class="fas fa-file-pdf"></i> PDF 저장';
+        });
+    }
+}
+</script>
+</body>
+</html>

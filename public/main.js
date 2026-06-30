@@ -112,6 +112,7 @@ window.showSection = (sectionId) => {
   else if (sectionId === 'process')       renderProcessEditForm();
   else if (sectionId === 'contacts')      renderContactTable();
   else if (sectionId === 'checklists')    renderChecklistTable();
+  else if (sectionId === 'contracts')     renderContractTable();
   else if (sectionId === 'reviews')       loadReviewsAdmin();
   else if (sectionId === 'hanyoung')      renderHanyoungTable();
   else if (sectionId === 'kids')          renderKidsTable();
@@ -662,6 +663,87 @@ window.copyChecklistLink = (id) => {
   const link = `${location.origin}/care?checklist=${id}`;
   navigator.clipboard.writeText(link)
     .then(() => alert('고객 링크가 클립보드에 복사되었습니다.\n\n' + link))
+    .catch(() => prompt('아래 링크를 복사하세요:', link));
+};
+
+// =============================================
+// 4-D. 근로계약서 관리
+// =============================================
+window.renderContractTable = async () => {
+  const body  = document.getElementById('contractTableBody');
+  const noMsg = document.getElementById('noContractMessage');
+  const total = document.getElementById('contractTotalCount');
+  const signed= document.getElementById('contractSignedCount');
+  if (!body) return;
+
+  const items = await api('GET', '/contracts') || [];
+  if (total)  total.textContent  = `${items.length}건`;
+  if (signed) signed.textContent = `${items.filter(i=>i.signed_at).length}건`;
+
+  body.innerHTML = '';
+  if (items.length === 0) { if (noMsg) noMsg.style.display = 'block'; return; }
+  if (noMsg) noMsg.style.display = 'none';
+
+  const fmtWage = (val) => {
+    const n = parseInt(String(val||'').replace(/[^0-9]/g, ''));
+    return isNaN(n) ? (val||'-') : n.toLocaleString('ko-KR') + '원';
+  };
+
+  items.forEach(item => {
+    const tr = document.createElement('tr');
+    const createdAt = item.created_at ? String(item.created_at).replace('T',' ').slice(0,16) : '-';
+    const signedAt  = item.signed_at  ? String(item.signed_at).replace('T',' ').slice(0,16)  : null;
+    tr.innerHTML = `
+      <td><strong>${item.worker_name}</strong></td>
+      <td>${item.worker_phone}</td>
+      <td style="font-size:0.8rem;">${item.contract_period}</td>
+      <td style="white-space:nowrap;">${fmtWage(item.daily_wage)}</td>
+      <td>
+        ${signedAt
+          ? `<span class="badge confirmed"><i class="fas fa-signature" style="margin-right:3px;"></i>서명완료</span><br><small style="color:#64748b;font-size:0.72rem;">${signedAt}</small>`
+          : `<span class="badge pending">미서명</span>`}
+      </td>
+      <td style="white-space:nowrap;font-size:0.8rem;color:#64748b;">${createdAt}</td>
+      <td><div class="btn-group">
+        <button class="btn-action btn-approve" onclick="copyContractLink(${item.id})" title="링크 복사"><i class="fas fa-link"></i></button>
+        <button class="btn-action btn-delete" onclick="deleteContract(${item.id})" title="삭제"><i class="fas fa-trash"></i></button>
+      </div></td>`;
+    body.appendChild(tr);
+  });
+};
+
+window.handleContractSubmit = async (e) => {
+  e.preventDefault();
+  const payload = {
+    worker_name:     document.getElementById('ctWorkerName').value.trim(),
+    worker_phone:    document.getElementById('ctWorkerPhone').value.trim(),
+    contract_period: document.getElementById('ctContractPeriod').value.trim(),
+    daily_wage:      document.getElementById('ctDailyWage').value.trim(),
+    bank_name:       document.getElementById('ctBankName').value.trim(),
+    bank_account:    document.getElementById('ctBankAccount').value.trim(),
+    contract_date:   document.getElementById('ctContractDate').value,
+  };
+  const result = await api('POST', '/contracts', payload);
+  if (result?.id) {
+    const link = `${location.origin}/contract?id=${result.id}`;
+    if (confirm(`계약서가 등록되었습니다!\n\n근로자 서명 링크:\n${link}\n\n클립보드에 복사하시겠습니까?`)) {
+      navigator.clipboard.writeText(link).catch(() => prompt('아래 링크를 복사하세요:', link));
+    }
+    document.getElementById('contractForm').reset();
+    renderContractTable();
+  }
+};
+
+window.deleteContract = async (id) => {
+  if (!confirm('이 계약서를 삭제하시겠습니까?')) return;
+  await api('DELETE', `/contracts/${id}`);
+  renderContractTable();
+};
+
+window.copyContractLink = (id) => {
+  const link = `${location.origin}/contract?id=${id}`;
+  navigator.clipboard.writeText(link)
+    .then(() => alert('근로자 링크가 클립보드에 복사되었습니다.\n\n' + link))
     .catch(() => prompt('아래 링크를 복사하세요:', link));
 };
 
