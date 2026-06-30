@@ -868,7 +868,7 @@ document.getElementById('ct-btn-submit').addEventListener('click', async () => {
     const btn   = document.getElementById('ct-btn-submit');
 
     const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    const hasSig    = pixelData.some((v, i) => i % 4 !== 3 && v < 200);
+    const hasSig    = pixelData.some((v, i) => i % 4 === 3 && v > 0);
     if (!hasSig) {
         errEl.textContent = '서명란에 서명을 먼저 해주세요.';
         errEl.style.display = 'block';
@@ -927,7 +927,7 @@ async function downloadPDF() {
         const d = contractData || {};
         const sigDataUrl  = canvas.toDataURL('image/png');
         const sigPixels   = ctx.getImageData(0,0,canvas.width,canvas.height).data;
-        const hasSig      = sigPixels.some((v,i) => i%4!==3 && v<200);
+        const hasSig      = sigPixels.some((v,i) => i%4===3 && v>0);
         const empSig      = d.employer_signature || null;
 
         const el = document.createElement('div');
