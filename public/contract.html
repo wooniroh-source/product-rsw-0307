@@ -1094,11 +1094,12 @@ async function downloadPDF() {
         const filename   = `근로계약서_${workerName}_${todayFile}.pdf`;
 
         if (isMobile && mobileWin) {
-            // 미리 열어둔 탭에 bloburl 적용 (iOS 팝업 차단 우회)
-            mobileWin.location.href = pdf.output('bloburl');
+            // blob URL은 생성한 탭 컨텍스트에서만 유효 (iOS 크로스탭 차단)
+            // data URI는 자체 포함이라 탭 간 전달 가능
+            mobileWin.location.href = pdf.output('datauristring');
         } else if (isMobile) {
             // 팝업이 차단된 경우 현재 탭에서 열기
-            location.href = pdf.output('bloburl');
+            location.href = pdf.output('datauristring');
         } else {
             pdf.save(filename);
         }
