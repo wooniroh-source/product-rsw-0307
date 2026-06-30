@@ -930,10 +930,39 @@ document.getElementById('ct-btn-submit').addEventListener('click', async () => {
     }
 });
 
+// ── 카카오톡 인앱 브라우저 안내 모달 ──
+function showKakaoGuide() {
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:16px;padding:1.6rem 1.4rem;max-width:320px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+        <div style="text-align:center;font-size:2rem;margin-bottom:0.6rem;">🌐</div>
+        <h3 style="text-align:center;margin:0 0 0.6rem;font-size:1rem;color:#1a2540;">외부 브라우저에서 열어주세요</h3>
+        <p style="font-size:0.78rem;color:#475569;margin:0 0 0.9rem;line-height:1.7;text-align:center;">카카오톡 내에서는 파일 저장이 제한됩니다.<br>아래 순서로 외부 브라우저를 열어주세요.</p>
+        <div style="background:#f0f4ff;border-radius:10px;padding:0.85rem 1rem;font-size:0.8rem;color:#1e3a5f;line-height:2.1;margin-bottom:1.1rem;">
+          ${isIOS
+            ? `① 화면 하단 <b>···</b> 버튼 탭<br>② <b>"Safari로 열기"</b> 선택<br>③ Safari에서 PDF 저장 버튼 탭`
+            : `① 우측 상단 <b>⋮</b> 버튼 탭<br>② <b>"다른 브라우저로 열기"</b> 선택<br>③ 열린 브라우저에서 PDF 저장 버튼 탭`}
+        </div>
+        <button onclick="this.closest('div').parentNode.remove()"
+          style="width:100%;padding:0.75rem;background:#0066cc;color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;">확인</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+}
+
 // ── PDF 다운로드 ──
 async function downloadPDF() {
     const pdfBtns = document.querySelectorAll('[id^="btn-pdf"]');
     pdfBtns.forEach(b => { b.disabled = true; b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 생성 중...'; });
+
+    // 카카오톡 인앱 브라우저: 파일 저장 불가 → 외부 브라우저 안내
+    if (/KAKAOTALK/i.test(navigator.userAgent)) {
+        pdfBtns.forEach(b => { b.disabled = false; b.innerHTML = '<i class="fas fa-file-pdf"></i> PDF 저장'; });
+        showKakaoGuide();
+        return;
+    }
 
     const isMobile     = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     // Web Share API 파일 공유 지원 여부 (iOS 15+, Android Chrome)
