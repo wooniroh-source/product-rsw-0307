@@ -935,18 +935,36 @@ function showKakaoGuide() {
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+    const pageUrl = location.href;
     overlay.innerHTML = `
       <div style="background:#fff;border-radius:16px;padding:1.6rem 1.4rem;max-width:320px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.18);">
         <div style="text-align:center;font-size:2rem;margin-bottom:0.6rem;">🌐</div>
-        <h3 style="text-align:center;margin:0 0 0.6rem;font-size:1rem;color:#1a2540;">외부 브라우저에서 열어주세요</h3>
-        <p style="font-size:0.78rem;color:#475569;margin:0 0 0.9rem;line-height:1.7;text-align:center;">카카오톡 내에서는 파일 저장이 제한됩니다.<br>아래 순서로 외부 브라우저를 열어주세요.</p>
-        <div style="background:#f0f4ff;border-radius:10px;padding:0.85rem 1rem;font-size:0.8rem;color:#1e3a5f;line-height:2.3;margin-bottom:1.1rem;">
-          ${isIOS
-            ? `① 화면 <b>하단 툴바</b>에서 <b>···</b> 탭<br>② <b>"Safari로 열기"</b> 선택<br>③ Safari에서 PDF 저장 버튼 탭`
-            : `① 화면 <b>하단 툴바</b>에서 <b>⋮</b> 탭<br>② <b>"다른 브라우저로 열기"</b> 선택<br>③ 열린 브라우저에서 PDF 저장 버튼 탭<br><br><span style="color:#64748b;font-size:0.74rem;">* 하단 툴바가 안 보이면 화면을 위로 스크롤하세요</span>`}
+        <h3 style="text-align:center;margin:0 0 0.5rem;font-size:1rem;color:#1a2540;">브라우저에서 열어주세요</h3>
+        <p style="font-size:0.78rem;color:#475569;margin:0 0 1rem;line-height:1.7;text-align:center;">카카오톡 내에서는 PDF 저장이 제한됩니다.<br>아래 방법 중 하나를 선택해 주세요.</p>
+
+        <!-- 방법 1: URL 복사 (가장 확실) -->
+        <div style="background:#f0f9ff;border:1.5px solid #0066cc;border-radius:10px;padding:0.9rem 1rem;margin-bottom:0.8rem;">
+          <div style="font-size:0.75rem;font-weight:700;color:#0066cc;margin-bottom:0.5rem;">방법 1 · URL 복사 후 브라우저에서 열기</div>
+          <button id="kakao-copy-btn"
+            onclick="navigator.clipboard.writeText('${pageUrl}').then(()=>{ document.getElementById('kakao-copy-btn').textContent='✓ 복사 완료!'; document.getElementById('kakao-copy-btn').style.background='#16a34a'; }).catch(()=>{ prompt('아래 주소를 복사하세요', '${pageUrl}'); })"
+            style="width:100%;padding:0.6rem;background:#0066cc;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;margin-bottom:0.4rem;">
+            🔗 주소 복사
+          </button>
+          <div style="font-size:0.72rem;color:#64748b;line-height:1.6;">복사 후 Chrome / Safari 앱을 열고<br>주소창에 붙여넣기 하세요.</div>
         </div>
+
+        <!-- 방법 2: 브라우저로 열기 메뉴 -->
+        <div style="background:#f8fafc;border-radius:10px;padding:0.9rem 1rem;margin-bottom:1rem;">
+          <div style="font-size:0.75rem;font-weight:700;color:#475569;margin-bottom:0.4rem;">방법 2 · 카카오톡 브라우저 메뉴</div>
+          <div style="font-size:0.78rem;color:#334155;line-height:2.1;">
+          ${isIOS
+            ? `① 하단 툴바 <b>···</b> 탭 → <b>"Safari로 열기"</b><br>② Safari에서 PDF 저장 버튼 탭`
+            : `① 하단 툴바 <b>⋮</b> 탭 → <b>"다른 브라우저로 열기"</b><br>② 열린 브라우저에서 PDF 저장 버튼 탭`}
+          </div>
+        </div>
+
         <button onclick="this.closest('div').parentNode.remove()"
-          style="width:100%;padding:0.75rem;background:#0066cc;color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;">확인</button>
+          style="width:100%;padding:0.7rem;background:#e2e8f0;color:#334155;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;">닫기</button>
       </div>`;
     document.body.appendChild(overlay);
     overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
