@@ -1571,6 +1571,7 @@ const cleanRoutes = {
   '/services':    'services.html',
   '/reservation': 'reservation.html',
   '/estimate':    'estimate.html',
+  '/request':     'request.html',
   '/gallery':     'gallery.html',
   '/about':       'about.html',
   '/contact':     'contact.html',
