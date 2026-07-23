@@ -26,6 +26,24 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="클린앤파트너즈">
     <link rel="canonical" href="https://cleannpartners.com/">
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    <script>
+    // 캐시된 메인 배너 이미지를 최우선순위로 프리로드 (재방문 시 이미지 지연 노출 방지)
+    (function () {
+      try {
+        ['hero_first_img_url', 'mid_first_img_url'].forEach(function (key) {
+          var url = localStorage.getItem(key);
+          if (!url) return;
+          var link = document.createElement('link');
+          link.rel = 'preload';
+          link.as = 'image';
+          link.href = url;
+          document.head.appendChild(link);
+        });
+      } catch (e) {}
+    })();
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script type="application/ld+json">
@@ -151,6 +169,15 @@
             <button class="slider-arrow prev" id="hero-prev"><i class="fas fa-chevron-left"></i></button>
             <button class="slider-arrow next" id="hero-next"><i class="fas fa-chevron-right"></i></button>
         </section>
+        <script>
+        (function () {
+          try {
+            var url = localStorage.getItem('hero_first_img_url');
+            var slide = document.querySelector('#hero-slider-container .slide.active');
+            if (url && slide) slide.style.backgroundImage = "linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('" + url + "')";
+          } catch (e) {}
+        })();
+        </script>
 
         <section id="professionalism">
             <div class="section-title">
@@ -195,6 +222,15 @@
             <button class="slider-arrow prev" id="mid-prev"><i class="fas fa-chevron-left"></i></button>
             <button class="slider-arrow next" id="mid-next"><i class="fas fa-chevron-right"></i></button>
         </section>
+        <script>
+        (function () {
+          try {
+            var url = localStorage.getItem('mid_first_img_url');
+            var slide = document.querySelector('#mid-slider-container .slide.active');
+            if (url && slide) slide.style.backgroundImage = "linear-gradient(rgba(0,0,0,0.58),rgba(0,0,0,0.58)),url('" + url + "')";
+          } catch (e) {}
+        })();
+        </script>
 
         <section id="features" style="background: var(--light);">
             <div class="section-title">

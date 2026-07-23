@@ -727,8 +727,12 @@ app.post('/api/reservations', async (req, res) => {
     const svcNames = { wall:'상업용 스탠드 에어컨', stand:'가정용 스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
     const districtLine = district ? `\n서비스 지역 : ${district}` : '';
     const addressLine  = address  ? `\n상세주소   : ${address}` : '';
+    const isRequest = source === 'request';
+    const sourceLabel = isRequest ? '대화형 상담(request)' : '실시간 예약폼';
+    const subjectTag = isRequest ? '[클린앤파트너즈][대화형 상담] 새 예약 접수' : '[클린앤파트너즈] 새 예약 접수';
     const mailBody = `📋 새 예약이 접수되었습니다\n` +
       `──────────────────────\n` +
+      `접수 경로 : ${sourceLabel}\n` +
       `고객명   : ${name}\n` +
       `연락처   : ${phone}` +
       `${addressLine}` +
@@ -737,8 +741,8 @@ app.post('/api/reservations', async (req, res) => {
       `예약 날짜 : ${date}\n` +
       `희망 시간 : ${time}\n` +
       `──────────────────────`;
-    sendMail(`[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`, mailBody);
-    sendWeb3Forms(`[클린앤파트너즈] 새 예약 접수 - ${name} (${date})`, mailBody);
+    sendMail(`${subjectTag} - ${name} (${date})`, mailBody);
+    sendWeb3Forms(`${subjectTag} - ${name} (${date})`, mailBody);
     const smsMsg = `[클린앤파트너즈] 예약접수\n${name} ${phone}\n${date} ${time}`;
     sendSMS(smsMsg, 'SMS');
     res.json({ id: result.insertId });
@@ -783,15 +787,19 @@ app.post('/api/contacts', async (req, res) => {
       'INSERT INTO contacts (name, phone, message, source) VALUES (?, ?, ?, ?)',
       [name, phone, message, source === 'request' ? 'request' : 'form']
     );
+    const isRequest = source === 'request';
+    const sourceLabel = isRequest ? '대화형 상담(request)' : '고객센터 문의폼';
+    const subjectTag = isRequest ? '[클린앤파트너즈][대화형 상담] 새 문의 접수' : '[클린앤파트너즈] 새 문의 접수';
     const contactBody = `💬 새 문의가 접수되었습니다\n` +
       `──────────────────────\n` +
+      `접수 경로 : ${sourceLabel}\n` +
       `고객명   : ${name}\n` +
       `연락처   : ${phone}\n` +
       `──────────────────────\n` +
       `문의 내용 :\n${message}\n` +
       `──────────────────────`;
-    sendMail(`[클린앤파트너즈] 새 문의 접수 - ${name}`, contactBody);
-    sendWeb3Forms(`[클린앤파트너즈] 새 문의 접수 - ${name}`, contactBody);
+    sendMail(`${subjectTag} - ${name}`, contactBody);
+    sendWeb3Forms(`${subjectTag} - ${name}`, contactBody);
     const contactSms = `[클린앤파트너즈] 문의접수\n${name} ${phone}`;
     sendSMS(contactSms, 'SMS');
     res.json({ id: result.insertId });
