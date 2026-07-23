@@ -153,7 +153,7 @@ window.renderReservationTable = async () => {
       <td>${res.phone}</td>
       <td style="font-size:0.82rem;color:#334155;">${res.address || '<span style="color:#bbb;">-</span>'}</td>
       <td>${res.district ? `<span style="background:#eff6ff;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:0.78rem;font-weight:600;">${res.district}</span>` : '<span style="color:#bbb;">-</span>'}</td>
-      <td><span class="service-tag">${serviceMap[res.service]||res.service}</span></td>
+      <td><span class="service-tag">${serviceMap[res.service]||res.service}</span>${res.source==='request'?' <span style="background:#f0e8ff;color:#7c3aed;padding:2px 8px;border-radius:12px;font-size:0.74rem;font-weight:700;white-space:nowrap;">💬 대화형</span>':''}</td>
       <td><span class="badge ${res.status}">${res.status==='pending'?'대기':res.status==='confirmed'?'확정':'취소'}</span></td>
       <td><div class="btn-group">
         ${res.status==='pending'?`<button class="btn-action btn-approve" onclick="updateStatus(${res.id},'confirmed')" title="확정"><i class="fas fa-check"></i></button>`:''}
@@ -536,7 +536,7 @@ window.renderContactTable = async () => {
     const dt = c.created_at ? String(c.created_at).replace('T',' ').slice(0,16) : '-';
     tr.innerHTML = `
       <td class="text-muted" style="white-space:nowrap;">${dt}</td>
-      <td class="text-bold">${c.name}</td>
+      <td class="text-bold">${c.name}${c.source==='request'?' <span style="background:#f0e8ff;color:#7c3aed;padding:2px 8px;border-radius:12px;font-size:0.74rem;font-weight:700;white-space:nowrap;">💬 대화형</span>':''}</td>
       <td>${c.phone}</td>
       <td class="contact-message-cell">${c.message}</td>
       <td><span class="badge ${c.is_read?'confirmed':'pending'}">${c.is_read?'확인완료':'미확인'}</span></td>

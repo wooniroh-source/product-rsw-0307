@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화형 상담 신청 - 클린앤파트너즈</title>
+    <meta name="description" content="챗봇처럼 간편하게 질문에 답하며 에어컨 청소 상담을 신청하세요. 서비스 종류, 지역, 희망 일정만 알려주시면 담당자가 바로 연락드립니다.">
+    <meta name="keywords" content="에어컨청소 상담신청, 대화형 상담, 챗봇 예약, 클린앤파트너즈 상담">
+    <meta name="robots" content="index, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="대화형 상담 신청 - 클린앤파트너즈">
+    <meta property="og:description" content="챗봇처럼 질문에 답하며 간편하게 상담을 신청하세요.">
+    <meta property="og:locale" content="ko_KR">
+    <meta property="og:url" content="https://cleannpartners.com/request">
+    <meta property="og:site_name" content="클린앤파트너즈">
+    <meta name="naver-site-verification" content="3258843bff58fb18d298a19e5b44bfaf86d43c14">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0066cc">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="클린앤파트너즈">
+    <link rel="canonical" href="https://cleannpartners.com/request">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #request-section {
+            padding: 4rem 5% 8rem;
+            max-width: 720px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .request-hero { text-align: center; margin-bottom: 2rem; }
+        .request-hero h1 { font-size: 2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.6rem; }
+        .request-hero p { color: #666; font-size: 0.98rem; }
+
+        .chat-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-window {
+            padding: 1.5rem 1.25rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            min-height: 220px;
+            max-height: 58vh;
+            overflow-y: auto;
+        }
+        .chat-row { display: flex; gap: 0.6rem; align-items: flex-end; }
+        .chat-row.user { justify-content: flex-end; }
+        .chat-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: var(--primary); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; flex-shrink: 0;
+        }
+        .chat-bubble {
+            padding: 0.75rem 1.05rem;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            line-height: 1.55;
+            max-width: 78%;
+            word-break: keep-all;
+            white-space: pre-line;
+        }
+        .chat-row.bot .chat-bubble { background: #f2f5f8; color: var(--dark); border-bottom-left-radius: 4px; }
+        .chat-row.user .chat-bubble { background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
+        .chat-typing { display: flex; gap: 4px; padding: 0.9rem 1.1rem; background: #f2f5f8; border-radius: 16px; border-bottom-left-radius: 4px; width: fit-content; }
+        .chat-typing span {
+            width: 6px; height: 6px; border-radius: 50%; background: #b7c0c9;
+            animation: chatBlink 1.2s infinite ease-in-out;
+        }
+        .chat-typing span:nth-child(2) { animation-delay: 0.15s; }
+        .chat-typing span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes chatBlink { 0%, 80%, 100% { opacity: 0.3; } 40% { opacity: 1; } }
+
+        .chat-input-area {
+            border-top: 1px solid var(--border);
+            padding: 1rem 1.25rem 1.25rem;
+            background: #fafbfc;
+        }
+        .chat-choice-grid { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+        .chat-choice-btn {
+            flex: 1 1 auto;
+            min-width: 46%;
+            padding: 0.8rem 0.9rem;
+            border: 2px solid var(--border);
+            background: #fff;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        .chat-choice-btn:hover { border-color: var(--primary); background: #f0f6ff; color: var(--primary); }
+
+        .chat-field-row { display: flex; gap: 0.6rem; }
+        .chat-input-area input[type="text"],
+        .chat-input-area input[type="tel"],
+        .chat-input-area input[type="date"],
+        .chat-input-area textarea {
+            flex: 1;
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            outline: none;
+            font-family: inherit;
+        }
+        .chat-input-area input:focus,
+        .chat-input-area textarea:focus { border-color: var(--primary); }
+        .chat-input-area textarea { resize: vertical; min-height: 80px; }
+        .chat-send-btn {
+            padding: 0.8rem 1.2rem;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+        .chat-send-btn:hover { background: #1a4fd8; }
+        .chat-send-btn:disabled { background: #ccc; cursor: default; }
+
+        .chat-consent {
+            display: flex; align-items: flex-start; gap: 0.6rem;
+            font-size: 0.85rem; color: #555; margin-bottom: 0.9rem; cursor: pointer;
+        }
+        .chat-consent input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--primary); flex-shrink: 0; }
+        .chat-consent a { color: var(--primary); font-weight: 700; text-decoration: underline; }
+
+        .chat-progress { display: flex; gap: 5px; padding: 0 1.25rem; margin-top: 0.9rem; }
+        .chat-progress span { flex: 1; height: 4px; border-radius: 2px; background: var(--border); }
+        .chat-progress span.done { background: var(--primary); }
+
+        .chat-final-cta { display: flex; flex-direction: column; gap: 0.6rem; }
+        .chat-final-cta a, .chat-final-cta button {
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.85rem; border-radius: 12px; font-weight: 700; font-size: 0.95rem;
+            text-decoration: none; border: none; cursor: pointer; transition: all 0.2s;
+        }
+        .cta-kakao { background: #fee500; color: #3c1e1e; }
+        .cta-kakao:hover { background: #f5da00; }
+        .cta-phone { background: var(--primary); color: #fff; }
+        .cta-phone:hover { background: #1a4fd8; }
+        .cta-restart { background: #eef1f4; color: #555; }
+        .cta-restart:hover { background: #e2e6ea; }
+
+        @media (max-width: 480px) {
+            .request-hero h1 { font-size: 1.6rem; }
+            .chat-bubble { max-width: 86%; font-size: 0.9rem; }
+            .chat-choice-btn { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">클린앤파트너즈</a>
+            <ul class="nav-menu">
+                <li><a href="/">홈</a></li>
+                <li><a href="/services">서비스 안내</a></li>
+                <li><a href="/reservation">실시간 예약</a></li>
+                <li><a href="/estimate">간편 견적</a></li>
+                <li><a href="/request" class="active">대화형 상담</a></li>
+                <li><a href="/gallery">시공 갤러리</a></li>
+                <li><a href="/about">브랜드 소개</a></li>
+                <li><a href="/contact">고객센터</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="tel:15888776" class="nav-phone-btn">
+                    <i class="fas fa-phone"></i>
+                    <span class="phone-label">1588-8776</span>
+                </a>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="request-section">
+            <div class="request-hero">
+                <h1><i class="fas fa-comment-dots" style="color:#00a8e8; margin-right:0.4rem;"></i>대화형 상담 신청</h1>
+                <p>몇 가지 질문에 답해주시면 담당자가 확인 후 바로 연락드립니다.</p>
+            </div>
+
+            <div class="chat-card">
+                <div class="chat-window" id="chat-window"></div>
+                <div class="chat-progress" id="chat-progress"></div>
+                <div class="chat-input-area" id="chat-input-area"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p><strong>클린앤파트너즈</strong> | 프리미엄 에어컨 토탈 케어 전문</p>
+            <p>상담전화: <a href="tel:15888776" style="color:#ccc;">1588-8776</a> | 운영시간: 평일 09:00 ~ 18:00 (주말·공휴일 휴무)</p>
+            <p style="margin-top:0.4rem; font-size:0.85rem; opacity:0.7;">대표: 김미영 | 사업자등록번호: 739-81-03458 | 서울시 영등포로28길 5, 지층 29호</p>
+            <div style="margin-top:1.2rem; display:flex; justify-content:center; gap:2rem; font-size:0.85rem; flex-wrap:wrap;">
+                <a href="/privacy" style="color:#bbb; text-decoration:none;">개인정보처리방침</a>
+                <a href="/contact" style="color:#bbb; text-decoration:none;">고객센터</a>
+                <a href="/estimate" style="color:#bbb; text-decoration:none;">간편 견적</a>
+                <a href="/care" style="color:#bbb; text-decoration:none;" onclick="window.open('/care','care-popup','width=500,height=750,scrollbars=yes,resizable=yes'); return false;">고객관리</a>
+            </div>
+            <p style="margin-top:1rem;">&copy; 2026 클린앤파트너즈. All rights reserved.</p>
+            <p style="margin-top:5px; font-size:0.75rem;"><a href="/admin" style="color:#333; text-decoration:none;">Admin</a></p>
+        </div>
+    </footer>
+
+    <!-- 사이드톡 (PC) & 퀵메뉴 (Mobile) -->
+    <div class="side-talk">
+        <a href="https://open.kakao.com/o/sgJdxooi" target="_blank" rel="noopener" class="side-talk-btn side-talk-kakao">
+            <span class="st-icon"><i class="fas fa-comment-dots"></i></span>
+            <span class="st-label">카카오상담</span>
+        </a>
+        <a href="https://talk.naver.com/ct/w5w574" target="_blank" rel="noopener" class="side-talk-btn side-talk-talktalk">
+            <span class="st-icon"><i class="fas fa-comments"></i></span>
+            <span class="st-label">톡톡상담</span>
+        </a>
+    </div>
+    <nav class="quick-menu">
+        <a href="https://open.kakao.com/o/sgJdxooi" target="_blank" rel="noopener" class="quick-menu-btn quick-menu-kakao">
+            <span class="qm-icon-wrap"><i class="fas fa-comment-dots"></i></span>
+            <span>카카오상담</span>
+        </a>
+        <a href="tel:01091152343" class="quick-menu-btn quick-menu-sms">
+            <span class="qm-icon-wrap"><i class="fas fa-sms"></i></span>
+            <span>문자상담</span>
+        </a>
+        <a href="https://talk.naver.com/ct/w5w574" target="_blank" rel="noopener" class="quick-menu-btn quick-menu-talktalk">
+            <span class="qm-icon-wrap"><i class="fas fa-comments"></i></span>
+            <span>톡톡상담</span>
+        </a>
+    </nav>
+    <script src="main.js?v=30"></script>
+    <script>
+    (function () {
+        const KAKAO_URL = 'https://open.kakao.com/o/sgJdxooi';
+
+        const SERVICE_OPTIONS = [
+            { value: 'stand', label: '가정용 스탠드 에어컨' },
+            { value: 'wall',  label: '상업용 스탠드 에어컨' },
+            { value: 'multi', label: '2-in-1 멀티형' },
+            { value: 'system', label: '천장형 시스템' },
+            { value: 'etc', label: '기타 문의' }
+        ];
+        const TIME_OPTIONS = [
+            { value: '09:00', label: '오전 09:00' },
+            { value: '11:00', label: '오전 11:00' },
+            { value: '14:00', label: '오후 02:00' },
+            { value: '16:00', label: '오후 04:00' },
+            { value: '18:00', label: '오후 06:00' },
+            { value: '시간무관', label: '시간 무관' }
+        ];
+
+        const chatWindow = document.getElementById('chat-window');
+        const inputArea  = document.getElementById('chat-input-area');
+        const progressEl = document.getElementById('chat-progress');
+
+        const TOTAL_STEPS = 6;
+        let stepIndex = 0;
+        const answers = {};
+
+        function renderProgress() {
+            progressEl.innerHTML = '';
+            for (let i = 0; i < TOTAL_STEPS; i++) {
+                const span = document.createElement('span');
+                if (i < stepIndex) span.classList.add('done');
+                progressEl.appendChild(span);
+            }
+        }
+
+        function scrollToBottom() {
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function addUserBubble(text) {
+            const row = document.createElement('div');
+            row.className = 'chat-row user';
+            row.innerHTML = `<div class="chat-bubble"></div>`;
+            row.querySelector('.chat-bubble').textContent = text;
+            chatWindow.appendChild(row);
+            scrollToBottom();
+        }
+
+        function addBotBubble(text) {
+            return new Promise(resolve => {
+                const typingRow = document.createElement('div');
+                typingRow.className = 'chat-row bot';
+                typingRow.innerHTML = `<div class="chat-avatar"><i class="fas fa-robot"></i></div><div class="chat-typing"><span></span><span></span><span></span></div>`;
+                chatWindow.appendChild(typingRow);
+                scrollToBottom();
+                setTimeout(() => {
+                    typingRow.remove();
+                    const row = document.createElement('div');
+                    row.className = 'chat-row bot';
+                    row.innerHTML = `<div class="chat-avatar"><i class="fas fa-robot"></i></div><div class="chat-bubble"></div>`;
+                    row.querySelector('.chat-bubble').textContent = text;
+                    chatWindow.appendChild(row);
+                    scrollToBottom();
+                    resolve();
+                }, 550);
+            });
+        }
+
+        function setInputArea(html) {
+            inputArea.innerHTML = html;
+        }
+
+        function nextStep(n) {
+            stepIndex = n;
+            renderProgress();
+        }
+
+        // ── STEP 0: 서비스 선택 ──
+        async function askService() {
+            nextStep(0);
+            await addBotBubble('안녕하세요! 클린앤파트너즈입니다 😊\n어떤 서비스가 필요하신가요?');
+            const grid = document.createElement('div');
+            grid.className = 'chat-choice-grid';
+            SERVICE_OPTIONS.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'chat-choice-btn';
+                btn.textContent = opt.label;
+                btn.addEventListener('click', () => {
+                    answers.service = opt.value;
+                    addUserBubble(opt.label);
+                    if (opt.value === 'etc') {
+                        askDetail();
+                    } else {
+                        askAddress();
+                    }
+                });
+                grid.appendChild(btn);
+            });
+            setInputArea('');
+            inputArea.appendChild(grid);
+        }
+
+        // ── 분기 A: 에어컨 청소 흐름 ──
+        async function askAddress() {
+            nextStep(1);
+            await addBotBubble('어느 지역/주소에서 진행하시나요?\n예) 서울시 강남구 테헤란로 123');
+            renderTextInput('address', '주소를 입력해주세요', () => askDateTime());
+        }
+
+        async function askDateTime() {
+            nextStep(2);
+            await addBotBubble('희망하시는 날짜와 시간을 선택해주세요.');
+            setInputArea(`
+                <div class="chat-field-row" style="margin-bottom:0.7rem;">
+                    <input type="date" id="chat-date-input" min="${new Date().toISOString().slice(0,10)}">
+                </div>
+                <div class="chat-choice-grid" id="chat-time-grid"></div>
+            `);
+            const grid = document.getElementById('chat-time-grid');
+            TIME_OPTIONS.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'chat-choice-btn';
+                btn.textContent = opt.label;
+                btn.addEventListener('click', () => {
+                    const dateVal = document.getElementById('chat-date-input').value;
+                    if (!dateVal) {
+                        document.getElementById('chat-date-input').focus();
+                        return;
+                    }
+                    answers.date = dateVal;
+                    answers.time = opt.value;
+                    addUserBubble(`${dateVal} / ${opt.label}`);
+                    askName();
+                });
+                grid.appendChild(btn);
+            });
+        }
+
+        async function askName() {
+            nextStep(3);
+            await addBotBubble('성함을 알려주세요.');
+            renderTextInput('name', '성함 입력', () => askPhone());
+        }
+
+        async function askPhone() {
+            nextStep(4);
+            await addBotBubble('마지막으로 연락 가능한 번호를 남겨주세요.');
+            renderTextInput('phone', '010-0000-0000', () => askConsent(), 'tel');
+        }
+
+        async function askConsent() {
+            nextStep(5);
+            await addBotBubble('개인정보 수집에 동의해주시면 접수가 완료됩니다.');
+            setInputArea(`
+                <label class="chat-consent">
+                    <input type="checkbox" id="chat-consent-check">
+                    <span><a href="/privacy" target="_blank">개인정보처리방침</a>에 동의합니다. <strong style="color:#e53e3e;">(필수)</strong><br>
+                    <span style="color:#888;">상담 접수 및 답변 안내를 위해 이름·연락처를 수집합니다.</span></span>
+                </label>
+                <button type="button" class="chat-send-btn" style="width:100%;" id="chat-submit-btn">상담 신청 완료하기</button>
+            `);
+            document.getElementById('chat-submit-btn').addEventListener('click', submitReservation);
+        }
+
+        async function submitReservation() {
+            const consented = document.getElementById('chat-consent-check').checked;
+            if (!consented) { alert('개인정보처리방침 동의가 필요합니다.'); return; }
+            const btn = document.getElementById('chat-submit-btn');
+            btn.disabled = true;
+            btn.textContent = '접수 중...';
+            try {
+                const res = await fetch('/api/reservations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: answers.name,
+                        phone: answers.phone,
+                        address: answers.address,
+                        service: answers.service,
+                        date: answers.date,
+                        time: answers.time,
+                        source: 'request'
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    addUserBubble('개인정보 수집에 동의합니다');
+                    await addBotBubble(`앗, 접수 중 문제가 발생했어요: ${data.error || '알 수 없는 오류'}\n다른 날짜를 다시 선택해주세요.`);
+                    return askDateTime();
+                }
+                addUserBubble('신청 완료');
+                nextStep(6);
+                await addBotBubble('접수 완료! 담당자가 확인 후 빠르게 연락드릴게요 ✅');
+                showFinalCta();
+            } catch (e) {
+                addUserBubble('개인정보 수집에 동의합니다');
+                await addBotBubble('네트워크 오류로 접수에 실패했어요. 다시 시도해주세요.');
+                btn.disabled = false;
+                btn.textContent = '상담 신청 완료하기';
+            }
+        }
+
+        // ── 분기 B: 기타 문의 흐름 ──
+        async function askDetail() {
+            nextStep(1);
+            await addBotBubble('어떤 도움이 필요하신지 편하게 남겨주세요.');
+            setInputArea(`
+                <textarea id="chat-detail-input" placeholder="궁금하신 내용을 입력해주세요"></textarea>
+                <button type="button" class="chat-send-btn" style="width:100%; margin-top:0.6rem;" id="chat-detail-send">다음</button>
+            `);
+            document.getElementById('chat-detail-send').addEventListener('click', () => {
+                const val = document.getElementById('chat-detail-input').value.trim();
+                if (!val) return;
+                answers.message = val;
+                addUserBubble(val);
+                askNameEtc();
+            });
+        }
+
+        async function askNameEtc() {
+            nextStep(3);
+            await addBotBubble('성함을 알려주세요.');
+            renderTextInput('name', '성함 입력', () => askPhoneEtc());
+        }
+
+        async function askPhoneEtc() {
+            nextStep(4);
+            await addBotBubble('연락 가능한 번호를 남겨주세요.');
+            renderTextInput('phone', '010-0000-0000', () => askConsentEtc(), 'tel');
+        }
+
+        async function askConsentEtc() {
+            nextStep(5);
+            await addBotBubble('개인정보 수집에 동의해주시면 접수가 완료됩니다.');
+            setInputArea(`
+                <label class="chat-consent">
+                    <input type="checkbox" id="chat-consent-check">
+                    <span><a href="/privacy" target="_blank">개인정보처리방침</a>에 동의합니다. <strong style="color:#e53e3e;">(필수)</strong><br>
+                    <span style="color:#888;">문의 답변 안내를 위해 이름·연락처를 수집합니다.</span></span>
+                </label>
+                <button type="button" class="chat-send-btn" style="width:100%;" id="chat-submit-btn">문의 접수 완료하기</button>
+            `);
+            document.getElementById('chat-submit-btn').addEventListener('click', submitContact);
+        }
+
+        async function submitContact() {
+            const consented = document.getElementById('chat-consent-check').checked;
+            if (!consented) { alert('개인정보처리방침 동의가 필요합니다.'); return; }
+            const btn = document.getElementById('chat-submit-btn');
+            btn.disabled = true;
+            btn.textContent = '접수 중...';
+            try {
+                const res = await fetch('/api/contacts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: answers.name, phone: answers.phone, message: answers.message, source: 'request' })
+                });
+                if (!res.ok) throw new Error('요청 실패');
+                addUserBubble('신청 완료');
+                nextStep(6);
+                await addBotBubble('문의가 접수되었습니다! 담당자가 확인 후 빠르게 연락드릴게요 ✅');
+                showFinalCta();
+            } catch (e) {
+                addUserBubble('개인정보 수집에 동의합니다');
+                await addBotBubble('네트워크 오류로 접수에 실패했어요. 다시 시도해주세요.');
+                btn.disabled = false;
+                btn.textContent = '문의 접수 완료하기';
+            }
+        }
+
+        // ── 공용: 텍스트 입력 렌더링 ──
+        function renderTextInput(key, placeholder, onNext, type) {
+            type = type || 'text';
+            setInputArea(`
+                <div class="chat-field-row">
+                    <input type="${type}" id="chat-text-input" placeholder="${placeholder}">
+                    <button type="button" class="chat-send-btn" id="chat-text-send">다음</button>
+                </div>
+            `);
+            const input = document.getElementById('chat-text-input');
+            const send = () => {
+                const val = input.value.trim();
+                if (!val) { input.focus(); return; }
+                answers[key] = val;
+                addUserBubble(val);
+                onNext();
+            };
+            document.getElementById('chat-text-send').addEventListener('click', send);
+            input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+            input.focus();
+        }
+
+        function showFinalCta() {
+            const summaryLines = [
+                answers.service && answers.service !== 'etc' ? `서비스: ${SERVICE_OPTIONS.find(o => o.value === answers.service).label}` : null,
+                answers.address ? `지역: ${answers.address}` : null,
+                answers.date ? `희망일정: ${answers.date} ${answers.time || ''}` : null,
+                answers.message ? `문의내용: ${answers.message}` : null,
+                `연락처: ${answers.phone}`
+            ].filter(Boolean).join('\n');
+            const encoded = encodeURIComponent(`[대화형 상담 신청]\n${summaryLines}`);
+            setInputArea(`
+                <div class="chat-final-cta">
+                    <a href="${KAKAO_URL}?text=${encoded}" target="_blank" rel="noopener" class="cta-kakao"><i class="fas fa-comment"></i> 카카오톡으로 추가 상담하기</a>
+                    <a href="tel:15888776" class="cta-phone"><i class="fas fa-phone"></i> 전화로 문의하기 (1588-8776)</a>
+                    <button type="button" class="cta-restart" id="chat-restart-btn"><i class="fas fa-rotate-left"></i> 처음부터 다시 신청하기</button>
+                </div>
+            `);
+            document.getElementById('chat-restart-btn').addEventListener('click', () => {
+                chatWindow.innerHTML = '';
+                for (const k in answers) delete answers[k];
+                askService();
+            });
+        }
+
+        askService();
+    })();
+    </script>
+</body>
+</html>

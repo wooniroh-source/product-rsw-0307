@@ -202,6 +202,7 @@ const htmlRedirects = {
   '/services.html':    '/services',
   '/reservation.html': '/reservation',
   '/estimate.html':    '/estimate',
+  '/request.html':     '/request',
   '/gallery.html':     '/gallery',
   '/about.html':       '/about',
   '/contact.html':     '/contact',
@@ -221,7 +222,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   const p = req.path;
   if (p === '/main.js' || p === '/sw.js' || p.endsWith('.html') ||
-      ['/reservation','/hanyoung','/com','/kids','/services','/estimate','/gallery','/about','/contact','/privacy','/care','/admin','/contract','/'].includes(p)) {
+      ['/reservation','/hanyoung','/com','/kids','/services','/estimate','/request','/gallery','/about','/contact','/privacy','/care','/admin','/contract','/'].includes(p)) {
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.set('Pragma', 'no-cache');
     res.set('Expires', '0');
@@ -318,6 +319,16 @@ async function initDB() {
       console.log('✅ reservations.address 컬럼 추가 완료');
     }
 
+    // 기존 reservations 테이블에 source 컬럼 없으면 추가 (접수 경로: form/request)
+    const [resSourceCols] = await pool.query(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'reservations' AND COLUMN_NAME = 'source'`
+    );
+    if (resSourceCols.length === 0) {
+      await pool.query(`ALTER TABLE reservations ADD COLUMN source VARCHAR(20) DEFAULT 'form'`);
+      console.log('✅ reservations.source 컬럼 추가 완료');
+    }
+
     await runQuery('hanyoung_reservations', `
       CREATE TABLE IF NOT EXISTS hanyoung_reservations (
         id         INT AUTO_INCREMENT PRIMARY KEY,
@@ -380,6 +391,16 @@ async function initDB() {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // 기존 contacts 테이블에 source 컬럼 없으면 추가 (접수 경로: form/request)
+    const [contactSourceCols] = await pool.query(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'contacts' AND COLUMN_NAME = 'source'`
+    );
+    if (contactSourceCols.length === 0) {
+      await pool.query(`ALTER TABLE contacts ADD COLUMN source VARCHAR(20) DEFAULT 'form'`);
+      console.log('✅ contacts.source 컬럼 추가 완료');
+    }
 
     await runQuery('banners', `
       CREATE TABLE IF NOT EXISTS banners (
@@ -691,7 +712,7 @@ app.get('/api/reservations', auth, async (req, res) => {
 
 app.post('/api/reservations', async (req, res) => {
   try {
-    const { name, phone, address, service, date, time, district } = req.body;
+    const { name, phone, address, service, date, time, district, source } = req.body;
 
     const [[closedRow]] = await pool.query(
       'SELECT id FROM closed_dates WHERE close_date = ?', [date]
@@ -700,8 +721,8 @@ app.post('/api/reservations', async (req, res) => {
       return res.status(409).json({ error: '해당 날짜는 예약 마감일입니다.' });
 
     const [result] = await pool.query(
-      'INSERT INTO reservations (name, phone, address, service, date, time, district) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [name, phone, address || null, service, date, time, district || null]
+      'INSERT INTO reservations (name, phone, address, service, date, time, district, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [name, phone, address || null, service, date, time, district || null, source === 'request' ? 'request' : 'form']
     );
     const svcNames = { wall:'상업용 스탠드 에어컨', stand:'가정용 스탠드 에어컨', multi:'2-in-1 멀티형', system:'천장형 시스템' };
     const districtLine = district ? `\n서비스 지역 : ${district}` : '';
@@ -757,10 +778,10 @@ app.get('/api/contacts', auth, async (req, res) => {
 
 app.post('/api/contacts', async (req, res) => {
   try {
-    const { name, phone, message } = req.body;
+    const { name, phone, message, source } = req.body;
     const [result] = await pool.query(
-      'INSERT INTO contacts (name, phone, message) VALUES (?, ?, ?)',
-      [name, phone, message]
+      'INSERT INTO contacts (name, phone, message, source) VALUES (?, ?, ?, ?)',
+      [name, phone, message, source === 'request' ? 'request' : 'form']
     );
     const contactBody = `💬 새 문의가 접수되었습니다\n` +
       `──────────────────────\n` +
