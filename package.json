@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   },
   "engines": {
     "node": ">=18"
@@ -18,5 +20,8 @@
     "mysql2": "^3.9.7",
     "nodemailer": "^8.0.2",
     "resend": "^6.14.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.113.0"
   }
 }
